@@ -17,16 +17,15 @@ import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
 
 export const SignIn = () => {
-const {loginMutation} = useAuth()
-  const onSubmit = async(values) => {
+  const { loginMutation } = useAuth();
+  const onSubmit = async (values) => {
     console.log(values);
     try {
-      const response = await loginMutation.mutateAsync(values)
-      console.log(response)
-      toast("User login successful")
-        
+      const response = await loginMutation.mutateAsync(values);
+      console.log(response);
+      toast("User login successful");
     } catch (error) {
-      console.error("Error during registration:", error); 
+      console.error("Error during registration:", error);
     }
   };
 
@@ -39,9 +38,9 @@ const {loginMutation} = useAuth()
   });
 
   return (
-    <Form {...form} >
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-
+        {/* identifier */}
         <FormField
           control={form.control}
           name="identifier"
@@ -56,7 +55,7 @@ const {loginMutation} = useAuth()
             </FormItem>
           )}
         />
-
+        {/* password */}
         <FormField
           control={form.control}
           name="password"

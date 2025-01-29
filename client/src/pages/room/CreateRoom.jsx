@@ -9,7 +9,7 @@ const CreateRoom = () => {
     const [isCreateRoom,setIsCreateRoom] = useState(true)
 
   return (
-    <div className="flex items-center justify-center flex-col gap-4 h-screen">
+    <div className="flex items-center justify-center flex-col gap-4 max-h-screen mt-20 ">
     <h1 className="text-2xl font-bold">
       {isCreateRoom ? "Create Room" : "Join Room"}
     </h1>

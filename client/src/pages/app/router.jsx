@@ -28,7 +28,7 @@ const RoomRoutes = () => {
       <Routes>
         <Route path="" element={<Room />} />
         <Route path="create" element={<CreateRoom />} />
-        <Route path=":roomId" element={
+        <Route path=":roomId/*" element={
           <RoomLayout />}>
           <Route index element={<RoomDetails />} />
           <Route path="awards" element={<Awards />} />

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { registerSchema } from "@/schema/authSchema";
-import {useAuth} from "@/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth";
 import {
   Form,
   FormItem,
@@ -18,15 +18,14 @@ import { toast } from "react-toastify";
 import { zodResolver } from "./../../../node_modules/@hookform/resolvers/zod/src/zod";
 
 export const SignUp = () => {
- 
-const {registerMutation} = useAuth()
+  const { registerMutation } = useAuth();
 
   const onSubmit = async (values) => {
-    console.log(values)
+    console.log(values);
     try {
-      await registerMutation.mutateAsync(values); 
+      await registerMutation.mutateAsync(values);
     } catch (error) {
-      console.error("Error during registration:", error); 
+      console.error("Error during registration:", error);
     }
   };
 
@@ -43,7 +42,8 @@ const {registerMutation} = useAuth()
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        {/* username */}
         <FormField
           control={form.control}
           name="username"
@@ -58,7 +58,7 @@ const {registerMutation} = useAuth()
             </FormItem>
           )}
         />
-
+        {/* email */}
         <FormField
           control={form.control}
           name="email"
@@ -73,7 +73,7 @@ const {registerMutation} = useAuth()
             </FormItem>
           )}
         />
-
+        {/* name */}
         <FormField
           control={form.control}
           name="fullName"
@@ -88,7 +88,7 @@ const {registerMutation} = useAuth()
             </FormItem>
           )}
         />
-
+        {/* password */}
         <FormField
           control={form.control}
           name="password"
@@ -96,7 +96,11 @@ const {registerMutation} = useAuth()
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Enter your password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
+                  {...field}
+                />
               </FormControl>
 
               <FormMessage />
@@ -104,6 +108,7 @@ const {registerMutation} = useAuth()
           )}
         />
 
+        {/* avatar */}
         <FormField
           control={form.control}
           name="avatar"
@@ -116,7 +121,7 @@ const {registerMutation} = useAuth()
           )}
         />
 
-        <Button type="submit" borderRadius="lg">
+        <Button type="submit"  borderRadius="lg" >
           Submit
         </Button>
       </form>

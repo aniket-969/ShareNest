@@ -1,16 +1,14 @@
-import React from "react";
-
 import { useEffect } from "react";
 import { SignUp } from "@/components/form/RegisterForm";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Register = () => {
- 
+  
   return (
     <>
-      <h1>Register</h1>
-      <div className="w-full max-w-[20rem] ">
+      <h1 className="text-lg">Register</h1>
+      <div className="w-full max-w-[20rem]">
         <SignUp />
       </div>
 

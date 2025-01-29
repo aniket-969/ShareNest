@@ -41,6 +41,7 @@ const SocketProvider = ({ children }) => {
     
     return () => {
       socket.disconnect();
+      console.log("Disconnecting user")
     };
   }, [socket]);
 

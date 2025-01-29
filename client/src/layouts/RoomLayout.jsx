@@ -1,10 +1,10 @@
-
 import { getSocket } from "@/socket";
 import { useEffect } from "react";
-import { Outlet, useParams} from "react-router-dom";
+import { Navigate, Outlet, useParams } from "react-router-dom";
 
 export const RoomLayout = ({ children }) => {
   const { roomId } = useParams();
+  const session = localStorage.getItem("session");
 
   const socket = getSocket();
   useEffect(() => {
@@ -19,11 +19,11 @@ export const RoomLayout = ({ children }) => {
       localStorage.removeItem("currentRoomId");
     };
   }, [roomId]);
-
-
-  return (
+  return session && roomId ? (
     <div className="m-2">
       <Outlet />
     </div>
+  ) : (
+    <Navigate to="/room" />
   );
 };

@@ -7,8 +7,6 @@ import PaymentMethod from "./ui/PaymentMethod";
 export default function QRScanner() {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
-  // console.log(data);
-
  
   if (isLoading) {
     return <Spinner />;
@@ -19,10 +17,10 @@ export default function QRScanner() {
   }
   return (
     <div className="">
-      {data.paymentMethod.length > 0 ? (
+      {data?.paymentMethod?.length > 0 ? (
         <>
           {/* <PaymentMethod /> */}
-          <QRCarousel paymentMethod={data.paymentMethod}/>
+          <QRCarousel paymentMethod={data?.paymentMethod}/>
         </>
       ) : (
         <PaymentMethod />

@@ -1,12 +1,16 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import React from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 const AuthLayout = () => {
-  return (
-    <div className='flex items-center justify-center flex-col gap-4 h-screen'>
-        <Outlet/>
-    </div>
-  )
-}
+  const session = localStorage.getItem("session");
 
-export default AuthLayout
+  return session ? (
+    <Navigate to="/room" />
+  ) : (
+    <div className="flex items-center flex-col gap-6 max-h-screen mt-10">
+      <Outlet />
+    </div>
+  );
+};
+
+export default AuthLayout;
