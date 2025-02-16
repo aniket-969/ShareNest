@@ -11,61 +11,50 @@ import {
   FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useExpense } from "@/hooks/useExpense";
 import { useParams } from "react-router-dom";
 import ParticipantSelector from "../ParticipantsSelector";
 import { useRoom } from "@/hooks/useRoom";
-import { Spinner } from "../ui/spinner";
+import { Spinner } from "@/components/ui/spinner";
+import DatePicker from "@/components/ui/datePicker";
+import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
 
-export const ExpenseForm = () => {
+export const ExpenseForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
-  const { roomQuery } = useRoom(roomId);
-  const { data, isLoading, isError } = roomQuery;
-  if (isLoading) {
-    return <Spinner />;
-  }
-  if (isError) {
-    return <>Something went wrong . Please refresh</>;
-  }
-  const participants = [
-    ...(data.tenants || []),
-    ...(data.landlord ? [data.landlord] : []),
-  ];
   const onSubmit = async (values) => {
-    console.log(values);
-    
+    console.log(values, roomId);
+    // return;
     try {
       const response = await createExpenseMutation.mutateAsync(values, roomId);
       console.log(response);
-      toast("Expense issue added");
+      toast("Splitted Expense ");
     } catch (error) {
       console.error("Error during registration:", error);
     }
   };
- 
+
   const form = useForm({
     resolver: zodResolver(createExpenseSchema),
     defaultValues: {
-      name: "",
-      totalAmount: "",
+      title: "",
+      totalAmount: 0,
       imageUrl: "",
-      dueDate: "",
-      userExpense: [{
-        userId:"",
-        amountOwed:"",
-      }],
+      dueDate: undefined,
+      paidBy: "",
+      participants: [],
     },
   });
-
+  console.log(form.formState.errors);
   return (
     <Form {...form}>
+      {/* title */}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
-          name="name"
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
@@ -77,7 +66,7 @@ export const ExpenseForm = () => {
             </FormItem>
           )}
         />
-
+        {/* Total amount */}
         <FormField
           control={form.control}
           name="totalAmount"
@@ -88,7 +77,7 @@ export const ExpenseForm = () => {
                 <Input
                   placeholder="add total amount"
                   {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  type="number"
                 />
               </FormControl>
 
@@ -96,21 +85,39 @@ export const ExpenseForm = () => {
             </FormItem>
           )}
         />
+        {/* Participants selector with additional charge*/}
+        <FormField
+          control={form.control}
+          name="participants"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Select Participants</FormLabel>
+              <FormControl>
+                <ExpenseParticipantSelector
+                  participants={participants}
+                  form={form}
+                  disabled={field.disabled}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* image or bill link */}
         <FormField
           control={form.control}
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Provider</FormLabel>
+              <FormLabel>Bill image link</FormLabel>
               <FormControl>
                 <Input placeholder="add link of expense" {...field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
-
+        {/* Due date */}
         <FormField
           control={form.control}
           name="dueDate"
@@ -118,27 +125,17 @@ export const ExpenseForm = () => {
             <FormItem>
               <FormLabel>Due Date</FormLabel>
               <FormControl>
-                <Input  {...field} type="date" />
+                <DatePicker
+                  name="dueDate"
+                  field={field}
+                  disableBefore={new Date(new Date().setHours(0, 0, 0, 0))}
+                />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="userExpense"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel> Add Participants</FormLabel>
-              <ParticipantSelector
-                participants={participants}
-                onChange={(selected) => form.setValue("userExpense", selected)}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <Button type="submit">Submit</Button>
       </form>
     </Form>

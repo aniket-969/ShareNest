@@ -14,10 +14,10 @@ const createRoomTask = asyncHandler(async (req, res) => {
     currentAssignee,
     dueDate,
     participants,
-    rotationOrder,
     priority,
     recurring,
     recurrencePattern,
+    recurrenceDays,
     customRecurrence,
     completed,
   } = req.body;
@@ -25,10 +25,31 @@ const createRoomTask = asyncHandler(async (req, res) => {
   if (room.tasks.length >= 40) {
     throw new ApiError(404, "Maximum tasks limit reached");
   }
+
+  let mappedRecurrenceDays = [];
+  let rotationOrder = [];
+
+  if (recurring) {
+    rotationOrder = [...participants];
+    console.log("here is rotation", rotationOrder);
+    const dayMapping = {
+      Sunday: 0,
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+    };
+    mappedRecurrenceDays = recurrenceDays
+      ?.map((day) => dayMapping[day] ?? -1)
+      .filter((num) => num !== -1);
+  }
+
   const task = {
     title,
     description,
-    currentAssignee,
+    currentAssignee: participants[0],
     dueDate,
     participants,
     rotationOrder,
@@ -37,13 +58,14 @@ const createRoomTask = asyncHandler(async (req, res) => {
     recurring,
     recurrencePattern,
     customRecurrence,
+    recurrenceDays: mappedRecurrenceDays,
     createdBy,
   };
+  console.log("This is created task", task);
   room.tasks.push(task);
-
   await room.save();
   const newTask = room.tasks[room.tasks.length - 1];
-  emitSocketEvent(req,roomId,TaskEventEnum.TASK_CREATE_EVENT, newTask)
+  emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, newTask);
   return res.json(new ApiResponse(200, newTask, "Task created successfully"));
 });
 
@@ -71,7 +93,7 @@ const updateRoomTask = asyncHandler(async (req, res) => {
   }
 
   const updatedTask = updatedRoom.tasks.id(taskId);
-  emitSocketEvent(req,roomId,TaskEventEnum.TASK_UPDATED_EVENT,updatedTask)
+  emitSocketEvent(req, roomId, TaskEventEnum.TASK_UPDATED_EVENT, updatedTask);
   return res.json(
     new ApiResponse(200, updatedTask, "Task updated successfully")
   );
@@ -87,11 +109,11 @@ const deleteRoomTask = asyncHandler(async (req, res) => {
   if (taskIndex === -1) {
     throw new ApiError(404, "Task not found in the room");
   }
- 
+
   room.tasks.splice(taskIndex, 1);
 
   await room.save();
-  emitSocketEvent(req,roomId,TaskEventEnum.TASK_DELETE_EVENT,taskId)
+  emitSocketEvent(req, roomId, TaskEventEnum.TASK_DELETE_EVENT, taskId);
 
   return res.json(new ApiResponse(200, {}, "Task deleted successfully"));
 });
@@ -99,7 +121,7 @@ const deleteRoomTask = asyncHandler(async (req, res) => {
 const createSwitchRequest = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;
   const { requestedTo } = req.body;
- 
+
   const updatedRoomTask = await Room.findOneAndUpdate(
     { _id: roomId, "tasks._id": taskId },
     {

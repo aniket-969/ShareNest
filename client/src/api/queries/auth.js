@@ -7,6 +7,7 @@ export const fetchSession = async () => {
 
   console.log("calling getAuth");
   const response = await axiosClient.get(`/${baseAuth}/session`);
+  console.log(response)
   // console.log("Fetched session data",response.data.data)
   localStorage.setItem("session", JSON.stringify(response.data.data));
   return response.data?.data;
@@ -31,7 +32,7 @@ export const refreshTokens = async (data) => {
 export const updateUser = async (data) => {
   return axiosClient.patch(`/${baseAuth}/update-user`, data);
 };
-
+ 
 export const addPayment = async (data) => {
   return axiosClient.patch(`/${baseAuth}/payment`, data);
 };

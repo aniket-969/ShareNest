@@ -32,8 +32,8 @@ const ChatLayout = ({ initialMessages, currentUser }) => {
   }, [socket]);
 
   return (
-    <div className="flex flex-col gap-5 p-2 sm:min-w-[40rem] bgr">
-      <div className="px-4 flex flex-col gap-2 b py-2">
+    <div className="flex flex-col gap-5 p-2 by">
+      <div className="px-4 flex flex-col gap-2 b py-2 ">
         {messages.map((msg) => (
           <ChatMessage
             key={msg._id}

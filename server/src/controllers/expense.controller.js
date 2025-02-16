@@ -7,22 +7,48 @@ import { emitSocketEvent } from "../socket/index.js";
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { name, totalAmount, imageUrl, userExpense, dueDate } = req.body;
-  const paidBy = req.user._id;
-  const participants = userExpense.map((user) => ({
-    user: user.userId,
-    amountOwed: user.amountOwed,
-  }));
+  const { title, totalAmount, imageUrl, dueDate, participants } = req.body;
+  const paidBy = req.user?._id;
+
+  if (!participants || participants.length === 0) {
+    throw new ApiError(400, "At least one participant is required");
+  }
+
+  // Calculate base amount for each participant
+  const baseAmount = totalAmount / participants.length;
+
+  const formattedParticipants = participants.map((participant) => {
+    const additionalCharges =
+      participant.additionalCharges?.map((charge) => ({
+        amount: charge.amount,
+        reason: charge.reason,
+      })) || [];
+
+    const additionalTotal = additionalCharges.reduce(
+      (sum, charge) => sum + charge.amount,
+      0
+    );
+
+    return {
+      user: participant.userId,
+      hasPaid: false,
+      paidDate: null,
+      baseAmount,
+      additionalCharges,
+      totalAmountOwed: baseAmount + additionalTotal,
+    };
+  });
 
   const expense = await Expense.create({
-    name,
-    totalAmount,
+    title,
     paidBy,
     roomId,
+    totalAmount,
     imageUrl,
     dueDate,
-    participants,
+    participants: formattedParticipants,
   });
+
   if (!expense) {
     throw new ApiError(500, "Expense creation failed");
   }

@@ -49,7 +49,7 @@ const RoomList = () => {
     <div className="flex flex-col gap-5 items-center ">
       <h1 className="text-xl font-semibold">Rooms</h1>
       <ScrollArea>
-        <div className="flex flex-col gap-5 h-[15rem] pt-2 pr-2 b">
+        <div className="flex flex-col gap-5 h-[15rem] pt-2 sm:pr-2 ">
           {rooms.map((room) => (
             <Link key={room._id} to={`/room/${room.roomId}`}>
               <Button

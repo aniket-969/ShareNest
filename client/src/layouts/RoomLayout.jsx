@@ -1,29 +1,37 @@
 import { getSocket } from "@/socket";
 import { useEffect } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { useRoomSocket } from "@/context/RoomSocket";
 
-export const RoomLayout = ({ children }) => {
+export const RoomLayout = () => {
   const { roomId } = useParams();
+  const { joinRoom, leaveRoom } = useRoomSocket();
   const session = localStorage.getItem("session");
 
-  const socket = getSocket();
   useEffect(() => {
-    socket.emit("joinRoom", roomId);
-    console.log(`Joined room: ${roomId}`);
-
-    localStorage.setItem("currentRoomId", roomId);
-
-    return () => {
-      socket.emit("leaveRoom", roomId);
-      console.log(`Left room: ${roomId}`);
-      localStorage.removeItem("currentRoomId");
-    };
+    if (roomId) {
+      joinRoom(roomId);
+      return () => leaveRoom(roomId);
+    }
   }, [roomId]);
-  return session && roomId ? (
-    <div className="m-2">
-      <Outlet />
-    </div>
-  ) : (
-    <Navigate to="/room" />
+
+  if (!session || !roomId) {
+    return <Navigate to="/room" />;
+  }
+
+  return (
+    <SidebarProvider>
+      <div className="flex w-full " >
+        <AppSidebar />
+        <main className=" w-full">
+          <SidebarTrigger />
+          <div className="px-2 py-5 w-full">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };

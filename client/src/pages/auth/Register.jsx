@@ -9,7 +9,7 @@ const Register = () => {
     <>
       <h1 className="text-lg">Register</h1>
       <div className="w-full max-w-[20rem]">
-        <SignUp />
+        <SignUp /> 
       </div>
 
       <div className="flex gap-4 items-center">

@@ -76,7 +76,7 @@ export const useAuth = () => {
   const refreshTokensMutation = useMutation({
     mutationFn: refreshTokens,
     onSuccess: (data) => {
-      //  refreshing tokens
+      queryClient.invalidateQueries(["auth", "session"]);
     },
     onError: (error) => {
       console.error("refresh token error:", error);

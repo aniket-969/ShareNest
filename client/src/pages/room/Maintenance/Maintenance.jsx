@@ -1,4 +1,5 @@
 import { MaintenanceForm } from "@/components/form/MaintenanceForm";
+import FormWrapper from "@/components/ui/formWrapper";
 import { getSocket } from "@/socket";
 import { useEffect, useState } from "react";
 
@@ -15,9 +16,9 @@ const Maintenance = ({ maintenance }) => {
         newMaintenance,
       ]);
     };
-const handleUpdateMaintenance = (data)=>{
-console.log(data)
-}
+    const handleUpdateMaintenance = (data) => {
+      console.log(data);
+    };
     socket.on("createMaintenance", handleCreateMaintenance);
 
     socket.on("updateMaintenance", handleUpdateMaintenance);
@@ -28,20 +29,11 @@ console.log(data)
   }, [socket]);
 
   return (
-    <div className="flex flex-col items-center justify-center m-5">
-      <div className="flex flex-col gap-3">
-        {maintenances.map((data) => (
-          <div key={data._id}>
-            <h2>{data.title}</h2>
-            <p>{data.description}</p>
-            <p>{data.maintenanceProvider}</p>
-            <p>{data.status}</p>
-            <p>{data.costEstimate}</p>
-          </div>
-        ))}
-      </div>
-
-      <MaintenanceForm />
+    <div className="flex flex-col gap-6 w-full items-center ">
+      <h2 className="font-bold text-xl">Create Maintenance Request</h2>
+      <FormWrapper>
+        <MaintenanceForm />
+      </FormWrapper>
     </div>
   );
 };

@@ -41,7 +41,7 @@ export const useExpense = (roomId) => {
     staleTime: 30 * 60 * 1000,
     cacheTime: 60 * 60 * 1000,
   });
-
+ 
   // Create an expense
   const createExpenseMutation = useMutation({
     mutationFn: (data) => createExpense(data, roomId),

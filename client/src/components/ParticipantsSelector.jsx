@@ -1,44 +1,80 @@
-import { useRoom } from "@/hooks/useRoom";
 import { useState } from "react";
-import { Spinner } from "./ui/spinner";
-import { useParams } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-const ParticipantSelector = ({ onChange, participants }) => {
+const ParticipantSelector = ({ participants, onChange }) => {
   const [selected, setSelected] = useState([]);
-  const { roomId } = useParams();
+  const [selectionOrder, setSelectionOrder] = useState({});
 
-  //   console.log(participants)
+  const getSortedParticipants = () => {
+    const selectedParticipants = participants.filter((user) =>
+      selected.includes(user._id)
+    );
+
+    selectedParticipants.sort((a, b) => {
+      return selectionOrder[a._id] - selectionOrder[b._id];
+    });
+
+    const unselectedParticipants = participants.filter(
+      (user) => !selected.includes(user._id)
+    );
+
+    return [...selectedParticipants, ...unselectedParticipants];
+  };
+
   const toggleSelection = (participant) => {
-    const isSelected = selected.some((p) => p.userId === participant._id);
-    const updated = isSelected
-      ? selected.filter((p) => p.userId !== participant._id)
-      : [...selected, { userId: participant._id, amountOwed: 10 }];
-    setSelected(updated);
-    onChange(updated);
+    const isSelected = selected.includes(participant._id);
+    let updatedSelected;
+
+    if (isSelected) {
+      updatedSelected = selected.filter((id) => id !== participant._id);
+      setSelectionOrder((prev) => {
+        const newOrder = { ...prev };
+        delete newOrder[participant._id];
+        return newOrder;
+      });
+    } else {
+      updatedSelected = [...selected, participant._id];
+      setSelectionOrder((prev) => {
+        return { ...prev, [participant._id]: Date.now() };
+      });
+    }
+
+    setSelected(updatedSelected);
+    onChange(updatedSelected);
   };
 
   return (
-    <div className="grid gap-2">
-      {participants.map((user) => (
-        <div
-          key={user._id}
-          onClick={() => toggleSelection(user)}
-          className={`flex items-center space-x-2 cursor-pointer ${
-            selected.some((p) => p.userId === user._id) ? "bg-blue-100" : ""
-          }`}
-        >
-          <img
-            src={user.avatar}
-            alt={`${user.fullName} avatar`}
-            className="w-8 h-8 rounded-full"
-          />
-          <div>
-            <p className="font-semibold">{user.username}</p>
-            <p className="text-sm text-gray-500">{user.fullName}</p>
+    <ScrollArea>
+      <div className="grid gap-2 h-[11.6rem] py-2">
+        {getSortedParticipants().map((user) => (
+          <div
+            key={user._id}
+            onClick={() => toggleSelection(user)}
+            className={`flex items-center space-x-2 cursor-pointer px-2 py-1 rounded-lg ${
+              selected.includes(user._id) ? "bg-card text-card-foreground" : ""
+            }`}
+          >
+            <img
+              src={user.avatar}
+              alt={`${user.fullName} avatar`}
+              className="w-8 h-8 rounded-full"
+            /> 
+            <div>
+              <p className="font-semibold">{user.username}</p>
+              <p
+                className={`text-sm ${
+                  selected.includes(user._id)
+                    ? "bg-card text-card-foreground"
+                    : "text-gray-500"
+                }`}
+              >
+                {user.fullName}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </ScrollArea>
   );
 };
 

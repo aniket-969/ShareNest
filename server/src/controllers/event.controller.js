@@ -53,7 +53,7 @@ const deleteCalendarEvent = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Calendar event not found");
   }
   const user = req.user
-  emitSocketEvent(
+  emitSocketEvent( 
     req,
     roomId,
     CalendarEventEnum.CALENDAR_DELETED_EVENT,

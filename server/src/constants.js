@@ -77,5 +77,5 @@ export const ExpenseEventEnum = Object.freeze({
   EXPENSE_DELETED_EVENT: "deletedExpense",
   EXPENSE_UPDATED_EVENT: "updatedExpense",
 });
-
+ 
 export const AvailableExpenseEvents = Object.values(ExpenseEventEnum);

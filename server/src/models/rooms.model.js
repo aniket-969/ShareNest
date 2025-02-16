@@ -66,11 +66,13 @@ const roomSchema = new Schema(
         criteria: {
           type: String,
         },
-        assignedTo: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
+        assignedTo: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+          },
+        ],
       },
     ],
     maintenanceRequests: [
@@ -85,7 +87,6 @@ const roomSchema = new Schema(
         },
         description: {
           type: String,
-          required: true,
         },
         status: {
           type: String,
@@ -126,7 +127,9 @@ const roomSchema = new Schema(
         currentAssignee: {
           type: Schema.Types.ObjectId,
           ref: "User",
-          required: true,
+          required: function () {
+            return this.assignmentMode === "single";
+          }, // Only required if it's a direct assignment
         },
         createdBy: {
           type: Schema.Types.ObjectId,
@@ -139,14 +142,24 @@ const roomSchema = new Schema(
         participants: [
           {
             type: Schema.Types.ObjectId,
-            ref: "user",
+            ref: "User",
             required: true,
           },
         ],
-        rotationOrder: {
-          type: [Schema.Types.ObjectId],
-          ref: "User",
+        rotationOrder: [
+          {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+          },
+        ],
+
+        assignmentMode: {
+          type: String,
+          enum: ["single", "rotation"],
+          default: "single",
+          required: true,
         },
+
         completed: {
           type: Boolean,
           default: false,
@@ -154,7 +167,7 @@ const roomSchema = new Schema(
         priority: {
           type: String,
           enum: ["low", "medium", "high"],
-          default: "medium",
+          default: "low",
         },
         switches: [
           {
@@ -177,11 +190,6 @@ const roomSchema = new Schema(
             acceptCount: { type: Number, default: 0 },
           },
         ],
-        completedBy: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          
-        },
         recurring: {
           type: Boolean,
           default: false,
@@ -190,11 +198,13 @@ const roomSchema = new Schema(
           type: String,
           enum: ["daily", "weekly", "monthly", "custom"],
         },
+        recurrenceDays: [Number],
         customRecurrence: {
-          type: String,
+          type: Number,
         },
       },
-    ], 
+    ],
+
     lastMessage: { type: Schema.Types.ObjectId, ref: "ChatMessage" },
     polls: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vote" }],
   },

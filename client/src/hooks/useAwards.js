@@ -20,7 +20,7 @@ export const useAward = () => {
       enabled: !!roomId,
     });
 
-  // Create a calendar event
+  // Create a custom award
   const createAwardMutation = useMutation({
     mutationFn: ({ data, roomId }) => createRoomAward(roomId, data),
     onSuccess: (data, { roomId }) => {

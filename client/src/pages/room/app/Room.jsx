@@ -1,4 +1,4 @@
-import ProfileCard from "@/components/profileCard";
+import ProfileCard from "@/components/ProfileCard";
 import QRCode from "@/components/QRCode";
 import { RoomHeader } from "@/components/Room/roomHeader";
 import RoomList from "@/components/Room/roomList";
@@ -8,13 +8,14 @@ const Room = () => {
   const session = localStorage.getItem("session");
 
   return session ? (
-    <div className="">
+    <div className=" max-h-screen ">
       <RoomHeader />
-      <div className="flex flex-col gap-10 items-center mt-10 mx-5 pb-20 pt-5 bmain">
+      <div className="flex flex-col gap-10 items-center pt-7 sm:pt-12">
         <ProfileCard />
-        <div className="flex flex-col-reverse justify-around items-center w-full gap-10 sm:flex-row">
+        <div className="flex flex-col-reverse justify-around items-center w-full gap-20 sm:gap-10 sm:flex-row sm:mt-7 ">
           <QRCode />
           <RoomList />
+          
         </div>
       </div>
     </div>

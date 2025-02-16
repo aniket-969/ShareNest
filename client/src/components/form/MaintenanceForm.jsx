@@ -17,11 +17,11 @@ import { useMaintenance } from "./../../hooks/useMaintenance";
 import { useParams } from "react-router-dom";
 
 export const MaintenanceForm = () => {
-    const {roomId} = useParams()
+  const { roomId } = useParams();
   const { createMaintenanceMutation } = useMaintenance(roomId);
   const onSubmit = async (values) => {
     console.log(values);
-    
+    // return;
     try {
       const response = await createMaintenanceMutation.mutateAsync(values);
       console.log(response);
@@ -38,7 +38,7 @@ export const MaintenanceForm = () => {
       description: "",
       maintenanceProvider: "",
       contactPhone: "",
-      costEstimate: "", 
+      costEstimate: "",
     },
   });
 
@@ -109,9 +109,17 @@ export const MaintenanceForm = () => {
             <FormItem>
               <FormLabel>Cost</FormLabel>
               <FormControl>
-                <Input placeholder="add probable cost" {...field} type="number" onChange={(e) => field.onChange(Number(e.target.value))}/>
+                <Input
+                  placeholder="add probable cost"
+                  type="number"
+                  {...field}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value);
+                  }}
+                  value={field.value === "" ? "" : field.value}
+                />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}

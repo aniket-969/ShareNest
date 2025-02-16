@@ -15,33 +15,46 @@ import { Button } from "../ui/button";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { useEvent } from "@/hooks/useEvent";
+import DatePicker from "../ui/datePicker";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const EventsForm = () => {
   const { roomId } = useParams();
-  // console.log(roomId)
+
   const { createEventMutation } = useEvent();
   const onSubmit = async (values) => {
-    console.log(values,roomId);
+    // console.log(values, roomId);
+    // return;
     try {
-      const response = await createEventMutation.mutateAsync({data:values,roomId});
+      const response = await createEventMutation.mutateAsync({
+        data: values,
+        roomId,
+      });
       console.log(response);
       toast(" Events added");
     } catch (error) {
       console.error("Error during registration:", error);
     }
-  }; 
+  };
 
   const form = useForm({
     resolver: zodResolver(createCalendarEventSchema),
     defaultValues: {
-        title: "",
-        description: "",
-        recurrencePattern: "",
-        startDate: "",
-        endDate: "",
-      },
+      title: "",
+      description: "",
+      recurrencePattern: "",
+      startDate: undefined,
+      endDate: undefined,
+      recurring: false,
+    },
   });
-
+  console.log("Form Errors:", form.formState.errors);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -83,17 +96,29 @@ export const EventsForm = () => {
           name="recurrencePattern"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Repeats every-</FormLabel>
+              <FormLabel>Repetition Pattern</FormLabel>
               <FormControl>
-                <Input placeholder="add  " {...field} />
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select pattern" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
         {/* start date */}
+
         <FormField
           control={form.control}
           name="startDate"
@@ -101,15 +126,15 @@ export const EventsForm = () => {
             <FormItem>
               <FormLabel>Start Date</FormLabel>
               <FormControl>
-                <Input placeholder="add start date " {...field} type="date" />
+                <DatePicker name="startDate" field={field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
         {/* end date */}
+
         <FormField
           control={form.control}
           name="endDate"
@@ -117,9 +142,8 @@ export const EventsForm = () => {
             <FormItem>
               <FormLabel>End Date</FormLabel>
               <FormControl>
-                <Input placeholder="add end date" {...field} type="date" />
+                <DatePicker name="endDate" field={field} />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}

@@ -29,7 +29,7 @@ router.route("/session").get(verifyJWT,fetchSession);
 // secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
 
-router.route("/refreshTokens").post(verifyJWT, refreshTokens);
+router.route("/refreshTokens").post(refreshTokens);
 router
   .route("/change-password")
   .post(validate(changePasswordSchema), verifyJWT, changePassword);

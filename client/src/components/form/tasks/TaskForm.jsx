@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { createRoomTaskSchema } from "@/schema/taskSchema";
-import { zodResolver } from "./../../../node_modules/@hookform/resolvers/zod/src/zod";
+import { zodResolver } from "@hookform/resolvers/zod/src/zod";
 import {
   Form,
   FormItem,
@@ -11,19 +11,20 @@ import {
   FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { useTask } from "@/hooks/useTask";
 import { useState } from "react";
-import ParticipantSelector from "../ParticipantsSelector";
+import ParticipantSelector from "../../ParticipantsSelector";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "../ui/select";
+} from "../../ui/select";
+import DatePicker from "@/components/ui/datePicker";
 
 export const TaskForm = ({ participants }) => {
   const { roomId } = useParams();
@@ -37,7 +38,7 @@ export const TaskForm = ({ participants }) => {
       currentAssignee: values.participants[0],
     };
     console.log(values, participants);
-    // return;
+  
 
     try {
       const response = await createTaskMutation.mutateAsync(data);
@@ -52,23 +53,20 @@ export const TaskForm = ({ participants }) => {
     defaultValues: {
       title: "",
       description: "",
-      dueDate: "", // Align with optional date
-      startDate: "", // Align with optional date
+      dueDate: undefined,
+      startDate: undefined,
       participants: [],
-      rotationOrder: undefined, // Allow undefined for optional fields
-      priority: "low",
       recurring: false,
-      recurrencePattern: undefined,
-      customRecurrence: undefined,
-      currentAssignee: undefined, // Allow undefined if optional
+      priority: "low",
+      assignmentMode: "single",
     },
   });
-  //   console.log("Form Errors:", form.formState.errors);
+  // console.log("Form Errors:", form.formState.errors);
   //   const participantsValue = form.watch("participants");
   //   console.log("Participants Value:", participantsValue);
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
         {/* Title */}
         <FormField
           control={form.control}
@@ -126,48 +124,6 @@ export const TaskForm = ({ participants }) => {
           )}
         />
 
-        {/* Recurring Toggle */}
-        <div className="flex items-center">
-          <label className="mr-2">Recurring:</label>
-          <Input
-            type="checkbox"
-            checked={isRecurring}
-            onChange={() => setIsRecurring(!isRecurring)}
-          />
-        </div>
-
-        {isRecurring && (
-          <>
-            <FormField
-              control={form.control}
-              name="recurrencePattern"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Recurrence Pattern</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Daily, Weekly" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="customRecurrence"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Custom Recurrence</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Add custom recurrence" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
-
         {/* Participants Selector */}
         <FormField
           control={form.control}
@@ -194,7 +150,7 @@ export const TaskForm = ({ participants }) => {
             <FormItem>
               <FormLabel>Start Date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <DatePicker name="startDate" field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -202,6 +158,7 @@ export const TaskForm = ({ participants }) => {
         />
 
         {/* End Date */}
+
         <FormField
           control={form.control}
           name="dueDate"
@@ -209,7 +166,7 @@ export const TaskForm = ({ participants }) => {
             <FormItem>
               <FormLabel>Due Date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <DatePicker name="dueDate" field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
