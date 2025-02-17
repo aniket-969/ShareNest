@@ -11,7 +11,7 @@ const Room = () => {
   return session ? (
     <div className=" max-h-screen ">
       <RoomHeader />
-      {/* <div className="flex flex-col gap-10 items-center pt-7 sm:pt-12">
+      <div className="flex flex-col gap-10 items-center pt-7 sm:pt-12">
         <ProfileCard />
         <div className="flex flex-col-reverse justify-around items-center w-full gap-20 sm:gap-10 sm:flex-row sm:mt-7 ">
           <QRCode />
@@ -20,8 +20,8 @@ const Room = () => {
          
           
         </div>
-      </div> */}
-      <RoomLoader/>
+      </div>
+      {/* <RoomLoader/> */}
     </div>
   ) : (
     <Navigate to="/login" />
