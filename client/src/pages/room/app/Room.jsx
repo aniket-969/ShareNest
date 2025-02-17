@@ -2,6 +2,7 @@ import ProfileCard from "@/components/ProfileCard";
 import QRCode from "@/components/QRCode";
 import { RoomHeader } from "@/components/Room/roomHeader";
 import RoomList from "@/components/Room/roomList";
+import RoomListSkeleton from "@/components/skeleton/roomList";
 import { Navigate, Outlet } from "react-router-dom";
 
 const Room = () => {
@@ -14,7 +15,8 @@ const Room = () => {
         <ProfileCard />
         <div className="flex flex-col-reverse justify-around items-center w-full gap-20 sm:gap-10 sm:flex-row sm:mt-7 ">
           <QRCode />
-          <RoomList />
+          {/* <RoomList /> */}
+          <RoomListSkeleton/>
           
         </div>
       </div>
