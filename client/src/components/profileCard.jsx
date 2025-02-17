@@ -19,8 +19,8 @@ const ProfileCard = () => {
         <img className="by rounded-[2.4rem]" src={data.avatar} alt="" />
       </div>
       <div className="flex gap-5">
-        <h2>{data.fullName}</h2>
-        <p>{data.username}</p>
+        <h2 className="br">{data.fullName}</h2>
+        <p className="bb">{data.username}</p>
       </div>
     </div>
   );
