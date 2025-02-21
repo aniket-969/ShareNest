@@ -20,10 +20,10 @@ const RoomDetails = () => {
   if (isError) {
     return <>Something went wrong . Please refresh</>;
   }
-  const participants = [
-    ...(data.tenants || []),
-    ...(data.landlord ? [data.landlord] : []),
-  ];
+  // const participants = [
+  //   ...(data.tenants || []),
+  //   ...(data.landlord ? [data.landlord] : []),
+  // ];
   // console.log(data)
   return (
     <div className="flex flex-col gap-10 ">
