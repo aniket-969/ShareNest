@@ -18,7 +18,13 @@ export const generateQRCode = async (text) => {
 };
 
 export const getAssignee = (task, selectedDate) => {
-  const { assignmentMode, rotationOrder, recurrencePattern, recurrenceDays, startDate } = task;
+  const {
+    assignmentMode,
+    rotationOrder,
+    recurrencePattern,
+    recurrenceDays,
+    startDate,
+  } = task;
 
   if (assignmentMode === "single") {
     return task.currentAssignee;
@@ -54,7 +60,11 @@ export const getAssignee = (task, selectedDate) => {
         index = Math.floor(dayDiff / 7) % rotationOrder.length;
         break;
       case "monthly":
-        index = (selected.getMonth() - start.getMonth() + 12 * (selected.getFullYear() - start.getFullYear())) % rotationOrder.length;
+        index =
+          (selected.getMonth() -
+            start.getMonth() +
+            12 * (selected.getFullYear() - start.getFullYear())) %
+          rotationOrder.length;
         break;
       case "custom":
         // Custom recurrence (e.g., every 3 days, garbage on Tue/Thu/Sat)
@@ -77,14 +87,18 @@ export const getTasksForDate = (tasks, selectedDate) => {
   return tasks
     .filter((task) => {
       const createdTime = new Date(task.createdAt).setHours(0, 0, 0, 0);
-      const diffDays = Math.floor((selectedTime - createdTime) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.floor(
+        (selectedTime - createdTime) / (1000 * 60 * 60 * 24)
+      );
 
       // If the task occurs on a particular rotation schedule
       return diffDays >= 0 && diffDays % task.rotationOrder.length === 0;
     })
     .map((task) => {
       const createdTime = new Date(task.createdAt).setHours(0, 0, 0, 0);
-      const diffDays = Math.floor((selectedTime - createdTime) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.floor(
+        (selectedTime - createdTime) / (1000 * 60 * 60 * 24)
+      );
       const assigneeIndex = diffDays % task.rotationOrder.length;
       const currentAssignee = task.rotationOrder[assigneeIndex];
 
