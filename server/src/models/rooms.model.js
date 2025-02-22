@@ -114,36 +114,35 @@ const roomSchema = new Schema(
     tasks: [
       {
         _id: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           default: () => new mongoose.Types.ObjectId(),
         },
         title: {
           type: String,
           required: true,
         },
-        description: {
+        description: String,
+        createdBy: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        assignmentMode: {
           type: String,
+          enum: ["single", "rotation"],
+          default: "single",
         },
         currentAssignee: {
           type: Schema.Types.ObjectId,
           ref: "User",
           required: function () {
             return this.assignmentMode === "single";
-          }, // Only required if it's a direct assignment
-        },
-        createdBy: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        dueDate: {
-          type: Date,
+          },
         },
         participants: [
           {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
           },
         ],
         rotationOrder: [
@@ -152,56 +151,62 @@ const roomSchema = new Schema(
             ref: "User",
           },
         ],
-
-        assignmentMode: {
-          type: String,
-          enum: ["single", "rotation"],
-          default: "single",
-          required: true,
-        },
-
-        completed: {
-          type: Boolean,
-          default: false,
-        },
-        priority: {
-          type: String,
-          enum: ["low", "medium", "high"],
-          default: "low",
-        },
-        switches: [
-          {
-            requestedBy: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-            requestedTo: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-          },
-        ],
-        switchCountPerUser: [
-          {
-            user: { type: Schema.Types.ObjectId, ref: "User" },
-            requestCount: { type: Number, default: 0 },
-            acceptCount: { type: Number, default: 0 },
-          },
-        ],
         recurring: {
-          type: Boolean,
-          default: false,
+          enabled: {
+            type: Boolean,
+            default: false,
+          },
+          type: {
+            type: String,
+            enum: ["fixed", "dynamic", "mixed"],
+            // fixed: specific days/dates
+            // dynamic: every X days
+            // mixed: combination of both
+          },
+          patterns: [
+            {
+              frequency: {
+                type: String,
+                enum: ["daily", "weekly", "monthly", "custom"],
+              },
+              interval: {
+                type: Number,
+                default: 1, // every X days/weeks/months
+              },
+              days: [Number], // 0-6 for weekdays, 1-31 for monthdays
+              weekOfMonth: {
+                type: String,
+                enum: ["first", "second", "third", "fourth", "last"],
+              },
+              dayOfWeek: {
+                type: Number, // 0-6 representing Sunday to Saturday
+              },
+            },
+          ],
+          startDate: Date,
+          endDate: Date,
         },
-        recurrencePattern: {
+        status: {
           type: String,
-          enum: ["daily", "weekly", "monthly", "custom"],
+          enum: ["pending", "completed", "skipped"],
+          default: "pending",
         },
-        recurrenceDays: [Number],
-        customRecurrence: {
-          type: Number,
-        },
+        completionHistory: [
+          {
+            date: Date,
+            completedBy: {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+            },
+            status: {
+              type: String,
+              enum: ["completed", "skipped", "reassigned"],
+            },
+            notes: String,
+          },
+        ],
+        lastCompletedDate: Date,
+        nextDueDate: Date,
       },
     ],
 
