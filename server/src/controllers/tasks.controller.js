@@ -63,7 +63,6 @@ const createRoomTask = asyncHandler(async (req, res) => {
     priority,
     dueDate,
     recurring: processedRecurrence,
-    status: "pending",
     createdBy,
     lastCompletedDate: null,
     nextDueDate: dueDate

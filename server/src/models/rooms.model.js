@@ -135,9 +135,7 @@ const roomSchema = new Schema(
         currentAssignee: {
           type: Schema.Types.ObjectId,
           ref: "User",
-          required: function () {
-            return this.assignmentMode === "single";
-          },
+          required: true,
         },
         participants: [
           {
@@ -184,7 +182,7 @@ const roomSchema = new Schema(
             },
           ],
           startDate: Date,
-          endDate: Date,
+          dueDate: Date,
         },
         status: {
           type: String,

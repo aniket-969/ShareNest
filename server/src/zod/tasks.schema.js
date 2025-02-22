@@ -1,4 +1,5 @@
 import { objectIdValidation, stringValidation } from "./customValidator.js";
+
 import { z } from "zod";
 
 const completionHistorySchema = z.object({
@@ -23,18 +24,16 @@ const recurringSchema = z.object({
   type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
   patterns: z.array(recurrencePatternSchema).optional(),
   startDate: z.date().optional(),
-  endDate: z.date().optional(),
+  dueDate: z.date().optional(),
 });
 
 const baseTaskValidation = {
-  title: stringValidation(1, 100, "title"),
-  description: z.string().optional(),
+  title: stringValidation(1, 40, "title"),
+  description: stringValidation(1,100,"description").optional(),
   assignmentMode: z.enum(["single", "rotation"]).default("single"),
-  currentAssignee: objectIdValidation.optional(),
   participants: z.array(objectIdValidation),
   rotationOrder: z.array(objectIdValidation).optional(),
   recurring: recurringSchema,
-  status: z.enum(["pending", "completed", "skipped"]).default("pending"),
 };
 
 // Full task schema including all fields
@@ -76,12 +75,12 @@ export const taskSchema = z
         });
       }
 
-      if (data.recurring.startDate && data.recurring.endDate) {
-        if (data.recurring.startDate > data.recurring.endDate) {
+      if (data.recurring.startDate && data.recurring.dueDate) {
+        if (data.recurring.startDate > data.recurring.dueDate) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "endDate must be after startDate",
-            path: ["recurring", "endDate"],
+            message: "dueDate must be after startDate",
+            path: ["recurring", "dueDate"],
           });
         }
       }

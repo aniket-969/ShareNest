@@ -30,7 +30,7 @@ export const processRecurrenceDetails = (recurrenceDetails) => {
       type,
       patterns: processedPatterns,
       startDate: new Date(),
-      endDate: recurrenceDetails.endDate || null
+      dueDate: recurrenceDetails.dueDate || null
     };
   };
   
