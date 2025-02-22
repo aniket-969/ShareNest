@@ -3,7 +3,7 @@ import { objectIdValidation, stringValidation } from "./customValidator.js";
 import { z } from "zod";
 
 const completionHistorySchema = z.object({
-  date: z.date(),
+  date: z.coerce.date(),
   completedBy: objectIdValidation,
   status: z.enum(["completed", "skipped", "reassigned"]),
   notes: z.string().optional(),
@@ -23,8 +23,8 @@ const recurringSchema = z.object({
   enabled: z.boolean().default(false),
   type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
   patterns: z.array(recurrencePatternSchema).optional(),
-  startDate: z.date().optional(),
-  dueDate: z.date().optional(),
+  startDate: z.coerce.date().optional(),
+  dueDate: z.coerce.date().optional(),
 });
 
 const baseTaskValidation = {
@@ -32,7 +32,6 @@ const baseTaskValidation = {
   description: stringValidation(1,100,"description").optional(),
   assignmentMode: z.enum(["single", "rotation"]).default("single"),
   participants: z.array(objectIdValidation),
-  rotationOrder: z.array(objectIdValidation).optional(),
   recurring: recurringSchema,
 };
 
@@ -42,8 +41,8 @@ export const taskSchema = z
     _id: objectIdValidation.optional(),
     ...baseTaskValidation,
     completionHistory: z.array(completionHistorySchema).optional(),
-    lastCompletedDate: z.date().optional(),
-    nextDueDate: z.date().optional(),
+    lastCompletedDate: z.coerce.date().optional(),
+    nextDueDate: z.coerce.date().optional(),
   })
   .superRefine((data, ctx) => {
     // Validate currentAssignee is required when assignmentMode is "single"
@@ -55,14 +54,7 @@ export const taskSchema = z
       });
     }
 
-    // Validate rotation-specific fields
-    if (data.assignmentMode === "rotation" && !data.rotationOrder?.length) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "rotationOrder is required when assignmentMode is 'rotation'",
-        path: ["rotationOrder"],
-      });
-    }
+   
 
     // Validate recurring patterns when enabled
     if (data.recurring.enabled) {
