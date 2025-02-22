@@ -16,7 +16,6 @@ export const DaysOfWeek = {
   SATURDAY: 6,
 } 
 
-// Frontend-specific pattern schema
 const recurrencePatternSchema = z.object({
   frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
   interval: z.number().int().positive().default(1),
@@ -31,17 +30,24 @@ const recurrencePatternSchema = z.object({
   customDays: z.number().min(1).max(300).optional(),
 });
 
+const recurringSchema = z.object({
+  enabled: z.boolean(),
+  type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
+  patterns: z.array(recurrencePatternSchema).optional(),
+});
+// Frontend-specific pattern schema
+
+
 export const createRoomTaskSchema = z.object({
   title: stringValidation(1, 40, "title"),
-  description: stringValidation(1, 100, "description").optional(),
-  assignmentMode: z.enum(["single", "rotation"]).default("single"),
+  description: optionalStringValidation(1, 100, "description"),
+  assignmentMode: z.enum(["single", "rotation"]),
   participants: z.array(objectIdValidation)
     .min(1, "At least one participant is required")
     .max(20, "Maximum 20 participants allowed"),
   
   // Recurring task fields
-  isRecurring: z.boolean().default(false),
-  recurrenceType: z.enum(["fixed", "dynamic", "mixed"]).optional(),
+  recurring:recurringSchema,
   startDate: z.date().optional(),
   dueDate: z.date().optional(),
   pattern: recurrencePatternSchema.optional(),
@@ -56,7 +62,7 @@ export const createRoomTaskSchema = z.object({
   }
 
   // Validate recurring task requirements
-  if (data.isRecurring) {
+  if (data.recurring.enabled) {
     if (!data.pattern) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

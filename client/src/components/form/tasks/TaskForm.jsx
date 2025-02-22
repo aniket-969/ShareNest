@@ -40,29 +40,23 @@ export const TaskForm = ({ participants }) => {
       participants: [],
       recurring: {
         enabled: false,
-        startDate: undefined,
-        dueDate: undefined,
-        type: undefined,
-        patterns: [],
       },
+      startDate: undefined,
+      dueDate: undefined,
     },
   });
 
   const onSubmit = async (values) => {
     try {
-      // Transform form data to match server schema
       const taskData = {
         ...values,
         // Set the first participant as currentAssignee for single mode
-        currentAssignee:
-          values.assignmentMode === "single"
-            ? values.participants[0]
-            : undefined,
+        currentAssignee: values.participants[0],
       };
 
       const response = await createTaskMutation.mutateAsync(taskData);
       toast.success("Task created successfully!");
-      form.reset(); // Reset form after successful submission
+      form.reset();
     } catch (error) {
       toast.error(error.message || "Failed to create task");
       console.error("Error creating task:", error);
@@ -106,7 +100,6 @@ export const TaskForm = ({ participants }) => {
           )}
         />
 
-
         {/* Participants */}
         <FormField
           control={form.control}
@@ -129,7 +122,7 @@ export const TaskForm = ({ participants }) => {
         {/* Start Date */}
         <FormField
           control={form.control}
-          name="recurring.startDate"
+          name="startDate"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Start Date</FormLabel>
@@ -144,7 +137,7 @@ export const TaskForm = ({ participants }) => {
         {/* Due Date */}
         <FormField
           control={form.control}
-          name="recurring.dueDate"
+          name="dueDate"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Due Date</FormLabel>
