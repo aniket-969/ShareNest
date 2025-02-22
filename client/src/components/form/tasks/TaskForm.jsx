@@ -57,7 +57,6 @@ export const TaskForm = ({ participants }) => {
       startDate: undefined,
       participants: [],
       recurring: false,
-      priority: "low",
       assignmentMode: "single",
     },
   });
@@ -91,33 +90,6 @@ export const TaskForm = ({ participants }) => {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Input placeholder="Add description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Priority */}
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priority</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
