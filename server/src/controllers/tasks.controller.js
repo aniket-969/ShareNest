@@ -11,61 +11,67 @@ const createRoomTask = asyncHandler(async (req, res) => {
   const {
     title,
     description,
-    currentAssignee,
-    dueDate,
+    assignmentMode = "single",
     participants,
     priority,
-    recurring,
-    recurrencePattern,
-    recurrenceDays,
-    customRecurrence,
-    completed,
+    dueDate,
+    recurring = false,
+    recurrenceDetails
   } = req.body;
+
+  // Validate room exists and check task limit
   const room = await Room.findById(roomId);
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
   if (room.tasks.length >= 40) {
-    throw new ApiError(404, "Maximum tasks limit reached");
+    throw new ApiError(400, "Maximum tasks limit reached");
   }
 
-  let mappedRecurrenceDays = [];
-  let rotationOrder = [];
-
-  if (recurring) {
-    rotationOrder = [...participants];
-    console.log("here is rotation", rotationOrder);
-    const dayMapping = {
-      Sunday: 0,
-      Monday: 1,
-      Tuesday: 2,
-      Wednesday: 3,
-      Thursday: 4,
-      Friday: 5,
-      Saturday: 6,
-    };
-    mappedRecurrenceDays = recurrenceDays
-      ?.map((day) => dayMapping[day] ?? -1)
-      .filter((num) => num !== -1);
+  // Validate participants are in the room
+  const invalidParticipants = participants.filter(
+    participantId => !room.members.includes(participantId)
+  );
+  if (invalidParticipants.length > 0) {
+    throw new ApiError(400, "Some participants are not members of this room");
   }
 
+  // Process recurrence settings
+  let processedRecurrence = {
+    enabled: false
+  };
+
+  if (recurring && recurrenceDetails) {
+    processedRecurrence = processRecurrenceDetails(recurrenceDetails);
+  }
+
+  // Create task object
   const task = {
     title,
     description,
-    currentAssignee: participants[0],
-    dueDate,
+    assignmentMode,
+    currentAssignee: participants[0], 
     participants,
-    rotationOrder,
-    completed,
+    rotationOrder: assignmentMode === "rotation" ? [...participants] : [],
     priority,
-    recurring,
-    recurrencePattern,
-    customRecurrence,
-    recurrenceDays: mappedRecurrenceDays,
+    dueDate,
+    recurring: processedRecurrence,
+    status: "pending",
     createdBy,
+    lastCompletedDate: null,
+    nextDueDate: calculateNextDueDate(dueDate, processedRecurrence),
+    completionHistory: []
   };
-  console.log("This is created task", task);
+
+  // Add task to room
   room.tasks.push(task);
   await room.save();
+
   const newTask = room.tasks[room.tasks.length - 1];
+  
+  // Emit socket event
   emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, newTask);
+  
   return res.json(new ApiResponse(200, newTask, "Task created successfully"));
 });
 
