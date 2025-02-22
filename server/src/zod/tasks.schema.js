@@ -26,18 +26,23 @@ const recurringSchema = z.object({
   endDate: z.date().optional(),
 });
 
+const baseTaskValidation = {
+  title: stringValidation(1, 100, "title"),
+  description: z.string().optional(),
+  createdBy: objectIdValidation,
+  assignmentMode: z.enum(["single", "rotation"]).default("single"),
+  currentAssignee: objectIdValidation.optional(),
+  participants: z.array(objectIdValidation),
+  rotationOrder: z.array(objectIdValidation).optional(),
+  recurring: recurringSchema,
+  status: z.enum(["pending", "completed", "skipped"]).default("pending"),
+};
+
+// Full task schema including all fields
 export const taskSchema = z
   .object({
     _id: objectIdValidation.optional(),
-    title: stringValidation(1, 100, "title"),
-    description: z.string().optional(),
-    createdBy: objectIdValidation,
-    assignmentMode: z.enum(["single", "rotation"]).default("single"),
-    currentAssignee: objectIdValidation.optional(),
-    participants: z.array(objectIdValidation),
-    rotationOrder: z.array(objectIdValidation).optional(),
-    recurring: recurringSchema,
-    status: z.enum(["pending", "completed", "skipped"]).default("pending"),
+    ...baseTaskValidation,
     completionHistory: z.array(completionHistorySchema).optional(),
     lastCompletedDate: z.date().optional(),
     nextDueDate: z.date().optional(),
@@ -84,36 +89,16 @@ export const taskSchema = z
     }
   });
 
-export const createRoomTaskSchema = z.object({
-  title: stringValidation(1, 100, "title"),
-  description: z.string().optional(),
-  createdBy: objectIdValidation,
-  assignmentMode: z.enum(["single", "rotation"]).default("single"),
-  currentAssignee: objectIdValidation.optional(),
-  participants: z.array(objectIdValidation),
-  rotationOrder: z.array(objectIdValidation).optional(),
-  recurring: recurringSchema,
-  status: z.enum(["pending", "completed", "skipped"]).default("pending"),
-});
+// Create schema without auto-generated fields
+export const createRoomTaskSchema = z.object(baseTaskValidation);
 
-export const updateRoomTaskSchema = z.object({
-  roomId: objectIdValidation,
-  taskId: objectIdValidation,
-  title: stringValidation(1, 20, "title").optional(),
-  description: stringValidation(5, 50, "description").optional(),
-  currentAssignee: objectIdValidation.optional(),
-  dueDate: z
-    .string()
-    .transform((val) => new Date(val))
-    .refine((date) => !isNaN(date.getTime()), {
-      message: "Invalid date format",
-    })
-    .optional(),
-  participants: z.array(objectIdValidation).optional(),
-  rotationOrder: stringValidation(1, 20, "rotationOrder").optional(),
-  completed: z.boolean().optional(),
-  priority: z.enum(["low", "medium", "high"]).optional(),
-  recurring: z.boolean().optional(),
-  recurrencePattern: stringValidation(1, 20, "recurrence pattern").optional(),
-  customRecurrence: stringValidation(1, 20, "custom recurrence").optional(),
-});
+// Update schema with all fields optional
+export const updateRoomTaskSchema = z.object(
+  Object.entries(baseTaskValidation).reduce(
+    (acc, [key, schema]) => ({
+      ...acc,
+      [key]: schema.optional(),
+    }),
+    {}
+  )
+);
