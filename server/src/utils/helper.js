@@ -1,4 +1,4 @@
-const processRecurrenceDetails = (recurrenceDetails) => {
+export const processRecurrenceDetails = (recurrenceDetails) => {
     const {
       type,
       patterns
@@ -36,7 +36,7 @@ const processRecurrenceDetails = (recurrenceDetails) => {
   
   
  // Helper function to calculate next due date
- const calculateNextDueDate = (dueDate, recurring) => {
+ export const calculateNextDueDate = (dueDate, recurring) => {
     if (!recurring.enabled) return new Date(dueDate);
   
     // Calculate the next occurrence based on recurrence patterns

@@ -29,7 +29,6 @@ const recurringSchema = z.object({
 const baseTaskValidation = {
   title: stringValidation(1, 100, "title"),
   description: z.string().optional(),
-  createdBy: objectIdValidation,
   assignmentMode: z.enum(["single", "rotation"]).default("single"),
   currentAssignee: objectIdValidation.optional(),
   participants: z.array(objectIdValidation),
@@ -89,16 +88,6 @@ export const taskSchema = z
     }
   });
 
-// Create schema without auto-generated fields
 export const createRoomTaskSchema = z.object(baseTaskValidation);
 
-// Update schema with all fields optional
-export const updateRoomTaskSchema = z.object(
-  Object.entries(baseTaskValidation).reduce(
-    (acc, [key, schema]) => ({
-      ...acc,
-      [key]: schema.optional(),
-    }),
-    {}
-  )
-);
+export const updateRoomTaskSchema = z.object(baseTaskValidation).partial();
