@@ -1,52 +1,100 @@
-import { z } from "zod";
 import { objectIdValidation, stringValidation } from "./customValidator.js";
- 
-export const createRoomTaskSchema = z
-  .object({
-    title: stringValidation(1, 20, "title"),
-    description: stringValidation(5, 50, "description").optional(),
-    assignmentMode: z.enum(["single", "rotation"]),
-    dueDate: z.coerce.date().optional(),
-    startDate: z.coerce.date().optional(),
-    participants: z.array(objectIdValidation),
-    priority: z.enum(["low", "medium", "high"]).optional(),
-    recurring: z.boolean().optional(),
-    recurrencePattern: stringValidation(1, 20, "recurrence pattern").optional(),
-    recurrenceDays: z
-    .array(
-      z.enum([
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ])
-    )
-    .optional()
-  ,
-    customRecurrence: z.coerce.number()
-    .max(300, { message: "Maximum allowed value for custom recurrence is 300" })
-    .min(1, { message: "Minimum one digit is required" })
+import { z } from "zod";
+
+const completionHistorySchema = z.object({
+  date: z.date(),
+  completedBy: objectIdValidation,
+  status: z.enum(["completed", "skipped", "reassigned"]),
+  notes: z.string().optional(),
+});
+
+const recurrencePatternSchema = z.object({
+  frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
+  interval: z.number().int().positive().default(1),
+  days: z.array(z.number().min(0).max(31)).optional(),
+  weekOfMonth: z
+    .enum(["first", "second", "third", "fourth", "last"])
     .optional(),
+  dayOfWeek: z.number().min(0).max(6).optional(),
+});
+
+const recurringSchema = z.object({
+  enabled: z.boolean().default(false),
+  type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
+  patterns: z.array(recurrencePatternSchema).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+});
+
+export const taskSchema = z
+  .object({
+    _id: objectIdValidation.optional(),
+    title: stringValidation(1, 100, "title"),
+    description: z.string().optional(),
+    createdBy: objectIdValidation,
+    assignmentMode: z.enum(["single", "rotation"]).default("single"),
+    currentAssignee: objectIdValidation.optional(),
+    participants: z.array(objectIdValidation),
+    rotationOrder: z.array(objectIdValidation).optional(),
+    recurring: recurringSchema,
+    status: z.enum(["pending", "completed", "skipped"]).default("pending"),
+    completionHistory: z.array(completionHistorySchema).optional(),
+    lastCompletedDate: z.date().optional(),
+    nextDueDate: z.date().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.recurring) {
-      const hasRecurrenceDays =
-        data.recurrenceDays && data.recurrenceDays.length > 0;
-      const hasRecurrencePattern = !!data.recurrencePattern;
-      const hasCustomRecurrence = !!data.customRecurrence;
+    // Validate currentAssignee is required when assignmentMode is "single"
+    if (data.assignmentMode === "single" && !data.currentAssignee) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "currentAssignee is required when assignmentMode is 'single'",
+        path: ["currentAssignee"],
+      });
+    }
 
-      if (!hasRecurrenceDays && !hasRecurrencePattern && !hasCustomRecurrence) {
+    // Validate rotation-specific fields
+    if (data.assignmentMode === "rotation" && !data.rotationOrder?.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "rotationOrder is required when assignmentMode is 'rotation'",
+        path: ["rotationOrder"],
+      });
+    }
+
+    // Validate recurring patterns when enabled
+    if (data.recurring.enabled) {
+      if (data.recurring.type && !data.recurring.patterns?.length) {
         ctx.addIssue({
-          path: ["recurrenceDays"],
+          code: z.ZodIssueCode.custom,
           message:
-            "At least one of recurrenceDays, recurrencePattern, or customRecurrence must be provided",
+            "patterns are required when recurring is enabled with a type",
+          path: ["recurring", "patterns"],
         });
+      }
+
+      if (data.recurring.startDate && data.recurring.endDate) {
+        if (data.recurring.startDate > data.recurring.endDate) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "endDate must be after startDate",
+            path: ["recurring", "endDate"],
+          });
+        }
       }
     }
   });
+
+export const createRoomTaskSchema = z.object({
+  title: stringValidation(1, 100, "title"),
+  description: z.string().optional(),
+  createdBy: objectIdValidation,
+  assignmentMode: z.enum(["single", "rotation"]).default("single"),
+  currentAssignee: objectIdValidation.optional(),
+  participants: z.array(objectIdValidation),
+  rotationOrder: z.array(objectIdValidation).optional(),
+  recurring: recurringSchema,
+  status: z.enum(["pending", "completed", "skipped"]).default("pending"),
+});
 
 export const updateRoomTaskSchema = z.object({
   roomId: objectIdValidation,
