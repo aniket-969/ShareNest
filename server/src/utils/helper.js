@@ -35,4 +35,18 @@ const processRecurrenceDetails = (recurrenceDetails) => {
   };
   
   
- 
+ // Helper function to calculate next due date
+ const calculateNextDueDate = (dueDate, recurring) => {
+    if (!recurring.enabled) return new Date(dueDate);
+  
+    // Calculate the next occurrence based on recurrence patterns
+    let nextDate = new Date(dueDate);
+    const today = new Date();
+  
+    if (nextDate < today) {
+      // If the due date is in the past, calculate the next occurrence
+      nextDate = calculateNextOccurrence(today, recurring);
+    }
+  
+    return nextDate;
+  };
