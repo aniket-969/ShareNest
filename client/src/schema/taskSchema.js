@@ -14,7 +14,7 @@ export const DaysOfWeek = {
   THURSDAY: 4,
   FRIDAY: 5,
   SATURDAY: 6,
-} as const;
+} 
 
 // Frontend-specific pattern schema
 const recurrencePatternSchema = z.object({
