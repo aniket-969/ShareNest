@@ -18,7 +18,7 @@ export const DaysOfWeek = {
 
 const recurrencePatternSchema = z.object({
   frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
-  interval: z.number().int().positive().default(1),
+  interval: z.coerce.number().int().positive().default(1),
   // For weekly recurrence
   selectedDays: z.array(z.number().min(0).max(6)).optional(),
   // For monthly recurrence
