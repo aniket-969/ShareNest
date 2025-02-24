@@ -74,7 +74,7 @@ export const RecurringTaskForm = ({ participants }) => {
       console.error("Error creating task:", error);
     }
   };
-
+ 
   const form = useForm({
     resolver: zodResolver(createRoomTaskSchema),
     defaultValues: {
@@ -261,7 +261,6 @@ export const RecurringTaskForm = ({ participants }) => {
         />
 
         {/* End Date */}
-
         <FormField
           control={form.control}
           name="dueDate"

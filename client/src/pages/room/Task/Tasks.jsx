@@ -12,7 +12,7 @@ import { getSocket } from "@/socket";
 
 const Tasks = () => {
   const { roomId } = useParams();
-  const [recurringTask, setRecurringTask] = useState(false);
+  const [recurringTask, setRecurringTask] = useState(true);
   const { roomQuery } = useRoom(roomId);
   const queryClient = useQueryClient();
   const socket = getSocket();
