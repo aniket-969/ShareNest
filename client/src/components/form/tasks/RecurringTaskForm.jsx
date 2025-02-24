@@ -86,13 +86,13 @@ export const RecurringTaskForm = ({ participants }) => {
       recurring: {
         enabled: true,
         type: "fixed",
-        patterns: [
-          {
+        patterns: 
+          [{
             frequency: "daily",
             interval: "1",
-            days: [],
-          },
-        ],
+            days: [],}
+          ],
+        
         startDate: undefined,
         dueDate: undefined,
       },
@@ -123,7 +123,7 @@ export const RecurringTaskForm = ({ participants }) => {
     "November",
     "December",
   ];
-
+console.log(form.watch("recurring.patterns"))
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -249,7 +249,7 @@ export const RecurringTaskForm = ({ participants }) => {
         {recurrenceType === "weekly" && (
           <FormField
             control={form.control}
-            name="recurring.patterns[0].days"
+            name="recurring.patterns.days"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Select Days of the Week</FormLabel>
@@ -269,7 +269,7 @@ export const RecurringTaskForm = ({ participants }) => {
         {recurrenceType === "monthly" && (
           <FormField
             control={form.control}
-            name="recurring.patterns[0].days"
+            name="recurring.patterns.days"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Select Days of the Month</FormLabel>

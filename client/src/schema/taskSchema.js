@@ -19,17 +19,11 @@ export const DaysOfWeek = {
 const recurrencePatternSchema = z.object({
   frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
   interval: z.coerce.number().int().positive().default(1),
-  // For weekly recurrence
-  selectedDays: z.array(z.number().min(0).max(6)).optional(),
-  // For monthly recurrence
-  monthlyOption: z.enum(["dayOfMonth", "dayOfWeek"]).optional(),
-  dayOfMonth: z.number().min(1).max(31).optional(),
+  days: z.array(z.number().min(0).max(31)).optional(),
   weekOfMonth: z
     .enum(["first", "second", "third", "fourth", "last"])
     .optional(),
   dayOfWeek: z.number().min(0).max(6).optional(),
-  // For custom recurrence
-  customDays: z.number().min(1).max(300).optional(),
 });
 
 const recurringSchema = z.object({
@@ -37,7 +31,6 @@ const recurringSchema = z.object({
   type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
   patterns: z.array(recurrencePatternSchema).optional(),
 });
-// Frontend-specific pattern schema
 
 export const createRoomTaskSchema = z
   .object({
@@ -53,7 +46,6 @@ export const createRoomTaskSchema = z
     recurring: recurringSchema,
     startDate: z.date().optional(),
     dueDate: z.date().optional(),
-    pattern: recurrencePatternSchema.optional(),
   })
   .superRefine((data, ctx) => {
     // Validate dates
@@ -67,7 +59,7 @@ export const createRoomTaskSchema = z
 
     // Validate recurring task requirements
     if (data.recurring.enabled) {
-      if (!data.pattern) {
+      if (!data.recurring.patterns) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Recurrence pattern is required for recurring tasks",
@@ -76,8 +68,7 @@ export const createRoomTaskSchema = z
         return;
       }
 
-      const pattern = data.pattern;
-
+      const pattern = data.recurring.patterns;
       // Validate pattern based on frequency
       switch (pattern.frequency) {
         case "weekly":
