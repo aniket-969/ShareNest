@@ -64,8 +64,8 @@ export const RecurringTaskForm = ({ participants }) => {
         ],
       },
     };
-    console.log(formattedData);
-    return;
+    // console.log(formattedData);
+    // return;
 
     try {
       const response = await createTaskMutation.mutateAsync(values);
@@ -123,7 +123,7 @@ export const RecurringTaskForm = ({ participants }) => {
     "November",
     "December",
   ];
-console.log(form.watch("recurring.patterns"))
+// console.log(form.watch("recurring.patterns"))
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
