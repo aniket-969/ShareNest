@@ -1,5 +1,4 @@
 import { objectIdValidation, stringValidation } from "./customValidator.js";
-
 import { z } from "zod";
 
 const completionHistorySchema = z.object({
@@ -20,19 +19,19 @@ const recurrencePatternSchema = z.object({
 });
 
 const recurringSchema = z.object({
-  enabled: z.boolean().default(false),
+  enabled: z.boolean(),
   type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
   patterns: z.array(recurrencePatternSchema).optional(),
-  startDate: z.coerce.date().optional(),
-  dueDate: z.coerce.date().optional(),
 });
 
 const baseTaskValidation = {
   title: stringValidation(1, 40, "title"),
-  description: stringValidation(1,100,"description").optional(),
+  description: stringValidation(1, 100, "description").optional(),
   assignmentMode: z.enum(["single", "rotation"]).default("single"),
   participants: z.array(objectIdValidation),
   recurring: recurringSchema,
+  startDate: z.coerce.date().optional(),
+  dueDate: z.coerce.date().optional(),
 };
 
 // Full task schema including all fields
@@ -40,43 +39,74 @@ export const taskSchema = z
   .object({
     _id: objectIdValidation.optional(),
     ...baseTaskValidation,
-    completionHistory: z.array(completionHistorySchema).optional(),
     lastCompletedDate: z.coerce.date().optional(),
     nextDueDate: z.coerce.date().optional(),
   })
   .superRefine((data, ctx) => {
-    // Validate currentAssignee is required when assignmentMode is "single"
-    if (data.assignmentMode === "single" && !data.currentAssignee) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "currentAssignee is required when assignmentMode is 'single'",
-        path: ["currentAssignee"],
-      });
-    }
 
-   
-
-    // Validate recurring patterns when enabled
+    // 🔄 Recurrence validation if enabled
     if (data.recurring.enabled) {
-      if (data.recurring.type && !data.recurring.patterns?.length) {
+      const { type, patterns } = data.recurring;
+
+      // ✅ patterns must exist when type is specified
+      if (type && (!patterns || patterns.length === 0)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message:
-            "patterns are required when recurring is enabled with a type",
+          message: "patterns are required when recurring is enabled with a type",
           path: ["recurring", "patterns"],
         });
       }
 
-      if (data.recurring.startDate && data.recurring.dueDate) {
-        if (data.recurring.startDate > data.recurring.dueDate) {
+      // 🔄 Loop through each recurrence pattern for advanced validation
+      patterns?.forEach((pattern, index) => {
+        const { frequency, dayOfWeek, days, weekOfMonth } = pattern;
+
+        // 🚫 dayOfWeek + days not allowed
+        if (dayOfWeek && days?.length) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "dueDate must be after startDate",
-            path: ["recurring", "dueDate"],
+            message: "'dayOfWeek' cannot be used with 'days' in the same recurrence pattern.",
+            path: ["recurring", "patterns", index, "dayOfWeek"],
           });
         }
-      }
+
+        // 🚫 dayOfWeek + weekOfMonth (with multiple days)
+        if (dayOfWeek && weekOfMonth && Array.isArray(dayOfWeek) && dayOfWeek.length > 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "'weekOfMonth' cannot be combined with multiple 'dayOfWeek' values.",
+            path: ["recurring", "patterns", index, "weekOfMonth"],
+          });
+        }
+
+        // 🚫 weekOfMonth without monthly frequency
+        if (weekOfMonth && frequency !== "monthly") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "'weekOfMonth' can only be used with 'monthly' frequency.",
+            path: ["recurring", "patterns", index, "weekOfMonth"],
+          });
+        }
+
+        // 🚫 days + weekOfMonth not allowed
+        if (days?.length && weekOfMonth) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "'days' and 'weekOfMonth' cannot be used together.",
+            path: ["recurring", "patterns", index, "days"],
+          });
+        }
+      });
+
+   
     }
+       if (data.startDate && data.dueDate && data.startDate > data.dueDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "dueDate must be after or equal to startDate",
+          path: ["dueDate"],
+        });
+      }
   });
 
 export const createRoomTaskSchema = z.object(baseTaskValidation);
