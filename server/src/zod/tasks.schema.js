@@ -10,7 +10,7 @@ const completionHistorySchema = z.object({
 
 const recurrencePatternSchema = z.object({
   frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
-  interval: z.number().int().positive().default(1),
+  interval: z.coerce.number().int().positive().default(1),
   days: z.array(z.number().min(0).max(31)).optional(),
   weekOfMonth: z
     .enum(["first", "second", "third", "fourth", "last"])
@@ -19,7 +19,7 @@ const recurrencePatternSchema = z.object({
 });
 
 const recurringSchema = z.object({
-  enabled: z.boolean(),
+  enabled: z.boolean(), 
   type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
   patterns: z.array(recurrencePatternSchema).optional(),
 });
@@ -43,7 +43,6 @@ export const taskSchema = z
     nextDueDate: z.coerce.date().optional(),
   })
   .superRefine((data, ctx) => {
-
     // 🔄 Recurrence validation if enabled
     if (data.recurring.enabled) {
       const { type, patterns } = data.recurring;
@@ -52,7 +51,8 @@ export const taskSchema = z
       if (type && (!patterns || patterns.length === 0)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "patterns are required when recurring is enabled with a type",
+          message:
+            "patterns are required when recurring is enabled with a type",
           path: ["recurring", "patterns"],
         });
       }
@@ -65,16 +65,23 @@ export const taskSchema = z
         if (dayOfWeek && days?.length) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "'dayOfWeek' cannot be used with 'days' in the same recurrence pattern.",
+            message:
+              "'dayOfWeek' cannot be used with 'days' in the same recurrence pattern.",
             path: ["recurring", "patterns", index, "dayOfWeek"],
           });
         }
 
         // 🚫 dayOfWeek + weekOfMonth (with multiple days)
-        if (dayOfWeek && weekOfMonth && Array.isArray(dayOfWeek) && dayOfWeek.length > 1) {
+        if (
+          dayOfWeek &&
+          weekOfMonth &&
+          Array.isArray(dayOfWeek) &&
+          dayOfWeek.length > 1
+        ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "'weekOfMonth' cannot be combined with multiple 'dayOfWeek' values.",
+            message:
+              "'weekOfMonth' cannot be combined with multiple 'dayOfWeek' values.",
             path: ["recurring", "patterns", index, "weekOfMonth"],
           });
         }
@@ -97,16 +104,14 @@ export const taskSchema = z
           });
         }
       });
-
-   
     }
-       if (data.startDate && data.dueDate && data.startDate > data.dueDate) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "dueDate must be after or equal to startDate",
-          path: ["dueDate"],
-        });
-      }
+    if (data.startDate && data.dueDate && data.startDate > data.dueDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "dueDate must be after or equal to startDate",
+        path: ["dueDate"],
+      });
+    }
   });
 
 export const createRoomTaskSchema = z.object(baseTaskValidation);

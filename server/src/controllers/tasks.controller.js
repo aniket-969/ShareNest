@@ -4,10 +4,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Room } from "../models/rooms.model.js";
 import { TaskEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
-import {
-  calculateNextDueDate,
-  processRecurrenceDetails,
-} from "../utils/helper.js";
 
 const createRoomTask = asyncHandler(async (req, res) => {
   const createdBy = req.user?._id;
@@ -15,12 +11,12 @@ const createRoomTask = asyncHandler(async (req, res) => {
   const {
     title,
     description,
-    assignmentMode = "single",
+    assignmentMode ,
     participants,
-    priority,
     dueDate,
-    recurring = false,
-    recurrenceDetails,
+    recurring ,
+    startDate,
+
   } = req.body;
 
   // Validate room exists and check task limit
@@ -43,15 +39,6 @@ const createRoomTask = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Some participants are not members of this room");
   }
 
-  // Process recurrence settings
-  let processedRecurrence = {
-    enabled: false,
-  };
-
-  if (recurring && recurrenceDetails) {
-    processedRecurrence = processRecurrenceDetails(recurrenceDetails);
-  }
-
   // Create task object
   const task = {
     title,
@@ -59,16 +46,12 @@ const createRoomTask = asyncHandler(async (req, res) => {
     assignmentMode,
     currentAssignee: participants[0],
     participants,
-    rotationOrder: assignmentMode === "rotation" ? [...participants] : [],
-    priority,
+    rotationOrder: assignmentMode === "rotation" ? [...participants] : null,
     dueDate,
-    recurring: processedRecurrence,
+    recurring,
     createdBy,
-    lastCompletedDate: null,
-    nextDueDate: dueDate
-      ? calculateNextDueDate(dueDate, processedRecurrence)
-      : null,
-    completionHistory: [],
+    lastCompletedDate: null
+  
   };
 
   // Add task to room

@@ -204,7 +204,6 @@ const roomSchema = new Schema(
           },
         ],
         lastCompletedDate: Date,
-        nextDueDate: Date,
       },
     ],
 
