@@ -91,7 +91,6 @@ export const RecurringTaskForm = ({ participants }) => {
       participants: [],
       recurring: {
         enabled: true,
-        type: "fixed",
         patterns: [
           {
             frequency: "",
