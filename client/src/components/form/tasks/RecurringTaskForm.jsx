@@ -36,6 +36,7 @@ export const RecurringTaskForm = ({ participants }) => {
   const [recurrenceType, setRecurrenceType] = useState("daily");
 
   const onSubmit = async (values) => {
+    const dayMapping = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const formattedData = {
       ...values,
       recurring: {
@@ -49,26 +50,20 @@ export const RecurringTaskForm = ({ participants }) => {
               ? parseInt(values.recurring.patterns[0].interval)
               : 1,
             days: values.recurring.patterns[0].days.map((day) => {
-              // Convert day names to numbers (Sunday = 0, Monday = 1, etc.)
-              return [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-              ].indexOf(day);
+              // Check if day is a string (weekday) or a number (day of the month)
+              return typeof day === "string"
+                ? dayMapping.indexOf(day)
+                : parseInt(day);
             }),
           },
         ],
       },
     };
-    console.log(formattedData);
-    return;
+    console.log(formattedData.recurring.patterns);
+    // return;
 
     try {
-      const response = await createTaskMutation.mutateAsync(values);
+      const response = await createTaskMutation.mutateAsync(formattedData);
       toast("Task added successfully!");
       console.log(response);
     } catch (error) {
@@ -124,7 +119,7 @@ export const RecurringTaskForm = ({ participants }) => {
     "November",
     "December",
   ];
-  console.log(form.watch("recurring.patterns"))
+  console.log(form.watch("recurring.patterns"));
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
