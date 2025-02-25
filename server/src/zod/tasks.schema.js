@@ -20,7 +20,6 @@ const recurrencePatternSchema = z.object({
 
 const recurringSchema = z.object({
   enabled: z.boolean(), 
-  type: z.enum(["fixed", "dynamic", "mixed"]).optional(),
   patterns: z.array(recurrencePatternSchema).optional(),
 });
 

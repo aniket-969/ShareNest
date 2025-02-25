@@ -37,6 +37,16 @@ const createRoomTask = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Some participants are not members of this room");
   }
 
+  // type dynamically
+  let type = "fixed";
+  const pattern = recurring?.patterns?.[0] || {};
+  if (assignmentMode === "rotation" && (pattern.dayOfWeek || pattern.weekOfMonth)) {
+    type = "mixed";
+  } else if (assignmentMode === "rotation") {
+    type = "dynamic";
+  } else if (pattern.dayOfWeek || pattern.weekOfMonth || pattern.days) {
+    type = "fixed";
+  }
   // Create task object
   const task = {
     title,
@@ -46,7 +56,7 @@ const createRoomTask = asyncHandler(async (req, res) => {
     participants,
     rotationOrder: assignmentMode === "rotation" ? [...participants] : null,
     dueDate,
-    recurring,
+    recurring:{...recurring,type},
     createdBy,
     lastCompletedDate: null,
   };
