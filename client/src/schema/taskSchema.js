@@ -88,7 +88,7 @@ export const createRoomTaskSchema = z
               message: "Day of month is required",
               path: ["pattern", "dayOfMonth"],
             });
-          }
+          } 
           if (
             pattern.monthlyOption === "dayOfWeek" &&
             (!pattern.weekOfMonth || typeof pattern.dayOfWeek !== "number")

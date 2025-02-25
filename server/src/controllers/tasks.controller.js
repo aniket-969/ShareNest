@@ -11,12 +11,11 @@ const createRoomTask = asyncHandler(async (req, res) => {
   const {
     title,
     description,
-    assignmentMode ,
+    assignmentMode,
     participants,
     dueDate,
-    recurring ,
+    recurring,
     startDate,
-
   } = req.body;
 
   // Validate room exists and check task limit
@@ -50,8 +49,7 @@ const createRoomTask = asyncHandler(async (req, res) => {
     dueDate,
     recurring,
     createdBy,
-    lastCompletedDate: null
-  
+    lastCompletedDate: null,
   };
 
   // Add task to room
