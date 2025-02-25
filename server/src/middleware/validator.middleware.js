@@ -3,7 +3,7 @@ export const validate = (schema) => async (req, res, next) => {
     console.log('Validate:', req.body); 
     
     try {
-      await schema.parseAsync(req.body);  
+      await schema.parseAsync(req.body);
       next();  
     } catch (error) {
       console.error('Validation Error:', error);  

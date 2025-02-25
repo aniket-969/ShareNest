@@ -17,7 +17,6 @@ const createRoomTask = asyncHandler(async (req, res) => {
     recurring,
     startDate,
   } = req.body;
-
   // Validate room exists and check task limit
   const room = await Room.findById(roomId);
   if (!room) {
