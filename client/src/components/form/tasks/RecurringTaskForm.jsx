@@ -36,7 +36,15 @@ export const RecurringTaskForm = ({ participants }) => {
   const [recurrenceType, setRecurrenceType] = useState("daily");
 
   const onSubmit = async (values) => {
-    const dayMapping = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayMapping = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
     const formattedData = {
       ...values,
       recurring: {
@@ -49,17 +57,20 @@ export const RecurringTaskForm = ({ participants }) => {
             interval: customRecurrence
               ? parseInt(values.recurring.patterns[0].interval)
               : 1,
+
             days: values.recurring.patterns[0].days.map((day) => {
-              // Check if day is a string (weekday) or a number (day of the month)
-              return typeof day === "string"
-                ? dayMapping.indexOf(day)
-                : parseInt(day);
+              // ✅ Check if the value is a weekday string
+              if (typeof day === "string" && dayMapping.includes(day)) {
+                return dayMapping.indexOf(day);
+              }
+              // ✅ If it's a number or numeric string (like "1"), convert to int
+              return parseInt(day, 10);
             }),
           },
         ],
       },
     };
-    console.log(formattedData.recurring.patterns);
+    console.log(formattedData);
     // return;
 
     try {
@@ -83,7 +94,7 @@ export const RecurringTaskForm = ({ participants }) => {
         type: "fixed",
         patterns: [
           {
-            frequency: "daily",
+            frequency: "",
             interval: "1",
             days: [],
           },
@@ -173,7 +184,7 @@ export const RecurringTaskForm = ({ participants }) => {
           <>
             <FormField
               control={form.control}
-              name="recurring.patterns.frequency"
+              name="recurring.patterns[0].frequency"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Repetition Pattern</FormLabel>
