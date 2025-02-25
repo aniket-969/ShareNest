@@ -124,7 +124,7 @@ export const RecurringTaskForm = ({ participants }) => {
     "November",
     "December",
   ];
-  // console.log(form.watch("recurring.patterns"))
+  console.log(form.watch("recurring.patterns"))
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

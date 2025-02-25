@@ -5,21 +5,25 @@ import {
 } from "@/utils/validation";
 import { z } from "zod";
 
-// Enum for days of week to maintain type safety
-export const DaysOfWeek = {
-  SUNDAY: 0,
-  MONDAY: 1,
-  TUESDAY: 2,
-  WEDNESDAY: 3,
-  THURSDAY: 4,
-  FRIDAY: 5,
-  SATURDAY: 6,
-};
-
 const recurrencePatternSchema = z.object({
   frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
   interval: z.coerce.number().int().positive().default(1),
-  days: z.array(z.number().min(0).max(31)).optional(),
+  days: z
+    .array(
+      z.union([
+        z.enum([
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ]),
+        z.string().regex(/^(?:[1-9]|[12][0-9]|3[01])$/), // 1-31 as string
+      ])
+    )
+    .optional(),
   weekOfMonth: z
     .enum(["first", "second", "third", "fourth", "last"])
     .optional(),
@@ -88,7 +92,7 @@ export const createRoomTaskSchema = z
               message: "Day of month is required",
               path: ["pattern", "dayOfMonth"],
             });
-          } 
+          }
           if (
             pattern.monthlyOption === "dayOfWeek" &&
             (!pattern.weekOfMonth || typeof pattern.dayOfWeek !== "number")
