@@ -144,7 +144,9 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
 const getAllMessages = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
   const selectedRoom = await Room.findById(roomId);
 
   if (!selectedRoom) {
@@ -160,14 +162,24 @@ const getAllMessages = asyncHandler(async (req, res) => {
   }
 
   const messages = await ChatMessage.find({ chat: roomId })
-    .sort({ createdAt: 1 })
-    .populate("sender", "fullName avatar")
+    .sort({ createdAt: -1 }) // Latest messages first
+    .skip(skip)
+    .limit(limit)
+    .populate("sender", "fullName avatar");
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, messages || [], "Messages fetched successfully")
-    );
+  const totalMessages = await ChatMessage.countDocuments({ chat: roomId });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        messages,
+        totalPages: Math.ceil(totalMessages / limit),
+        currentPage: page,
+      },
+      "Messages fetched successfully"
+    )
+  );
 });
 
 export { sendMessage, deleteMessage, getAllMessages };
