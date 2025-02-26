@@ -38,6 +38,7 @@ const ChatLayout = ({
   }, []);
 
   // Send message handler
+
   const handleSendMessage = (content) => {
     // Ensure we scroll to bottom for new messages
     shouldScrollToBottom.current = true;
@@ -65,35 +66,15 @@ const ChatLayout = ({
 
   // Handle infinite scroll when scrolled to top
   const handleScroll = (event) => {
-    // Get the scroll container
-    const scrollContainer = scrollAreaRef.current?.querySelector(
-      "[data-radix-scroll-area-viewport]"
-    );
-console.log("Scrolling", scrollContainer);
-    if (!scrollContainer) return;
-
-    
-
-    // Detect if user has scrolled up - disable auto-scroll if they're not at bottom
-    const isAtBottom =
-      scrollContainer.scrollHeight - scrollContainer.scrollTop <=
-      scrollContainer.clientHeight + 10;
-
-    shouldScrollToBottom.current = isAtBottom;
-
-    // Load more messages when scrolled to top
-    if (scrollContainer.scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
-      const prevScrollHeight = scrollContainer.scrollHeight;
-
-      fetchNextPage().then(() => {
-        // After loading, adjust scroll position
-        setTimeout(() => {
-          if (scrollContainer) {
-            scrollContainer.scrollTop =
-              scrollContainer.scrollHeight - prevScrollHeight;
-          }
-        }, 100);
-      });
+    if (scrollAreaRef.current && shouldScrollToBottom.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
+      if (scrollContainer.scrollTop === 0) {
+        console.log("hello");
+        console.log(hasNextPage);
+        console.log(fetchNextPage);
+      }
     }
   };
 
