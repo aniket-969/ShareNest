@@ -33,7 +33,7 @@ const RoomDetails = () => {
       </div>
       <div className="flex justify-center">
          <RoomCalendar tasks={data.tasks}/>
-      {/* <Chat/> */}
+      <Chat/>
       </div>
      
     </div>

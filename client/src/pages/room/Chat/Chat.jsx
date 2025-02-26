@@ -26,10 +26,10 @@ const Chat = () => {
   if (isMessageError || isUserError) {
     return <>Something went wrong . Please refresh</>;
   }
-  console.log(userData._id);
+  console.log(messageData.pages[0].messages);
   return (
-    <div className="flex flex-col w-full items-center  ">
-      <ChatLayout initialMessages={messageData} currentUser={userData._id} />
+    <div className="flex flex-col items-center bb">
+      <ChatLayout initialMessages={messageData.pages[0].messages} currentUser={userData._id} />
     </div>
   );
 };

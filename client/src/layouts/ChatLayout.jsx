@@ -2,6 +2,7 @@ import ChatMessage from "@/components/Chat/ChatMessage";
 import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
 import { useEffect, useState } from "react";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 const ChatLayout = ({ initialMessages, currentUser }) => {
   const [messages, setMessages] = useState(initialMessages);
@@ -32,18 +33,23 @@ const ChatLayout = ({ initialMessages, currentUser }) => {
   }, [socket]);
 
   return (
-    <div className="flex flex-col gap-5 p-2 by">
-      <div className="px-4 flex flex-col gap-2 b py-2 ">
-        {messages.map((msg) => (
-          <ChatMessage
-            key={msg._id}
-            message={msg}
-            isCurrentUser={msg.sender._id === currentUser}
-          />
-        ))}
+    <ScrollArea>
+      <div className="flex flex-col gap-5 p-2 by h-[450px]">
+        <div className="px-4 flex flex-col gap-2 b py-2 ">
+          {messages.map((msg) => (
+            <ChatMessage
+              key={msg._id}
+              message={msg}
+              isCurrentUser={msg.sender._id === currentUser}
+            />
+          ))}
+        </div>
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          setMessages={setMessages}
+        />
       </div>
-      <ChatInput onSendMessage={handleSendMessage} setMessages={setMessages} />
-    </div>
+    </ScrollArea>
   );
 };
 
