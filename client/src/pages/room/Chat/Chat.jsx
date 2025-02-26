@@ -28,7 +28,10 @@ const Chat = () => {
   if (isMessageError || isUserError)
     return <>Something went wrong. Please refresh.</>;
   // Flatten the messages array from all pages
-  const allMessages = messageData.pages.flatMap((page) => page.messages);
+  const allMessages = messageData.pages
+    .slice()
+    .reverse()
+    .flatMap((page) => page.messages);
 
   return (
     <div className="flex flex-col items-center ">
