@@ -69,10 +69,10 @@ const ChatLayout = ({
     const scrollContainer = scrollAreaRef.current?.querySelector(
       "[data-radix-scroll-area-viewport]"
     );
-
+console.log("Scrolling", scrollContainer);
     if (!scrollContainer) return;
 
-    console.log("Scrolling", scrollContainer.scrollTop);
+    
 
     // Detect if user has scrolled up - disable auto-scroll if they're not at bottom
     const isAtBottom =
@@ -102,7 +102,7 @@ const ChatLayout = ({
       <ScrollArea
         ref={scrollAreaRef}
         onScroll={handleScroll}
-        className="flex flex-col gap-5 p-2 h-[450px]"
+        className="flex flex-col gap-5 p-2 h-[450px] "
       >
         {chatMessages.map((msg) => (
           <ChatMessage
