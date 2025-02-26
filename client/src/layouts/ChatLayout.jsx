@@ -110,10 +110,8 @@ const ChatLayout = ({
           isLoadingMore.current = true;
 
           // Save current scroll height with small offset to account for possible rounding errors
-          // The -1 works because it creates a small buffer that prevents jumping
           prevScrollHeightRef.current = scrollContainer.scrollHeight - 1;
 
-          // Fetch the next page - this will add older messages to the beginning
           await fetchNextPage();
         } catch (error) {
           console.error("Error fetching more messages:", error);
@@ -171,13 +169,22 @@ const ChatLayout = ({
             Loading more messages...
           </div>
         )}
-        {chatMessages.map((msg) => (
-          <ChatMessage
-            key={msg._id}
-            message={msg}
-            isCurrentUser={msg.sender._id === currentUser}
-          />
-        ))}
+        <div className="flex flex-col space-y-4">
+          {chatMessages.map((msg, index) => {
+            const prevMsg = index > 0 ? chatMessages[index - 1] : null;
+            const showAvatar =
+              !prevMsg || prevMsg.sender._id !== msg.sender._id;
+
+            return (
+              <ChatMessage
+                key={msg._id}
+                message={msg}
+                isCurrentUser={msg.sender._id === currentUser}
+                showAvatar={showAvatar}
+              />
+            );
+          })}
+        </div>
       </ScrollArea>
       <ChatInput
         onSendMessage={handleSendMessage}
