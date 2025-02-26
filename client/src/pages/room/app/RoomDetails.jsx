@@ -32,7 +32,7 @@ const RoomDetails = () => {
         <p className="text-lg">{data.description}</p>
       </div>
       <div className="flex justify-center">
-         <RoomCalendar tasks={data.tasks}/>
+         {/* <RoomCalendar tasks={data.tasks}/> */}
       <Chat/>
       </div>
      

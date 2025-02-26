@@ -3,7 +3,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
 import { useChat } from "@/hooks/useChat";
 import ChatLayout from "@/layouts/ChatLayout";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useParams } from "react-router-dom";
 const Chat = () => {
   const { roomId } = useParams();
@@ -32,16 +31,15 @@ const Chat = () => {
   const allMessages = messageData.pages.flatMap((page) => page.messages);
 
   return (
-    
-      <div className="flex flex-col items-center ">
-        <ChatLayout
-          messages={allMessages}
-          currentUser={userData._id}
-          fetchNextPage={fetchNextPage}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-        />
-      </div>
+    <div className="flex flex-col items-center ">
+      <ChatLayout
+        messages={allMessages}
+        currentUser={userData._id}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+      />
+    </div>
   );
 };
 

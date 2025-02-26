@@ -11,7 +11,7 @@ export const fetchMessages = async (roomId, page = 1, limit = 20) => {
 };
 
 export const sendMessage = async (data, roomId) => {
-  console.log(data, roomId);
+  // console.log(data, roomId);
   const response = await axiosClient.post(`${baseChat}/${roomId}/`, data);
   return response.data?.data;
 };

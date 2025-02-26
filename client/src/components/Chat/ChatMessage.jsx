@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-
+ 
 const ChatMessage = ({ message, isCurrentUser }) => {
   return (
     <>
