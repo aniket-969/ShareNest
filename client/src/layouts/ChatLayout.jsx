@@ -20,7 +20,7 @@ const ChatLayout = ({
   const isInitialLoad = useRef(true);
   const isLoadingMore = useRef(false);
 
-  // Function to scroll to bottom - memoized with useCallback
+  // Function to scroll to bottom
   const scrollToBottom = useCallback(() => {
     if (scrollAreaRef.current && shouldScrollToBottom.current) {
       const scrollContainer = scrollAreaRef.current.querySelector(
@@ -56,7 +56,7 @@ const ChatLayout = ({
   // Send message handler
   const handleSendMessage = useCallback(
     (content) => {
-      // Ensure we scroll to bottom for new messages
+      // scroll to bottom for new messages
       shouldScrollToBottom.current = true;
 
       // Optimistically update UI
@@ -64,7 +64,6 @@ const ChatLayout = ({
         _id: Date.now().toString(), // Temporary ID
         content,
         sender: { _id: currentUser, username: "You" },
-        isTemporary: true,
       };
       setChatMessages((prev) => [...prev, newMessage]);
     },
@@ -123,7 +122,6 @@ const ChatLayout = ({
 
   // This effect handles scroll position restoration after loading previous messages
   useEffect(() => {
-    // Only run this effect when we finish fetching new messages
     if (isFetchingNextPage) {
       return;
     }
