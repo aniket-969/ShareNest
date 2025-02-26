@@ -1,8 +1,8 @@
 import ChatMessage from "@/components/Chat/ChatMessage";
 import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
-import { useEffect, useState,useRef } from "react";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { useEffect, useState, useRef } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ChatLayout = ({
   messages,
@@ -14,12 +14,17 @@ const ChatLayout = ({
   const [chatMessages, setChatMessages] = useState(messages);
   const socket = getSocket();
   const chatContainerRef = useRef(null);
-
-  // Update messages when new pages are fetched
-  useEffect(() => {
-    setChatMessages(messages);
-  }, [messages]);
-
+  console.log(chatMessages);
+  const handleSendMessage = (content) => {
+    // Optimistically update UI
+    const newMessage = {
+      _id: Date.now().toString(), // Temporary ID
+      content,
+      sender: { _id: currentUser, username: "You" }, // Temporary user details
+      isTemporary: true, 
+    };
+    setChatMessages((prev) => [...prev, newMessage]);
+  };
   // Listen for new incoming messages via socket
   useEffect(() => {
     const handleNewMessage = (newMessage) => {
@@ -42,14 +47,15 @@ const ChatLayout = ({
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight - prevScrollHeight;
     }
+    console.log("scrolling");
   };
 
   return (
-    <ScrollArea>
-      <div
+    <>
+      <ScrollArea
         ref={chatContainerRef}
         onScroll={handleScroll}
-        className="flex flex-col gap-5 p-2 h-[450px] overflow-y-auto"
+        className="flex flex-col gap-5 p-2 h-[450px] "
       >
         {chatMessages.map((msg) => (
           <ChatMessage
@@ -59,13 +65,9 @@ const ChatLayout = ({
           />
         ))}
         {isFetchingNextPage && <div>Loading more messages...</div>}
-      </div>
-      <ChatInput
-        onSendMessage={(content) =>
-          setChatMessages((prev) => [...prev, content])
-        }
-      />
-    </ScrollArea>
+      </ScrollArea>
+      <ChatInput onSendMessage={handleSendMessage} setMessages={setChatMessages} />
+    </>
   );
 };
 

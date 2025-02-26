@@ -6,7 +6,7 @@ export const fetchMessages = async (roomId, page = 1, limit = 20) => {
   const response = await axiosClient.get(
     `${baseChat}/${roomId}?page=${page}&limit=${limit}`
   );
-  console.log(response)
+  // console.log(response)
   return response.data.data;
 };
 
