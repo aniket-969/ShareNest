@@ -169,6 +169,11 @@ const adminResponse = asyncHandler(async (req, res) => {
     await user.save();
     await room.save();
 
+    emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
+      action: "approved",
+      roomId: room._id,
+      roomName:room.name
+    });
     return res.json(
       new ApiResponse(200, {}, "User approved and added to the room")
     );
@@ -177,9 +182,9 @@ const adminResponse = asyncHandler(async (req, res) => {
     await room.save();
 
     emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
-      action: "approved",
+      action: "denied",
       roomId: room._id,
-      roomName: room.name,
+      roomName:room.name
     });
     return res.json(
       new ApiResponse(200, {}, "User denied and removed from pending requests")
