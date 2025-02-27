@@ -37,10 +37,6 @@ const roomSchema = new Schema(
     ],
     pendingRequests: [
       {
-        id: {
-          type: Schema.Types.ObjectId,
-          default: new mongoose.Types.ObjectId(),
-        },
         userId: { type: Schema.Types.ObjectId, ref: "User" },
         role: { type: String, enum: ["tenant", "landlord"], required: true },
         requestedAt: { type: Date, default: Date.now },
