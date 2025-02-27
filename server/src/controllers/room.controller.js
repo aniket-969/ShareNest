@@ -8,6 +8,7 @@ import { Poll } from "../models/poll.model.js";
 import { Expense } from "../models/expense.model.js";
 import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
 }
@@ -164,7 +165,7 @@ const adminResponse = asyncHandler(async (req, res) => {
       throw new ApiError(404, "User not found");
     }
 
-    user.rooms.push({ id: room._id, name: room.name });
+    user.rooms.push({ roomId: room._id, name: room.name });
     await user.save();
     await room.save();
 
@@ -217,7 +218,7 @@ const getRoomData = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
   // console.log(roomId, userId);
-  console.log("getting room Data")
+  console.log("getting room Data");
   let roomQuery = await Room.findById(roomId).select(
     "-groupCode -pendingRequests"
   );
@@ -230,7 +231,8 @@ const getRoomData = asyncHandler(async (req, res) => {
       path: "awards",
     },
     {
-      path: "tasks.currentAssignee",select:"username fullName",
+      path: "tasks.currentAssignee",
+      select: "username fullName",
     },
     { path: "polls" },
   ]);
