@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { ExpenseForm } from "@/components/form/ExpenseForm";
-import FormWrapper from "@/components/ui/formWrapper";
+import { Suspense, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useExpense } from "@/hooks/useExpense";
 import { useRoom } from "@/hooks/useRoom";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+
+const ExpenseForm = lazy(()=>import("@/components/form/ExpenseForm"))
+const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
 const RoomExpense = () => {
   const { roomId } = useParams();
@@ -34,12 +35,15 @@ const RoomExpense = () => {
       </Button>
 
       {isFormOpen && (
-        <FormWrapper onClose={() => setIsFormOpen(false)}>
+        <Suspense fallback={<Spinner/>}>
+           <FormWrapper onClose={() => setIsFormOpen(false)}>
           <ExpenseForm
             participants={participants}
             onSubmit={() => setIsFormOpen(false)} // Close on submit
           />
         </FormWrapper>
+        </Suspense>
+       
       )}
     </div>
   );
