@@ -21,7 +21,7 @@ import { Spinner } from "@/components/ui/spinner";
 import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
 
-export const ExpenseForm = ({ participants }) => {
+const ExpenseForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
   const onSubmit = async (values) => {
@@ -141,3 +141,5 @@ export const ExpenseForm = ({ participants }) => {
     </Form>
   );
 };
+
+export default ExpenseForm

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import AwardCard from "@/components/ui/awardCard";
 import { useAward } from "@/hooks/useAwards";
 import { Spinner } from "@/components/ui/spinner";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState,lazy } from "react";
 import { getSocket } from "@/socket";
 import { useRoom } from "@/hooks/useRoom";
 import { Button } from "@/components/ui/button";

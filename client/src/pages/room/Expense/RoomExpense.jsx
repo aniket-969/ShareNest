@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useState ,lazy} from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useExpense } from "@/hooks/useExpense";
 import { useRoom } from "@/hooks/useRoom";

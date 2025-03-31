@@ -1,11 +1,11 @@
 import { Spinner } from "@/components/ui/spinner";
 import { useEvent } from "@/hooks/useEvent";
 import { getSocket } from "@/socket";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState,lazy } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-const EventsForms = lazy(() => import("@/components/form/EventsForms"));
+const EventsForm = lazy(() => import("@/components/form/EventsForms"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
 const RoomEvents = () => {
