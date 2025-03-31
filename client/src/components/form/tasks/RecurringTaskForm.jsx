@@ -29,7 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import MultiSelect from "@/components/ui/multiSelect";
 import DatePicker from "@/components/ui/datePicker";
 
-export const RecurringTaskForm = ({ participants }) => {
+const RecurringTaskForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createTaskMutation } = useTask(roomId);
   const [customRecurrence, setCustomRecurrence] = useState(false);
@@ -354,3 +354,5 @@ export const RecurringTaskForm = ({ participants }) => {
     </Form>
   );
 };
+
+export default RecurringTaskForm

@@ -27,7 +27,7 @@ import {
 import DatePicker from "@/components/ui/datePicker";
 import { Textarea } from "@/components/ui/textarea";
 
-export const TaskForm = ({ participants }) => {
+const TaskForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createTaskMutation } = useTask(roomId);
 
