@@ -21,7 +21,6 @@ const Room = () => {
           
         </div>
       </div>
-      {/* <RoomLoader/> */}
     </div>
   ) : (
     <Navigate to="/login" />
