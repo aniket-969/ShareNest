@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/label";
 import FormWrapper from "@/components/ui/formWrapper";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/socket";
+import { Button } from "@/components/ui/button";
 
 const Tasks = () => {
   const { roomId } = useParams();
   const [recurringTask, setRecurringTask] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const { roomQuery } = useRoom(roomId);
   const queryClient = useQueryClient();
   const socket = getSocket();
@@ -52,7 +54,7 @@ const Tasks = () => {
 
   return (
     <div className="flex flex-col gap-6 w-full items-center ">
-      <h2 className="font-bold text-xl">Create Task</h2>
+      <h2 className="font-bold text-xl">Tasks</h2>
       <div className="flex items-center gap-4 ">
         <Label htmlFor="room-toggle" className="text-sm">
           One Time
@@ -66,13 +68,23 @@ const Tasks = () => {
           Recurring
         </Label>
       </div>
-      <FormWrapper>
-        {recurringTask ? (
-          <RecurringTaskForm participants={participants} />
-        ) : (
-          <TaskForm participants={participants} />
-        )}
-      </FormWrapper>
+      <Button
+        onClick={() => setIsFormOpen(true)}
+       
+      >
+        Create Task
+      </Button>
+
+      {isFormOpen && (
+         <FormWrapper onClose={() => setIsFormOpen(false)}>
+         {recurringTask ? (
+           <RecurringTaskForm participants={participants} />
+         ) : (
+           <TaskForm participants={participants} />
+         )}
+       </FormWrapper>
+      )}
+   
     </div>
   );
 };

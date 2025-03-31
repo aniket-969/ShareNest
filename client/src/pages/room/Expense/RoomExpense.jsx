@@ -24,7 +24,7 @@ const RoomExpense = () => {
 
   return (
     <div className="flex flex-col gap-6 w-full items-center">
-      <h2 className="font-bold text-xl">Split Expense</h2>
+      <h2 className="font-bold text-xl">Expense</h2>
 
       <Button
         onClick={() => setIsFormOpen(true)}
