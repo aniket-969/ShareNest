@@ -222,37 +222,30 @@ const deleteRoom = asyncHandler(async (req, res) => {
 const getRoomData = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
-  // console.log(roomId, userId);
+
   console.log("getting room Data");
-  let roomQuery = await Room.findById(roomId).select(
-    "-groupCode -pendingRequests"
-  );
+
+  // Determine whether to include pendingRequests based on admin status
+  const selectFields =
+    "-groupCode" +
+    (req.user?._id.toString() === roomId.toString() ? "" : " -pendingRequests");
+
+  let roomQuery = await Room.findById(roomId).select(selectFields);
 
   const room = await roomQuery.populate([
     { path: "admin", select: "username fullName avatar _id" },
     { path: "tenants", select: "username fullName avatar _id" },
     { path: "landlord", select: "username fullName avatar _id" },
-    {
-      path: "awards",
-    },
-    {
-      path: "tasks.currentAssignee",
-      select: "username fullName",
-    },
+    { path: "awards" },
+    { path: "tasks.currentAssignee", select: "username fullName" },
     { path: "polls" },
+    ...(roomQuery.admin.toString() === userId.toString()
+      ? [{ path: "pendingRequests.userId" }]
+      : []), // Only populate pendingRequests if admin
   ]);
 
   if (!room) {
     throw new ApiError(404, "Room not found");
-  }
-
-  if (room.admin.toString() === userId.toString()) {
-    const roomWithRequests = await Room.findById(roomId)
-      .select("-groupCode")
-      .populate("admin tenants landlord awards pendingRequests.userId");
-    return res.json(
-      new ApiResponse(200, roomWithRequests, "Room data fetched successfully")
-    );
   }
 
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
