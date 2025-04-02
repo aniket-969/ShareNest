@@ -225,12 +225,15 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   console.log("getting room Data");
 
-  // Determine whether to include pendingRequests based on admin status
-  const selectFields =
-    "-groupCode" +
-    (req.user?._id.toString() === roomId.toString() ? "" : " -pendingRequests");
+  // Fetch room with/without pendingRequests based on admin status
+  let roomQuery = Room.findById(roomId).select("-groupCode");
+  
+  // Check if user is admin (without making an extra DB call)
+  const isAdmin = await Room.exists({ _id: roomId, admin: userId });
 
-  let roomQuery = await Room.findById(roomId).select(selectFields);
+  if (!isAdmin) {
+    roomQuery = roomQuery.select("-pendingRequests"); // Exclude pendingRequests for non-admins
+  }
 
   const room = await roomQuery.populate([
     { path: "admin", select: "username fullName avatar _id" },
@@ -239,9 +242,7 @@ const getRoomData = asyncHandler(async (req, res) => {
     { path: "awards" },
     { path: "tasks.currentAssignee", select: "username fullName" },
     { path: "polls" },
-    ...(roomQuery.admin.toString() === userId.toString()
-      ? [{ path: "pendingRequests.userId" }]
-      : []), // Only populate pendingRequests if admin
+    ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []), // Only populate pendingRequests if admin
   ]);
 
   if (!room) {
@@ -250,6 +251,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
 });
+
 
 const leaveRoom = asyncHandler(async (req, res) => {
   console.log("This is user", req.user);
