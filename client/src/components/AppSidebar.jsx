@@ -67,8 +67,8 @@ export function AppSidebar() {
         <div className="p-4 border-b">
           <div className="flex items-center text-sm cursor-pointer space-x-2" onClick={toggleMembers}>
             <Users className="w-5 h-5" />
-            <span className="flex-1 font-medium">Members</span>
-            <span className="text-xs bg-secondary px-2 py-1 rounded-full">{roomData?.tenants?.length || 0}</span>
+            <span className="flex-1 font-medium ">Members</span>
+            <span className="text-xs bg-secondary px-2 text-black font-semibold py-1 rounded-full">{roomData?.tenants?.length || 0}</span>
           </div>
           {showMembers && (
             <div className="mt-3">
@@ -77,7 +77,7 @@ export function AppSidebar() {
                   {roomData?.tenants?.map((member) => (
                     <div key={member._id} className="flex items-center p-2 bg-secondary/20 rounded-lg">
                       <img src={member.avatar} alt={member.fullName} className="w-8 h-8 rounded-full mr-3 border" />
-                      <span className="text-sm font-medium">{member.fullName}</span>
+                      <span className="text-sm font-medium ">{member.fullName}</span>
                     </div>
                   ))}
                 </div>
@@ -90,8 +90,8 @@ export function AppSidebar() {
         <div className="p-4 border-b">
           <div className="flex items-center text-sm cursor-pointer space-x-2" onClick={toggleRequests}>
             <Zap className="w-5 h-5" />
-            <span className="flex-1 font-medium">Join Requests</span>
-            <span className="text-xs bg-secondary px-2 py-1 rounded-full">{roomData?.pendingRequests?.length || 0}</span>
+            <span className="flex-1  font-medium ">Join Requests</span>
+            <span className="text-xs bg-secondary text-black font-semibold px-[0.6rem] py-1 rounded-full ">{roomData?.pendingRequests?.length || 0}</span>
           </div>
           {showRequests && (
             <div className="mt-3">

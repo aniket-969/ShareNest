@@ -26,7 +26,7 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar }) => {
           </div>
         </div>
       )}
-      <div className="max-w-[75%] sm:max-w-[65%] bg-secondary text-secondary-foreground rounded-xl pl-3 py-1 shadow-sm">
+      <div className="max-w-[70%] sm:max-w-[60%] bg-secondary text-secondary-foreground rounded-xl pl-3 py-1 shadow-sm">
         <p className="break-words">{message.content}</p>
       </div>
     </div>
