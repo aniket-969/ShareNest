@@ -32,7 +32,7 @@ const Chat = () => {
   const allMessages = messageData.pages.flatMap((page) => page.messages).reverse();
   console.log(allMessages)
   return (
-    <div className="flex flex-col items-center h-[400px] w-full rounded-lg shadow-md">
+    <div className="flex flex-col items-center h-[400px] w-full rounded-lg shadow-md bgr">
     <ChatLayout
       messages={allMessages}
       currentUser={userData._id}

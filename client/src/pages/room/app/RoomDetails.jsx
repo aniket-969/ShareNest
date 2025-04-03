@@ -28,14 +28,12 @@ const RoomDetails = () => {
   // console.log(data)
   return (
     <div className="bb">
-     
-      <div className="flex justify-center">
-         {/* <RoomCalendar tasks={data.tasks}/> */}
-         <div className="flex flex-col items-center gap-10 h-[90vh]">
-           <Chat/>
-      {/* <PollCard initialPolls={data.polls}/> */}
-         </div>
-     
+      <div className="flex justify-around gap-10">
+        <RoomCalendar tasks={data.tasks} />
+        <div className="flex flex-col items-center gap-5 h-[92vh]">
+          <Chat />
+          <PollCard initialPolls={data.polls} />
+        </div>
       </div>
     </div>
   );

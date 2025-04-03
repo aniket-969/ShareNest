@@ -7,7 +7,7 @@ import Poll from "./Poll";
 const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
   return (
-    <div className="h-[150px]">
+    <div className="h-[250px] overflow-y-scroll by">
       <Button onClick={() => setShowPoll(true)}>Create Poll</Button>
       {showPoll && (
         <FormWrapper onClose={() => setShowPoll(false)}>

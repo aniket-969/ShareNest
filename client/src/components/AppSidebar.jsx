@@ -59,8 +59,8 @@ export function AppSidebar() {
       <SidebarContent>
         {/* Room Info */}
         <div className="p-4 border-b">
-          <h2 className="text-lg font-bold">{roomData?.name || "Loading..."}</h2>
-          <p className="text-sm text-muted-foreground">{roomData?.description || ""}</p>
+          <h2 className="text-lg font-bold">{roomData?.name.toUpperCase() || "Loading..."}</h2>
+          <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">{roomData?.description || ""}</p>
         </div>
 
         {/* Room Members */}
@@ -89,7 +89,7 @@ export function AppSidebar() {
         {/* Pending Requests */}
         <div className="p-4 border-b">
           <div className="flex items-center text-sm cursor-pointer space-x-2" onClick={toggleRequests}>
-            <Zap className="w-5 h-5" />
+            <Zap className="w-5 h-5 text-yellow-300" />
             <span className="flex-1  font-medium ">Join Requests</span>
             <span className="text-xs bg-secondary text-black font-semibold px-[0.6rem] py-1 rounded-full ">{roomData?.pendingRequests?.length || 0}</span>
           </div>

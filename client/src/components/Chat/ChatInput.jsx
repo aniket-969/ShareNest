@@ -35,7 +35,7 @@ const ChatInput = ({ onSendMessage }) => {
         rows={1}
       />
       {content.trim() && (
-        <Button onClick={handleSendMessage} className="  rounded-full">
+        <Button onClick={handleSendMessage} >
           <SendHorizontal />
         </Button>
       )}
