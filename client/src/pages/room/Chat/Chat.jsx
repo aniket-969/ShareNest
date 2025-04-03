@@ -8,7 +8,7 @@ const Chat = () => {
   const { roomId } = useParams();
   const { messageQuery } = useChat();
   const { sessionQuery } = useAuth();
-
+ 
   const {
     data: messageData,
     isLoading: isMessageLoading,
@@ -32,7 +32,7 @@ const Chat = () => {
   const allMessages = messageData.pages.flatMap((page) => page.messages).reverse();
   console.log(allMessages)
   return (
-    <div className="flex flex-col items-center ">
+    <div className="flex flex-col items-center h-[50%]">
       <ChatLayout
         messages={allMessages}
         currentUser={userData._id}
