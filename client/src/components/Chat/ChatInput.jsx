@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { SendHorizontal } from "lucide-react"; // Importing SendHorizontal  icon
-import { Textarea } from "@/components/ui/textarea"; // ShadCN Textarea
+import { SendHorizontal } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 import { useParams } from "react-router-dom";
