@@ -1,29 +1,21 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ChatMessage = ({ message, isCurrentUser, showAvatar }) => {
-  
-
   return isCurrentUser ? (
-    <div className="flex flex-col items-end mb-2">
+    <div className="flex flex-col items-end ">
       {showAvatar && <p className="text-sm text-muted-foreground mb-1">You</p>}
-      <div className="max-w-[80%]">
-        <div
-          className={`rounded-lg py-2 px-4 bg-primary text-primary-foreground`}
-        >
-          <p className="break-words">{message.content}</p>
-        </div>
+      <div className=" bg-primary text-primary-foreground rounded-xl px-3 py-1 max-w-[75%] sm:max-w-[65%] ">
+        <p className="break-words leading-normal">{message.content}</p>
       </div>
     </div>
   ) : (
-    <div className="flex flex-col mb-2">
+    <div className="flex flex-col">
       {showAvatar && (
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 ">
           <Avatar className="h-8 w-8">
             <AvatarImage src={message.sender.avatar} />
             <AvatarFallback>
-              {message.sender.fullName?.charAt(0) ||
-                message.sender.username?.charAt(0) ||
-                "U"}
+              {message.sender.fullName?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -34,12 +26,8 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar }) => {
           </div>
         </div>
       )}
-      <div className="flex">
-        <div className="max-w-[80%]">
-          <div className="rounded-lg py-2 px-4 bg-secondary text-secondary-foreground">
-            <p className="break-words">{message.content}</p>
-          </div>
-        </div>
+      <div className="max-w-[75%] sm:max-w-[65%] bg-secondary text-secondary-foreground rounded-xl pl-3 py-1 shadow-sm">
+        <p className="break-words">{message.content}</p>
       </div>
     </div>
   );

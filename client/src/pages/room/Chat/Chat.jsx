@@ -32,15 +32,15 @@ const Chat = () => {
   const allMessages = messageData.pages.flatMap((page) => page.messages).reverse();
   console.log(allMessages)
   return (
-    <div className="flex flex-col items-center h-[50%]">
-      <ChatLayout
-        messages={allMessages}
-        currentUser={userData._id}
-        fetchNextPage={fetchNextPage}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-      />
-    </div>
+    <div className="flex flex-col items-center h-[400px] w-full rounded-lg shadow-md">
+    <ChatLayout
+      messages={allMessages}
+      currentUser={userData._id}
+      fetchNextPage={fetchNextPage}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+    />
+  </div>
   );
 };
 

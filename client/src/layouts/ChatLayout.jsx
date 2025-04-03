@@ -157,19 +157,21 @@ const ChatLayout = ({
 
   return (
     <>
+       <div className="flex flex-col w-full h-full">
       <ScrollArea
         ref={scrollAreaRef}
         onScroll={handleScroll}
-        className="flex flex-col gap-5 p-2 h-[450px]"
+        className="flex flex-col gap-4 px-4 py-2 h-[450px] overflow-y-auto"
       >
         {isFetchingNextPage && (
           <div className="py-2 text-center text-sm text-gray-500">
-            Loading more messages...
+            Loading messages...
           </div>
         )}
-        <div className="flex flex-col space-y-4">
-          {chatMessages.map((msg, index) => {
-            const prevMsg = index > 0 ? chatMessages[index - 1] : null;
+
+        <div className="flex flex-col space-y-3">
+          {messages.map((msg, index) => {
+            const prevMsg = index > 0 ? messages[index - 1] : null;
             const showAvatar =
               !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
@@ -184,10 +186,10 @@ const ChatLayout = ({
           })}
         </div>
       </ScrollArea>
-      <ChatInput
-        onSendMessage={handleSendMessage}
-        setMessages={setChatMessages}
-      />
+
+      {/* Chat Input */}
+      <ChatInput onSendMessage={handleSendMessage} />
+    </div>
     </>
   );
 };
