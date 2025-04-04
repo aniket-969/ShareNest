@@ -144,14 +144,11 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
 const getAllMessages = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
-  const skip = (page - 1) * limit;
-  const selectedRoom = await Room.findById(roomId);
+  const lastMessageTime = req.query.lastMessageTime || null;
 
-  if (!selectedRoom) {
-    throw new ApiError(404, "Room does not exist");
-  }
+  const selectedRoom = await Room.findById(roomId);
+  if (!selectedRoom) throw new ApiError(404, "Room does not exist");
 
   if (
     !selectedRoom.tenants.includes(req.user._id) &&
@@ -161,25 +158,19 @@ const getAllMessages = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not authorized to view this chat");
   }
 
-  const messages = await ChatMessage.find({ chat: roomId })
-    .sort({ createdAt: -1 }) // Latest messages first
-    .skip(skip)
+  let query = { chat: roomId };
+  if (lastMessageTime) {
+    query.createdAt = { $lt: new Date(lastMessageTime) };
+  }
+
+  const messages = await ChatMessage.find(query)
+    .sort({ createdAt: -1 })
     .limit(limit)
     .populate("sender", "fullName avatar");
 
-  const totalMessages = await ChatMessage.countDocuments({ chat: roomId });
-
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        messages,
-        totalPages: Math.ceil(totalMessages / limit),
-        currentPage: page,
-      },
-      "Messages fetched successfully"
-    )
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { messages }, "Messages fetched successfully"));
 });
 
 export { sendMessage, deleteMessage, getAllMessages };
