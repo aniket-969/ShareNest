@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/Chat/ChatMessage";
 import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ChatLayout = ({
   messages,
@@ -15,6 +16,34 @@ const ChatLayout = ({
   const socket = getSocket();
   const [prevMessagesLength, setPrevMessagesLength] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+const queryClient = useQueryClient()
+
+// Socket to update messages
+useEffect(() => {
+  if (!roomId) return;
+
+  const handleNewMessage = (newMessage) => {
+    queryClient.setQueryData(["messages", roomId], (oldData) => {
+      if (!oldData) return;
+
+      const updatedPages = [...oldData.pages];
+      const lastPageIndex = updatedPages.length - 1;
+
+      updatedPages[lastPageIndex] = {
+        ...updatedPages[lastPageIndex],
+        messages: [...updatedPages[lastPageIndex].messages, newMessage],
+      };
+
+      return { ...oldData, pages: updatedPages };
+    });
+  };
+
+  socket.on("messageReceived", handleNewMessage);
+
+  return () => {
+    socket.off("messageReceived", handleNewMessage);
+  };
+}, [roomId, queryClient, socket]);
 
   /** Scroll to bottom function */
   const scrollToBottom = useCallback(() => {
