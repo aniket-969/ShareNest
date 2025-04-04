@@ -2,13 +2,15 @@ import axiosClient from "../axiosClient";
 
 const baseChat = "chat";
 
-export const fetchMessages = async (roomId, page = 1, limit = 20) => {
-  const response = await axiosClient.get(
-    `${baseChat}/${roomId}?page=${page}&limit=${limit}`
-  );
-  // console.log(response)
+export const fetchMessages = async (roomId, lastMessageTime = null, limit = 20) => {
+  const url = lastMessageTime
+    ? `${baseChat}/${roomId}?lastMessageTime=${lastMessageTime}&limit=${limit}`
+    : `${baseChat}/${roomId}?limit=${limit}`;
+
+  const response = await axiosClient.get(url);
   return response.data.data;
 };
+
 
 export const sendMessage = async (data, roomId) => {
   // console.log(data, roomId);
