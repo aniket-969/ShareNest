@@ -45,16 +45,6 @@ const ChatLayout = ({
     }
   }, [messages, scrollToBottom, isInitialLoad, prevMessagesLength]);
 
-  /** Handle new incoming messages via socket */
-  useEffect(() => {
-    const handleNewMessage = (newMessage) => {
-      // Let the react-query update handle this
-      // The messages.length change will trigger the above effect
-    };
-
-    socket.on("messageReceived", handleNewMessage);
-    return () => socket.off("messageReceived", handleNewMessage);
-  }, [socket, messages]);
 
   /** Handle infinite scroll (Load older messages) */
   const handleScroll = async (event) => {
