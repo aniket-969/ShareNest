@@ -24,21 +24,31 @@ const ChatLayout = ({
     if (!roomId) return;
 
     const handleNewMessage = (newMessage) => {
+      console.log("messageReceived:", newMessage);
+
       queryClient.setQueryData(["chat", roomId], (oldData) => {
         if (!oldData) return;
-    
+
         const updatedPages = [...oldData.pages];
-        const lastPageIndex = updatedPages.length - 1;
-    
-        updatedPages[lastPageIndex] = {
-          ...updatedPages[lastPageIndex],
-          messages: [newMessage, ...updatedPages[lastPageIndex].messages], // 👈 prepend
+        const firstPage = updatedPages[0];
+
+        // Check if message already exists (by _id)
+        const messageAlreadyExists = firstPage.messages.some(
+          (msg) => msg._id === newMessage._id
+        );
+
+        if (messageAlreadyExists) return oldData; // No update needed
+
+        // Prepend to the first page if it's a new message
+        updatedPages[0] = {
+          ...firstPage,
+          messages: [newMessage, ...firstPage.messages],
         };
-    
+
         return { ...oldData, pages: updatedPages };
       });
     };
-    
+
     socket.on("messageReceived", handleNewMessage);
 
     return () => {
