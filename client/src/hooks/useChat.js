@@ -5,16 +5,20 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
- 
+
 export const useChat = () => {
   const queryClient = useQueryClient();
-   const messageQuery = (roomId) =>
+
+  const messageQuery = (roomId) =>
     useInfiniteQuery({
       queryKey: ["chat", roomId],
-      queryFn: ({ pageParam = 1 }) => fetchMessages(roomId, pageParam),
+      queryFn: ({ pageParam = null }) => fetchMessages(roomId, pageParam),
       getNextPageParam: (lastPage, allPages) => {
-        const { currentPage, totalPages } = lastPage;
-        return currentPage < totalPages ? currentPage + 1 : undefined;
+        // Get the oldest message's timestamp from the last batch
+        const messages = lastPage.messages;
+        if (messages.length === 0) return undefined; // No more messages
+
+        return messages[messages.length - 1].createdAt; // Use last message's timestamp as cursor
       },
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,
