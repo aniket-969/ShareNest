@@ -4,21 +4,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 import { useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ChatInput = () => {
   const [content, setContent] = useState("");
   const { sendMessageMutation } = useChat();
   const { roomId } = useParams();
+  const queryClient = useQueryClient();
 
   const handleSendMessage = async () => {
     if (!content.trim()) return;
 
-    await sendMessageMutation.mutateAsync({
-      roomId,
-      data: { content },
-    });
+    try {
+      const sentMessage = await sendMessageMutation.mutateAsync({
+        roomId,
+        data: { content },
+      });
 
-    setContent("");
+      // Update UI immediately for the sender
+      queryClient.setQueryData(["chat", roomId], (oldData) => {
+        if (!oldData) return;
+
+        const updatedPages = [...oldData.pages];
+        updatedPages[0] = {
+          ...updatedPages[0],
+          messages: [sentMessage, ...updatedPages[0].messages],
+        };
+
+        return { ...oldData, pages: updatedPages };
+      });
+
+      setContent("");
+    } catch (error) {
+      console.error("Failed to send message", error);
+    }
   };
 
   const handleKeyDown = (e) => {
