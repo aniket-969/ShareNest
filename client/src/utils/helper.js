@@ -17,6 +17,26 @@ export const generateQRCode = async (text) => {
   }
 };
 
+export const formatMessageTime = (timestamp) => {
+  const date = new Date(timestamp);
+  const now = new Date();
+
+  const isToday = date.toDateString() === now.toDateString();
+  const isYesterday =
+    new Date(now.setDate(now.getDate() - 1)).toDateString() === date.toDateString();
+
+  const options = { hour: "2-digit", minute: "2-digit", hour12: true };
+
+  if (isToday) {
+    return `Today, ${date.toLocaleTimeString(undefined, options)}`;
+  } else if (isYesterday) {
+    return `Yesterday, ${date.toLocaleTimeString(undefined, options)}`;
+  } else {
+    return date.toLocaleString(undefined, { ...options, year: "numeric", month: "short", day: "numeric" });
+  }
+};
+
+
 export function getTasksForDate(tasks, selectedDate) {
   // Normalize the selected date to midnight for proper comparison
   const targetDate = new Date(selectedDate);
