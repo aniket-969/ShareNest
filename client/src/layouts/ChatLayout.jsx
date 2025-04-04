@@ -14,7 +14,6 @@ const ChatLayout = ({ messages, currentUser }) => {
     if (viewportRef.current) {
       viewportRef.current.scrollTo({
         top: viewportRef.current.scrollHeight,
-        behavior: "smooth",
       });
     }
   }, []);
@@ -24,10 +23,10 @@ const ChatLayout = ({ messages, currentUser }) => {
     scrollToBottom();
   }, []); // Runs only once on mount
 
-  /** Auto-scroll when new messages arrive */
-  useEffect(() => {
-    scrollToBottom();
-  }, [chatMessages]);
+  // /** Auto-scroll when new messages arrive */
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [chatMessages]);
 
   /** Handle sending messages */
   const handleSendMessage = (content) => {
@@ -50,16 +49,37 @@ const ChatLayout = ({ messages, currentUser }) => {
     return () => socket.off("messageReceived", handleNewMessage);
   }, [socket]);
 
+  const handleScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    
+    if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
+      const prevScrollHeight = scrollHeight;
+      fetchNextPage().then(() => {
+        if (viewportRef.current) {
+          viewportRef.current.scrollTop = viewportRef.current.scrollHeight - prevScrollHeight;
+        }
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col w-full h-full">
       {/* ✅ Auto-scroll works because viewportRef is attached to ScrollArea */}
-      <ScrollArea ref={viewportRef} className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto">
+      <ScrollArea
+        ref={viewportRef}
+        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
+      >
         {chatMessages.map((msg, index) => {
           const prevMsg = index > 0 ? chatMessages[index - 1] : null;
           const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
           return (
-            <ChatMessage key={msg._id} message={msg} isCurrentUser={msg.sender._id === currentUser} showAvatar={showAvatar} />
+            <ChatMessage
+              key={msg._id}
+              message={msg}
+              isCurrentUser={msg.sender._id === currentUser}
+              showAvatar={showAvatar}
+            />
           );
         })}
       </ScrollArea>
