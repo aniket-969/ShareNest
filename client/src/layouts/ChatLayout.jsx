@@ -4,6 +4,7 @@ import ChatMessage from "@/components/Chat/ChatMessage";
 import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 
 const ChatLayout = ({
   messages,
@@ -16,34 +17,34 @@ const ChatLayout = ({
   const socket = getSocket();
   const [prevMessagesLength, setPrevMessagesLength] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
+  const { roomId } = useParams();
+  // Socket to update messages
+  useEffect(() => {
+    if (!roomId) return;
 
-// Socket to update messages
-useEffect(() => {
-  if (!roomId) return;
+    const handleNewMessage = (newMessage) => {
+      queryClient.setQueryData(["chat", roomId], (oldData) => {
+        if (!oldData) return;
+    
+        const updatedPages = [...oldData.pages];
+        const lastPageIndex = updatedPages.length - 1;
+    
+        updatedPages[lastPageIndex] = {
+          ...updatedPages[lastPageIndex],
+          messages: [newMessage, ...updatedPages[lastPageIndex].messages], // 👈 prepend
+        };
+    
+        return { ...oldData, pages: updatedPages };
+      });
+    };
+    
+    socket.on("messageReceived", handleNewMessage);
 
-  const handleNewMessage = (newMessage) => {
-    queryClient.setQueryData(["messages", roomId], (oldData) => {
-      if (!oldData) return;
-
-      const updatedPages = [...oldData.pages];
-      const lastPageIndex = updatedPages.length - 1;
-
-      updatedPages[lastPageIndex] = {
-        ...updatedPages[lastPageIndex],
-        messages: [...updatedPages[lastPageIndex].messages, newMessage],
-      };
-
-      return { ...oldData, pages: updatedPages };
-    });
-  };
-
-  socket.on("messageReceived", handleNewMessage);
-
-  return () => {
-    socket.off("messageReceived", handleNewMessage);
-  };
-}, [roomId, queryClient, socket]);
+    return () => {
+      socket.off("messageReceived", handleNewMessage);
+    };
+  }, [roomId, queryClient, socket]);
 
   /** Scroll to bottom function */
   const scrollToBottom = useCallback(() => {
@@ -73,7 +74,6 @@ useEffect(() => {
       setPrevMessagesLength(messages.length);
     }
   }, [messages, scrollToBottom, isInitialLoad, prevMessagesLength]);
-
 
   /** Handle infinite scroll (Load older messages) */
   const handleScroll = async (event) => {

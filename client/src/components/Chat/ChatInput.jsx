@@ -4,17 +4,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 import { useParams } from "react-router-dom";
-import Chat from './../../pages/room/Chat/Chat';
 
-const ChatInput = ({ onSendMessage }) => {
+const ChatInput = () => {
   const [content, setContent] = useState("");
   const { sendMessageMutation } = useChat();
   const { roomId } = useParams();
 
   const handleSendMessage = async () => {
     if (!content.trim()) return;
-    onSendMessage(content);
-    await sendMessageMutation.mutateAsync({ data: { content }, roomId });
+
+    await sendMessageMutation.mutateAsync({
+      roomId,
+      data: { content },
+    });
+
     setContent("");
   };
 
@@ -32,14 +35,16 @@ const ChatInput = ({ onSendMessage }) => {
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
-        className=" overflow-hidden rounded-md px-4 py-2 border focus:outline-none focus:ring-2 "
+        className="overflow-hidden rounded-md px-4 py-2 border focus:outline-none focus:ring-2"
         rows={1}
       />
       {content.trim() && (
-        <Button onClick={handleSendMessage} className="  rounded-full">
+        <Button onClick={handleSendMessage} className="rounded-full">
           <SendHorizontal />
         </Button>
       )}
-    </div>)
-}
-export default ChatInput
+    </div>
+  );
+};
+
+export default ChatInput;
