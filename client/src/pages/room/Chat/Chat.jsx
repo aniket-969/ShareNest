@@ -8,7 +8,7 @@ const Chat = () => {
   const { roomId } = useParams();
   const { messageQuery } = useChat();
   const { sessionQuery } = useAuth();
- 
+
   const {
     data: messageData,
     isLoading: isMessageLoading,
@@ -17,7 +17,6 @@ const Chat = () => {
     hasNextPage,
     isFetchingNextPage,
   } = messageQuery(roomId);
-
   const {
     data: userData,
     isLoading: isUserLoading,
@@ -28,19 +27,21 @@ const Chat = () => {
   if (isMessageError || isUserError)
     return <>Something went wrong. Please refresh.</>;
   // Flatten the messages array from all pages
- 
-  const allMessages = messageData.pages.flatMap((page) => page.messages).reverse();
-  console.log(allMessages)
+
+  const allMessages = messageData.pages
+    .flatMap((page) => page.messages)
+    .reverse();
+  // console.log(allMessages);
   return (
     <div className="flex flex-col items-center h-[400px] w-[25rem] rounded-lg shadow-md bgr">
-    <ChatLayout
-      messages={allMessages}
-      currentUser={userData._id}
-      fetchNextPage={fetchNextPage}
-      hasNextPage={hasNextPage}
-      isFetchingNextPage={isFetchingNextPage}
-    />
-  </div>
+      <ChatLayout
+        messages={allMessages}
+        currentUser={userData._id}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+      />
+    </div>
   );
 };
 

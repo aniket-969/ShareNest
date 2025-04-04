@@ -2,36 +2,48 @@ import ChatMessage from "@/components/Chat/ChatMessage";
 import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
 import { useEffect, useState, useRef, useCallback } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area"; // Only ScrollArea is needed
 
-// ChatLayout.jsx
-const ChatLayout = ({
-  messages,
-  currentUser,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
-}) => {
+const ChatLayout = ({ messages, currentUser }) => {
   const [chatMessages, setChatMessages] = useState(messages);
+  const viewportRef = useRef(null);
   const socket = getSocket();
 
-  const handleSendMessage = useCallback(
-    (content) => {
-      const newMessage = {
-        _id: Date.now().toString(), // Temporary ID
-        content,
-        sender: { _id: currentUser, username: "You" },
-      };
-      setChatMessages((prev) => [...prev, newMessage]);
-    },
-    [currentUser]
-  );
+  /** Scroll to bottom function */
+  const scrollToBottom = useCallback(() => {
+    if (viewportRef.current) {
+      viewportRef.current.scrollTo({
+        top: viewportRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, []);
 
-  // Listen for new incoming messages via socket
+  /** Auto-scroll on first load */
+  useEffect(() => {
+    scrollToBottom();
+  }, []); // Runs only once on mount
+
+  /** Auto-scroll when new messages arrive */
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
+
+  /** Handle sending messages */
+  const handleSendMessage = (content) => {
+    const newMessage = {
+      _id: Date.now().toString(),
+      content,
+      sender: { _id: currentUser, username: "You" },
+      createdAt: new Date().toISOString(),
+    };
+    setChatMessages((prev) => [...prev, newMessage]);
+  };
+
+  /** Handle new incoming messages via socket */
   useEffect(() => {
     const handleNewMessage = (newMessage) => {
-      shouldScrollToBottom.current = true;
-      setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+      setChatMessages((prev) => [...prev, newMessage]);
     };
 
     socket.on("messageReceived", handleNewMessage);
@@ -39,37 +51,22 @@ const ChatLayout = ({
   }, [socket]);
 
   return (
-    <>
-      <div className="flex flex-col w-full h-full">
-        <ScrollArea className="flex flex-col gap-4 px-4 py-2 h-[450px] overflow-y-auto">
-          {isFetchingNextPage && (
-            <div className="py-2 text-center text-sm text-gray-500">
-              Loading messages...
-            </div>
-          )}
+    <div className="flex flex-col w-full h-full">
+      {/* ✅ Auto-scroll works because viewportRef is attached to ScrollArea */}
+      <ScrollArea ref={viewportRef} className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto">
+        {chatMessages.map((msg, index) => {
+          const prevMsg = index > 0 ? chatMessages[index - 1] : null;
+          const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
-          <div className="flex flex-col space-y-2">
-            {messages.map((msg, index) => {
-              const prevMsg = index > 0 ? messages[index - 1] : null;
-              const showAvatar =
-                !prevMsg || prevMsg.sender._id !== msg.sender._id;
+          return (
+            <ChatMessage key={msg._id} message={msg} isCurrentUser={msg.sender._id === currentUser} showAvatar={showAvatar} />
+          );
+        })}
+      </ScrollArea>
 
-              return (
-                <ChatMessage
-                  key={msg._id}
-                  message={msg}
-                  isCurrentUser={msg.sender._id === currentUser}
-                  showAvatar={showAvatar}
-                />
-              );
-            })}
-          </div>
-        </ScrollArea>
-
-        {/* Chat Input */}
-        <ChatInput onSendMessage={handleSendMessage} />
-      </div>
-    </>
+      {/* Chat Input */}
+      <ChatInput onSendMessage={handleSendMessage} />
+    </div>
   );
 };
 
