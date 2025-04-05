@@ -5,6 +5,7 @@ import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { getDateLabel } from "@/utils/helper";
 
 const ChatLayout = ({
   messages,
@@ -129,26 +130,37 @@ const ChatLayout = ({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <ScrollArea
-        ref={viewportRef}
-        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
-        onScroll={handleScroll}
-      >
-        {messages.map((msg, index) => {
-          const prevMsg = index > 0 ? messages[index - 1] : null;
-          const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
+     <ScrollArea
+  ref={viewportRef}
+  className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
+  onScroll={handleScroll}
+>
+  {messages.map((msg, index) => {
+    const prevMsg = index > 0 ? messages[index - 1] : null;
+    const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
-          return (
-            <ChatMessage
-              key={msg._id}
-              message={msg}
-              isCurrentUser={msg.sender._id === currentUser}
-              showAvatar={showAvatar}
-              data-message-id={msg._id} // Add this attribute for scroll position reference
-            />
-          );
-        })}
-      </ScrollArea>
+    const currentDateLabel = getDateLabel(msg.createdAt);
+    const prevDateLabel = prevMsg ? getDateLabel(prevMsg.createdAt) : null;
+
+    const showDateSeparator = currentDateLabel !== prevDateLabel;
+
+    return (
+      <div key={msg._id}>
+        {showDateSeparator && (
+          <div className="text-center my-4 text-muted-foreground text-sm font-medium">
+            {currentDateLabel}
+          </div>
+        )}
+        <ChatMessage
+          message={msg}
+          isCurrentUser={msg.sender._id === currentUser}
+          showAvatar={showAvatar}
+          data-message-id={msg._id}
+        />
+      </div>
+    );
+  })}
+</ScrollArea>
 
       {/* Chat Input */}
       <ChatInput />
