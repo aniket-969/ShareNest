@@ -17,23 +17,25 @@ export const generateQRCode = async (text) => {
   }
 };
 
-export const formatMessageTime = (timestamp) => {
-  const date = new Date(timestamp);
-  const now = new Date();
+export const getDateLabel = (date) => {
+  const messageDate = new Date(date);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
 
-  const isToday = date.toDateString() === now.toDateString();
-  const isYesterday =
-    new Date(now.setDate(now.getDate() - 1)).toDateString() === date.toDateString();
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
 
-  const options = { hour: "2-digit", minute: "2-digit", hour12: true };
+  if (isSameDay(messageDate, today)) return "Today";
+  if (isSameDay(messageDate, yesterday)) return "Yesterday";
 
-  if (isToday) {
-    return `Today, ${date.toLocaleTimeString(undefined, options)}`;
-  } else if (isYesterday) {
-    return `Yesterday, ${date.toLocaleTimeString(undefined, options)}`;
-  } else {
-    return date.toLocaleString(undefined, { ...options, year: "numeric", month: "short", day: "numeric" });
-  }
+  return messageDate.toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 };
 
 
