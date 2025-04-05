@@ -87,7 +87,7 @@ export function AppSidebar() {
         </div>
 
         {/* Pending Requests */}
-        <div className="p-4 border-b">
+       {roomData?.pendingRequests && <div className="p-4 border-b">
           <div className="flex items-center text-sm cursor-pointer space-x-2" onClick={toggleRequests}>
             <Zap className="w-5 h-5 text-yellow-300" />
             <span className="flex-1  font-medium ">Join Requests</span>
@@ -108,7 +108,7 @@ export function AppSidebar() {
               </ScrollArea>
             </div>
           )}
-        </div>
+        </div>}
 
         {/* Menu Items */}
         <SidebarGroup>
