@@ -7,11 +7,8 @@ import {
   Inbox,
   Settings,
   Wallet,
-  Users,
-  UserPlus,
   Zap,
 } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -25,16 +22,26 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "react-router-dom";
 import { useRoom } from "@/hooks/useRoom";
-import { useState } from "react";
-import RoomMembers from "./Sidebar/RoomMembers";
-import PendingRequests from "./Sidebar/PendingRequests";
+import { useState, lazy } from "react";
+import { Spinner } from "./ui/spinner";
+
+const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
+const PendingRequests = lazy(
+  () => import("@/components/Sidebar/PendingRequests")
+);
 
 export function AppSidebar() {
   const { roomId } = useParams();
   const { roomQuery } = useRoom(roomId);
-  const { data: roomData, isLoading } = roomQuery;
+  const { data: roomData, isLoading, isError } = roomQuery;
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
+  if (isLoading || !roomId) {
+    return <Spinner />;
+  }
+  if (isError) {
+    return <p>Please Refresh</p>;
+  }
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
@@ -46,36 +53,36 @@ export function AppSidebar() {
   };
 
   const items = [
-    { title: "Home", url: "/room", icon: Home },
-    { title: "Room", url: roomId ? `/room/${roomId}` : "/room", icon: Inbox },
+    { title: "Home", url:"/room", icon: Home },
+    { title: "Room", url:  `/room/${roomId}` , icon: Inbox },
     {
       title: "Awards",
-      url: roomId ? `/room/${roomId}/awards` : "/room",
+      url:  `/room/${roomId}/awards` ,
       icon: Award,
     },
     {
       title: "Events",
-      url: roomId ? `/room/${roomId}/events` : "/room",
+      url:  `/room/${roomId}/events` ,
       icon: CalendarDays,
     },
     {
       title: "Expense",
-      url: roomId ? `/room/${roomId}/expense` : "/room",
+      url:  `/room/${roomId}/expense` ,
       icon: Wallet,
     },
     {
       title: "Task",
-      url: roomId ? `/room/${roomId}/tasks` : "/room",
+      url:  `/room/${roomId}/tasks` ,
       icon: ClipboardList,
     },
     {
       title: "Maintenance",
-      url: roomId ? `/room/${roomId}/maintenance` : "/room",
+      url:  `/room/${roomId}/maintenance` ,
       icon: Hammer,
     },
     {
       title: "Settings",
-      url: roomId ? `/room/${roomId}/settings` : "/room/settings",
+      url:  `/room/${roomId}/settings`,
       icon: Settings,
     },
   ];
@@ -85,7 +92,7 @@ export function AppSidebar() {
       <SidebarContent>
         {/* Room Info */}
         <div className="p-4 border-b">
-          <h2 className="text-lg font-bold">
+          <h2 className="text-lg font-bold line-clamp-1">
             {roomData?.name.toUpperCase() || "Loading..."}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
@@ -102,7 +109,11 @@ export function AppSidebar() {
 
         {/* Pending Requests */}
         {roomData?.pendingRequests && (
-          <PendingRequests pendingRequests={roomData?.pendingRequests} showRequests={showRequests} toggleRequests={toggleRequests}/>
+          <PendingRequests
+            pendingRequests={roomData?.pendingRequests}
+            showRequests={showRequests}
+            toggleRequests={toggleRequests}
+          />
         )}
 
         {/* Menu Items */}
