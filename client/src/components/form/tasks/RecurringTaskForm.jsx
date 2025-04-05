@@ -22,25 +22,59 @@ import {
   SelectTrigger,
   SelectContent,
   SelectItem,
-  SelectValue, 
+  SelectValue,
 } from "../../ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { MultiSelect } from "@/components/ui/multiSelect";
+import MultiSelect from "@/components/ui/multiSelect";
 import DatePicker from "@/components/ui/datePicker";
 
-export const RecurringTaskForm = ({ participants }) => {
+const RecurringTaskForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createTaskMutation } = useTask(roomId);
   const [customRecurrence, setCustomRecurrence] = useState(false);
+  const [recurrenceType, setRecurrenceType] = useState("daily");
 
   const onSubmit = async (values) => {
-    
-    console.log(values);
+    const dayMapping = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const formattedData = {
+      ...values,
+      recurring: {
+        ...values.recurring,
+        patterns: [
+          {
+            frequency: customRecurrence
+              ? "custom"
+              : values.recurring.patterns[0].frequency,
+            interval: customRecurrence
+              ? parseInt(values.recurring.patterns[0].interval)
+              : 1,
+
+            days: values.recurring.patterns[0].days.map((day) => {
+              // ✅ Check if the value is a weekday string
+              if (typeof day === "string" && dayMapping.includes(day)) {
+                return dayMapping.indexOf(day);
+              }
+              // ✅ If it's a number or numeric string (like "1"), convert to int
+              return parseInt(day, 10);
+            }),
+          },
+        ],
+      },
+    };
+    console.log(formattedData);
     // return;
 
     try {
-      const response = await createTaskMutation.mutateAsync(values);
+      const response = await createTaskMutation.mutateAsync(formattedData);
       toast("Task added successfully!");
       console.log(response);
     } catch (error) {
@@ -53,21 +87,26 @@ export const RecurringTaskForm = ({ participants }) => {
     defaultValues: {
       title: "",
       description: "",
-      dueDate: undefined,
-      startDate: undefined,
-      participants: [],
-      priority: "low",
-      recurring: true,
-      recurrencePattern: "",
-      recurrenceDays: [],
-      customRecurrence: undefined,
       assignmentMode: "rotation",
+      participants: [],
+      recurring: {
+        enabled: true,
+        patterns: [
+          {
+            frequency: "",
+            interval: "1",
+            days: [],
+          },
+        ],
+
+        startDate: undefined,
+        dueDate: undefined,
+      },
     },
   });
-
   console.log("Form Errors:", form.formState.errors);
 
-  const days = [
+  const daysOfWeek = [
     "Sunday",
     "Monday",
     "Tuesday",
@@ -76,7 +115,21 @@ export const RecurringTaskForm = ({ participants }) => {
     "Friday",
     "Saturday",
   ];
-
+  const monthsOfYear = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  console.log(form.watch("recurring.patterns"));
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -110,34 +163,7 @@ export const RecurringTaskForm = ({ participants }) => {
           )}
         />
 
-        {/* Priority */}
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priority</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Recurrence Pattern */}
+        {/* Recurrence Pattern Toggle */}
         <div className="flex items-center gap-4">
           <Label htmlFor="custom-toggle" className="text-sm">
             Predefined
@@ -152,44 +178,71 @@ export const RecurringTaskForm = ({ participants }) => {
           </Label>
         </div>
 
+        {/* Frequency Selector */}
         {!customRecurrence ? (
-          <FormField
-            control={form.control}
-            name="recurrencePattern"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Repetition Pattern</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select pattern" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <>
+            <FormField
+              control={form.control}
+              name="recurring.patterns[0].frequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Repetition Pattern</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setRecurrenceType(value);
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select pattern" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Interval Field for Predefined Frequencies */}
+            <FormField
+              control={form.control}
+              name="recurring.patterns[0].interval"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {recurrenceType === "daily"
+                      ? "Repeat every (days)"
+                      : recurrenceType === "weekly"
+                        ? "Repeat every (weeks)"
+                        : "Repeat every (months)"}
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter interval" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
         ) : (
           <FormField
             control={form.control}
-            name="customRecurrence"
+            name="recurring.patterns[0].interval"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Custom Recurrence</FormLabel>
+                <FormLabel>Custom Recurrence Interval (Days)</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="e.g. if repeats every 3 days mention 3"
-                    {...field}
                     type="number"
+                    placeholder="Enter interval in days"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -198,24 +251,48 @@ export const RecurringTaskForm = ({ participants }) => {
           />
         )}
 
-        {/* Recurrence Days */}
-        <FormField
-          control={form.control}
-          name="recurrenceDays"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Days task happens</FormLabel>
-              <FormControl>
-                <MultiSelect
-                  options={days}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Conditional Fields Based on Frequency */}
+        {recurrenceType === "weekly" && (
+          <FormField
+            control={form.control}
+            name="recurring.patterns[0].days"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Days of the Week</FormLabel>
+                <FormControl>
+                  <MultiSelect
+                    options={daysOfWeek}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {recurrenceType === "monthly" && (
+          <FormField
+            control={form.control}
+            name="recurring.patterns[0].days"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select Days of the Month</FormLabel>
+                <FormControl>
+                  <MultiSelect
+                    options={Array.from({ length: 31 }, (_, i) =>
+                      (i + 1).toString()
+                    )}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Participants Selector */}
         <FormField
@@ -223,13 +300,12 @@ export const RecurringTaskForm = ({ participants }) => {
           name="participants"
           render={({ field }) => (
             <FormItem>
-              <FormLabel> Choose Participants</FormLabel>
+              <FormLabel>Choose Participants</FormLabel>
               <ParticipantSelector
                 participants={participants}
-                onChange={field.onChange} // Directly bind field.onChange
+                onChange={field.onChange}
                 selectionTransform={(participant) => participant._id}
               />
-
               <FormMessage />
             </FormItem>
           )}
@@ -251,7 +327,6 @@ export const RecurringTaskForm = ({ participants }) => {
         />
 
         {/* End Date */}
-
         <FormField
           control={form.control}
           name="dueDate"
@@ -266,8 +341,18 @@ export const RecurringTaskForm = ({ participants }) => {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        {/* Action Buttons */}
+        <div className="flex gap-3 justify-end">
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={createTaskMutation.isLoading}>
+            {createTaskMutation.isLoading ? "Creating..." : "Create Task"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
 };
+
+export default RecurringTaskForm

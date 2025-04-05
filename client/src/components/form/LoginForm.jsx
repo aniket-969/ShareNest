@@ -20,7 +20,7 @@ export const SignIn = () => {
   const { loginMutation } = useAuth();
   const onSubmit = async (values) => {
     console.log(values);
-    try {
+    try { 
       const response = await loginMutation.mutateAsync(values);
       console.log(response);
       toast("User login successful");

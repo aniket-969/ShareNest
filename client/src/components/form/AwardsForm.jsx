@@ -17,7 +17,7 @@ import { useAward } from "@/hooks/useAwards";
 import { createCustomAwardSchema } from "@/schema/awardsSchema";
 import ParticipantSelector from "../ParticipantsSelector";
 
-export const AwardsForm = ({ participants }) => {
+const AwardsForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createAwardMutation } = useAward();
   const onSubmit = async (values) => {
@@ -135,3 +135,5 @@ export const AwardsForm = ({ participants }) => {
     </Form>
   );
 };
+
+export default AwardsForm

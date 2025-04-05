@@ -5,52 +5,114 @@ import {
 } from "@/utils/validation";
 import { z } from "zod";
 
+const recurrencePatternSchema = z.object({
+  frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
+  interval: z.coerce.number().int().positive().default(1),
+  days: z
+    .array(
+      z.union([
+        z.enum([
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ]),
+        z.string().regex(/^(?:[1-9]|[12][0-9]|3[01])$/), // 1-31 as string
+      ])
+    )
+    .optional(),
+  weekOfMonth: z
+    .enum(["first", "second", "third", "fourth", "last"])
+    .optional(),
+  dayOfWeek: z.number().min(0).max(6).optional(),
+});
+
+const recurringSchema = z.object({
+  enabled: z.boolean(),
+  patterns: z.array(recurrencePatternSchema).optional(),
+});
+
 export const createRoomTaskSchema = z
   .object({
-    title: stringValidation(1, 20, "title"),
-    description: optionalStringValidation(5, 50, "description").optional(),
+    title: stringValidation(1, 40, "title"),
+    description: optionalStringValidation(1, 100, "description"),
     assignmentMode: z.enum(["single", "rotation"]),
-    dueDate: z.date().optional(),
-    startDate: z.date().optional(),
     participants: z
       .array(objectIdValidation)
-      .min(1, "Minimum one participants is required")
-      .max(20, "Maximum allowed participants are 20"),
-    priority: z.enum(["low", "medium", "high"]).optional(),
-    recurring: z.boolean().optional(),
-    recurrencePattern: optionalStringValidation(1, 20, "recurrence pattern"),
-    recurrenceDays: z
-  .array(
-    z.enum([
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ])
-  )
-  .optional()
-,
-    customRecurrence:z.coerce.number()
-    .max(300, { message: "Maximum allowed value for custom recurrence is 300" })
-    .min(1, { message: "Minimum one digit is required" })
-    .optional(),
+      .min(1, "At least one participant is required")
+      .max(20, "Maximum 20 participants allowed"),
+
+    // Recurring task fields
+    recurring: recurringSchema,
+    startDate: z.date().optional(),
+    dueDate: z.date().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.recurring) {
-      const hasRecurrenceDays =
-        data.recurrenceDays && data.recurrenceDays.length > 0;
-      const hasRecurrencePattern = !!data.recurrencePattern;
-      const hasCustomRecurrence = !!data.customRecurrence;
+    // Validate dates
+    if (data.startDate && data.dueDate && data.startDate > data.dueDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Due date must be after start date",
+        path: ["dueDate"],
+      });
+    }
 
-      if (!hasRecurrenceDays && !hasRecurrencePattern && !hasCustomRecurrence) {
+    // Validate recurring task requirements
+    if (data.recurring.enabled) {
+      if (!data.recurring.patterns) {
         ctx.addIssue({
-          path: ["recurrenceDays"],
-          message:
-            "At least one of recurrenceDays, recurrencePattern, or customRecurrence must be provided",
+          code: z.ZodIssueCode.custom,
+          message: "Recurrence pattern is required for recurring tasks",
+          path: ["pattern"],
         });
+        return;
+      }
+
+      const pattern = data.recurring.patterns;
+      // Validate pattern based on frequency
+      switch (pattern.frequency) {
+        case "weekly":
+          if (!pattern.selectedDays?.length) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Select at least one day for weekly recurrence",
+              path: ["pattern", "selectedDays"],
+            });
+          }
+          break;
+
+        case "monthly":
+          if (pattern.monthlyOption === "dayOfMonth" && !pattern.dayOfMonth) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Day of month is required",
+              path: ["pattern", "dayOfMonth"],
+            });
+          }
+          if (
+            pattern.monthlyOption === "dayOfWeek" &&
+            (!pattern.weekOfMonth || typeof pattern.dayOfWeek !== "number")
+          ) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Week of month and day of week are required",
+              path: ["pattern", "weekOfMonth"],
+            });
+          }
+          break;
+
+        case "custom":
+          if (!pattern.customDays) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Number of days is required for custom recurrence",
+              path: ["pattern", "customDays"],
+            });
+          }
+          break;
       }
     }
   });

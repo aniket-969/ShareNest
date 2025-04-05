@@ -24,7 +24,7 @@ export const PollForm = () => {
     defaultValues: {
       title: "",
       voteEndTime: "",
-      options: [""], // Start with one empty option
+      options: [""], 
     },
   });
 

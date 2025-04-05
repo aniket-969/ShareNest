@@ -37,10 +37,6 @@ const roomSchema = new Schema(
     ],
     pendingRequests: [
       {
-        id: {
-          type: Schema.Types.ObjectId,
-          default: new mongoose.Types.ObjectId(),
-        },
         userId: { type: Schema.Types.ObjectId, ref: "User" },
         role: { type: String, enum: ["tenant", "landlord"], required: true },
         requestedAt: { type: Date, default: Date.now },
@@ -114,36 +110,33 @@ const roomSchema = new Schema(
     tasks: [
       {
         _id: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           default: () => new mongoose.Types.ObjectId(),
         },
         title: {
           type: String,
           required: true,
         },
-        description: {
-          type: String,
-        },
-        currentAssignee: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: function () {
-            return this.assignmentMode === "single";
-          }, // Only required if it's a direct assignment
-        },
+        description: String,
         createdBy: {
           type: Schema.Types.ObjectId,
           ref: "User",
           required: true,
         },
-        dueDate: {
-          type: Date,
+        assignmentMode: {
+          type: String,
+          enum: ["single", "rotation"],
+          default: "single",
+        },
+        currentAssignee: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
         },
         participants: [
           {
             type: Schema.Types.ObjectId,
             ref: "User",
-            required: true,
           },
         ],
         rotationOrder: [
@@ -152,56 +145,61 @@ const roomSchema = new Schema(
             ref: "User",
           },
         ],
-
-        assignmentMode: {
-          type: String,
-          enum: ["single", "rotation"],
-          default: "single",
-          required: true,
-        },
-
-        completed: {
-          type: Boolean,
-          default: false,
-        },
-        priority: {
-          type: String,
-          enum: ["low", "medium", "high"],
-          default: "low",
-        },
-        switches: [
-          {
-            requestedBy: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-            requestedTo: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-          },
-        ],
-        switchCountPerUser: [
-          {
-            user: { type: Schema.Types.ObjectId, ref: "User" },
-            requestCount: { type: Number, default: 0 },
-            acceptCount: { type: Number, default: 0 },
-          },
-        ],
         recurring: {
-          type: Boolean,
-          default: false,
+          enabled: {
+            type: Boolean,
+            default: false,
+          },
+          type: {
+            type: String,
+            enum: ["fixed", "dynamic", "mixed"],
+            // fixed: specific days/dates
+            // dynamic: every X days
+            // mixed: combination of both
+          },
+          patterns: [
+            {
+              frequency: {
+                type: String,
+                enum: ["daily", "weekly", "monthly", "custom"],
+              },
+              interval: {
+                type: Number,
+                default: 1, // every X days/weeks/months
+              },
+              days: [Number], // 0-6 for weekdays, 1-31 for monthdays
+              weekOfMonth: {
+                type: String,
+                enum: ["first", "second", "third", "fourth", "last"],
+              },
+              dayOfWeek: {
+                type: Number, // 0-6 representing Sunday to Saturday
+              },
+            },
+          ],
+          startDate: Date,
+          dueDate: Date,
         },
-        recurrencePattern: {
+        status: {
           type: String,
-          enum: ["daily", "weekly", "monthly", "custom"],
+          enum: ["pending", "completed", "skipped"],
+          default: "pending",
         },
-        recurrenceDays: [Number],
-        customRecurrence: {
-          type: Number,
-        },
+        completionHistory: [
+          {
+            date: Date,
+            completedBy: {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+            },
+            status: {
+              type: String,
+              enum: ["completed", "skipped", "reassigned"],
+            },
+            notes: String,
+          },
+        ],
+        lastCompletedDate: Date,
       },
     ],
 

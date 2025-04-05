@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { useMaintenance } from "./../../hooks/useMaintenance";
 import { useParams } from "react-router-dom";
 
-export const MaintenanceForm = () => {
+ const MaintenanceForm = () => {
   const { roomId } = useParams();
   const { createMaintenanceMutation } = useMaintenance(roomId);
   const onSubmit = async (values) => {
@@ -130,3 +130,5 @@ export const MaintenanceForm = () => {
     </Form>
   );
 };
+
+export default MaintenanceForm

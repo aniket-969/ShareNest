@@ -1,15 +1,18 @@
-import { EventsForm } from "@/components/form/EventsForms";
 import { Spinner } from "@/components/ui/spinner";
 import { useEvent } from "@/hooks/useEvent";
 import { getSocket } from "@/socket";
-import { useEffect } from "react";
+import { Suspense, useEffect, useState,lazy } from "react";
 import { useParams } from "react-router-dom";
-import FormWrapper from "@/components/ui/formWrapper";
+import { Button } from "@/components/ui/button";
+
+const EventsForm = lazy(() => import("@/components/form/EventsForms"));
+const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
 const RoomEvents = () => {
   const { roomId } = useParams();
   const { roomEventsQuery } = useEvent();
   const { isLoading, data, isError } = roomEventsQuery(roomId);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   // console.log(data);
   const socket = getSocket();
 
@@ -34,10 +37,17 @@ const RoomEvents = () => {
 
   return (
     <div className="flex flex-col gap-6 w-full items-center ">
-      <h2 className="font-bold text-xl">Create Event</h2>
-      <FormWrapper>
-        <EventsForm />
-      </FormWrapper>
+      <h2 className="font-bold text-xl"> Events</h2>
+      <Button onClick={() => setIsFormOpen(true)}>Create Event</Button>
+
+      {isFormOpen && (
+        <Suspense fallback={<Spinner />}>
+          <FormWrapper onClose={() => setIsFormOpen(false)}>
+            {" "}
+            <EventsForm />
+          </FormWrapper>{" "}
+        </Suspense>
+      )}
     </div>
   );
 };

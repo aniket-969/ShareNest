@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const EventsForm = () => {
+const EventsForm = () => {
   const { roomId } = useParams();
 
   const { createEventMutation } = useEvent();
@@ -154,3 +154,5 @@ export const EventsForm = () => {
     </Form>
   );
 };
+
+export default EventsForm;

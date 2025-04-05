@@ -8,6 +8,7 @@ import { Poll } from "../models/poll.model.js";
 import { Expense } from "../models/expense.model.js";
 import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
 }
@@ -164,10 +165,15 @@ const adminResponse = asyncHandler(async (req, res) => {
       throw new ApiError(404, "User not found");
     }
 
-    user.rooms.push({ id: room._id, name: room.name });
+    user.rooms.push({ roomId: room._id, name: room.name });
     await user.save();
     await room.save();
 
+    emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
+      action: "approved",
+      roomId: room._id,
+      roomName: room.name,
+    });
     return res.json(
       new ApiResponse(200, {}, "User approved and added to the room")
     );
@@ -176,7 +182,7 @@ const adminResponse = asyncHandler(async (req, res) => {
     await room.save();
 
     emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
-      action: "approved",
+      action: "denied",
       roomId: room._id,
       roomName: room.name,
     });
@@ -216,40 +222,36 @@ const deleteRoom = asyncHandler(async (req, res) => {
 const getRoomData = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
-  // console.log(roomId, userId);
-  console.log("getting room Data")
-  let roomQuery = await Room.findById(roomId).select(
-    "-groupCode -pendingRequests"
-  );
+
+  console.log("getting room Data");
+
+  // Fetch room with/without pendingRequests based on admin status
+  let roomQuery = Room.findById(roomId).select("-groupCode");
+  
+  // Check if user is admin (without making an extra DB call)
+  const isAdmin = await Room.exists({ _id: roomId, admin: userId });
+
+  if (!isAdmin) {
+    roomQuery = roomQuery.select("-pendingRequests"); // Exclude pendingRequests for non-admins
+  }
 
   const room = await roomQuery.populate([
     { path: "admin", select: "username fullName avatar _id" },
     { path: "tenants", select: "username fullName avatar _id" },
     { path: "landlord", select: "username fullName avatar _id" },
-    {
-      path: "awards",
-    },
-    {
-      path: "tasks.currentAssignee",select:"username fullName",
-    },
+    { path: "awards" },
+    { path: "tasks.currentAssignee", select: "username fullName" },
     { path: "polls" },
+    ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []), // Only populate pendingRequests if admin
   ]);
 
   if (!room) {
     throw new ApiError(404, "Room not found");
   }
 
-  if (room.admin.toString() === userId.toString()) {
-    const roomWithRequests = await Room.findById(roomId)
-      .select("-groupCode")
-      .populate("admin tenants landlord awards pendingRequests.userId");
-    return res.json(
-      new ApiResponse(200, roomWithRequests, "Room data fetched successfully")
-    );
-  }
-
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
 });
+
 
 const leaveRoom = asyncHandler(async (req, res) => {
   console.log("This is user", req.user);

@@ -11,18 +11,27 @@ import {
   FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useRoomMutation } from "@/hooks/useRoom";
 
 export const JoinRoomForm = () => {
-  const onSubmit = (values) => {
+  const { requestJoinRoomMutation } = useRoomMutation();
+
+  const onSubmit = async (values) => {
     console.log(values);
+    try {
+      const response = await requestJoinRoomMutation.mutateAsync(values);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const form = useForm({
     resolver: zodResolver(addUserRequestSchema),
     defaultValues: {
-      groupCode:"",
+      groupCode: "",
       role: "",
     },
   });
@@ -44,7 +53,6 @@ export const JoinRoomForm = () => {
             </FormItem>
           )}
         />
-
 
         <FormField
           control={form.control}

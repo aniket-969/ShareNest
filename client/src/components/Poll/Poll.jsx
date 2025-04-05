@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { getSocket } from "@/socket";
 import { useParams } from "react-router-dom";
 
-const PollVote = ({ initialPolls }) => {
+const Poll = ({ initialPolls }) => {
   const [polls, setPolls] = useState(initialPolls);
   const { sessionQuery } = useAuth();
   const { data: user, isLoading, isError } = sessionQuery;
@@ -48,7 +48,7 @@ const PollVote = ({ initialPolls }) => {
   if (isError) {
     return <p>Something went wrong</p>;
   }
-
+console.log(polls)
   return (
     <div className="flex flex-col gap-4">
       {polls.map((poll) =>
@@ -62,4 +62,4 @@ const PollVote = ({ initialPolls }) => {
   );
 };
 
-export default PollVote;
+export default Poll;

@@ -4,6 +4,7 @@ import { Spinner } from "../ui/spinner";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import RoomListSkeleton from "../skeleton/Room/roomList";
 
 const RoomList = () => {
   const { sessionQuery } = useAuth();
@@ -11,7 +12,7 @@ const RoomList = () => {
   //   console.log(data);
 
   if (isLoading) {
-    return <Spinner />;
+    return <RoomListSkeleton />;
   }
   if (isError) {
     return <>Something went wrong . Please refresh</>;

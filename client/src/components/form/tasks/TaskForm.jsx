@@ -25,48 +25,47 @@ import {
   SelectValue,
 } from "../../ui/select";
 import DatePicker from "@/components/ui/datePicker";
+import { Textarea } from "@/components/ui/textarea";
 
-export const TaskForm = ({ participants }) => {
+const TaskForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createTaskMutation } = useTask(roomId);
 
-  const [isRecurring, setIsRecurring] = useState(false);
-
-  const onSubmit = async (values) => {
-    const data = {
-      ...values,
-      currentAssignee: values.participants[0],
-    };
-    console.log(values, participants);
-  
-
-    try {
-      const response = await createTaskMutation.mutateAsync(data);
-      toast("Task added successfully!");
-      console.log(response);
-    } catch (error) {
-      console.error("Error creating task:", error);
-    }
-  };
   const form = useForm({
     resolver: zodResolver(createRoomTaskSchema),
     defaultValues: {
       title: "",
       description: "",
-      dueDate: undefined,
-      startDate: undefined,
-      participants: [],
-      recurring: false,
-      priority: "low",
       assignmentMode: "single",
+      participants: [],
+      recurring: {
+        enabled: false,
+      },
+      startDate: undefined,
+      dueDate: undefined,
     },
   });
-  // console.log("Form Errors:", form.formState.errors);
-  //   const participantsValue = form.watch("participants");
-  //   console.log("Participants Value:", participantsValue);
+
+  const onSubmit = async (values) => {
+    try {
+      const taskData = {
+        ...values,
+        // Set the first participant as currentAssignee for single mode
+        currentAssignee: values.participants[0],
+      };
+
+      const response = await createTaskMutation.mutateAsync(taskData);
+      toast.success("Task created successfully!");
+      form.reset();
+    } catch (error) {
+      toast.error(error.message || "Failed to create task");
+      console.error("Error creating task:", error);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Title */}
         <FormField
           control={form.control}
@@ -75,7 +74,7 @@ export const TaskForm = ({ participants }) => {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Add title" {...field} />
+                <Input placeholder="Task title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,53 +89,31 @@ export const TaskForm = ({ participants }) => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Add description" {...field} />
+                <Textarea
+                  placeholder="Task description"
+                  className="resize-none"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Priority */}
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priority</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Participants Selector */}
+        {/* Participants */}
         <FormField
           control={form.control}
           name="participants"
           render={({ field }) => (
             <FormItem>
-              <FormLabel> Choose Participants</FormLabel>
-              <ParticipantSelector
-                participants={participants}
-                onChange={field.onChange} // Directly bind field.onChange
-                selectionTransform={(participant) => participant._id}
-              />
-
+              <FormLabel>Participants</FormLabel>
+              <FormControl>
+                <ParticipantSelector
+                  participants={participants}
+                  onChange={field.onChange}
+                  selectionTransform={(participant) => participant._id}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -157,8 +134,7 @@ export const TaskForm = ({ participants }) => {
           )}
         />
 
-        {/* End Date */}
-
+        {/* Due Date */}
         <FormField
           control={form.control}
           name="dueDate"
@@ -173,8 +149,17 @@ export const TaskForm = ({ participants }) => {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <div className="flex gap-3 justify-end">
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={createTaskMutation.isLoading}>
+            {createTaskMutation.isLoading ? "Creating..." : "Create Task"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
 };
+
+export default TaskForm;

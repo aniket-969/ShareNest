@@ -39,16 +39,6 @@ export const useRoom = (roomId) => {
     },
   });
 
-  const joinRoomMutation = useMutation({
-    queryFn: addUserRequest,
-    onSuccess: () => {
-      console.log("Join request sent successfully");
-      navigate("/room");
-    },
-    onError: (error) => {
-      console.error("Failed to send join request", error);
-    },
-  });
  
   const adminResponseMutation = useMutation({
     queryFn: adminResponse,
@@ -62,7 +52,6 @@ export const useRoom = (roomId) => {
 
   return {
     roomQuery,
-    joinRoomMutation,
     adminResponseMutation,
     updateRoomMutation,
     deleteRoomMutation,
@@ -82,6 +71,18 @@ export const useRoomMutation =()=>{
           console.error("Room creation failed:", error);
         },
       });
+
+      
+  const requestJoinRoomMutation = useMutation({
+    mutationFn: addUserRequest,
+    onSuccess: () => {
+      console.log("Join request sent successfully");
+      navigate("/room");
+    },
+    onError: (error) => {
+      console.error("Failed to send join request", error);
+    },
+  });
     
-      return { createRoomMutation };
+      return { createRoomMutation ,requestJoinRoomMutation};
 }

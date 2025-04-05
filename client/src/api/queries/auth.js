@@ -5,9 +5,7 @@ const baseAuth = "users";
 export const fetchSession = async () => {
   // console.log("calling session");
 
-  console.log("calling getAuth");
   const response = await axiosClient.get(`/${baseAuth}/session`);
-  console.log(response)
   // console.log("Fetched session data",response.data.data)
   localStorage.setItem("session", JSON.stringify(response.data.data));
   return response.data?.data;

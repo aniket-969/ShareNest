@@ -25,7 +25,7 @@ export const QRCarousel = ({ paymentMethod }) => {
 
     generateAllQRImages();
   }, [paymentMethod]);
-
+ 
   // console.log(paymentMethod);
   return (
     <Carousel className="w-full max-w-[14rem] md:max-w-[20rem] sm:max-w-[15rem] ">
