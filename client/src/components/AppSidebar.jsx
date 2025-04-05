@@ -7,7 +7,6 @@ import {
   Inbox,
   Settings,
   Wallet,
-  Zap,
 } from "lucide-react";
 import {
   Sidebar,
@@ -53,36 +52,36 @@ export function AppSidebar() {
   };
 
   const items = [
-    { title: "Home", url:"/room", icon: Home },
-    { title: "Room", url:  `/room/${roomId}` , icon: Inbox },
+    { title: "Home", url: "/room", icon: Home },
+    { title: "Room", url: `/room/${roomId}`, icon: Inbox },
     {
       title: "Awards",
-      url:  `/room/${roomId}/awards` ,
+      url: `/room/${roomId}/awards`,
       icon: Award,
     },
     {
       title: "Events",
-      url:  `/room/${roomId}/events` ,
+      url: `/room/${roomId}/events`,
       icon: CalendarDays,
     },
     {
       title: "Expense",
-      url:  `/room/${roomId}/expense` ,
+      url: `/room/${roomId}/expense`,
       icon: Wallet,
     },
     {
       title: "Task",
-      url:  `/room/${roomId}/tasks` ,
+      url: `/room/${roomId}/tasks`,
       icon: ClipboardList,
     },
     {
       title: "Maintenance",
-      url:  `/room/${roomId}/maintenance` ,
+      url: `/room/${roomId}/maintenance`,
       icon: Hammer,
     },
     {
       title: "Settings",
-      url:  `/room/${roomId}/settings`,
+      url: `/room/${roomId}/settings`,
       icon: Settings,
     },
   ];
