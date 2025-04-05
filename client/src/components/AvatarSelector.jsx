@@ -46,7 +46,7 @@ export const AvatarSelector = ({ onSelect }) => {
         </DialogTitle>
 
         <ScrollArea className="max-h-64 pr-2">
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-5 gap-4 p-2">
             {avatars.map((url) => (
               <Card
                 key={url}
