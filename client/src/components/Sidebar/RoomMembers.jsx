@@ -11,7 +11,7 @@ const RoomMembers = ({ tenants, showMembers, toggleMembers }) => {
         <Users className="w-5 h-5" />
         <span className="flex-1 font-medium ">Members</span>
         <span className="text-xs bg-secondary px-2 text-black font-semibold py-1 rounded-full">
-          {tenants.length || 0}
+          {tenants?.length || 0}
         </span>
       </div>
       {showMembers && (

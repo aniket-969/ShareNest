@@ -9,7 +9,7 @@ import {
   Wallet,
   Users,
   UserPlus,
-  Zap
+  Zap,
 } from "lucide-react";
 
 import {
@@ -27,6 +27,7 @@ import { useParams } from "react-router-dom";
 import { useRoom } from "@/hooks/useRoom";
 import { useState } from "react";
 import RoomMembers from "./Sidebar/RoomMembers";
+import PendingRequests from "./Sidebar/PendingRequests";
 
 export function AppSidebar() {
   const { roomId } = useParams();
@@ -47,12 +48,36 @@ export function AppSidebar() {
   const items = [
     { title: "Home", url: "/room", icon: Home },
     { title: "Room", url: roomId ? `/room/${roomId}` : "/room", icon: Inbox },
-    { title: "Awards", url: roomId ? `/room/${roomId}/awards` : "/room", icon: Award },
-    { title: "Events", url: roomId ? `/room/${roomId}/events` : "/room", icon: CalendarDays },
-    { title: "Expense", url: roomId ? `/room/${roomId}/expense` : "/room", icon: Wallet },
-    { title: "Task", url: roomId ? `/room/${roomId}/tasks` : "/room", icon: ClipboardList },
-    { title: "Maintenance", url: roomId ? `/room/${roomId}/maintenance` : "/room", icon: Hammer },
-    { title: "Settings", url: roomId ? `/room/${roomId}/settings` : "/room/settings", icon: Settings },
+    {
+      title: "Awards",
+      url: roomId ? `/room/${roomId}/awards` : "/room",
+      icon: Award,
+    },
+    {
+      title: "Events",
+      url: roomId ? `/room/${roomId}/events` : "/room",
+      icon: CalendarDays,
+    },
+    {
+      title: "Expense",
+      url: roomId ? `/room/${roomId}/expense` : "/room",
+      icon: Wallet,
+    },
+    {
+      title: "Task",
+      url: roomId ? `/room/${roomId}/tasks` : "/room",
+      icon: ClipboardList,
+    },
+    {
+      title: "Maintenance",
+      url: roomId ? `/room/${roomId}/maintenance` : "/room",
+      icon: Hammer,
+    },
+    {
+      title: "Settings",
+      url: roomId ? `/room/${roomId}/settings` : "/room/settings",
+      icon: Settings,
+    },
   ];
 
   return (
@@ -60,36 +85,25 @@ export function AppSidebar() {
       <SidebarContent>
         {/* Room Info */}
         <div className="p-4 border-b">
-          <h2 className="text-lg font-bold">{roomData?.name.toUpperCase() || "Loading..."}</h2>
-          <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">{roomData?.description || ""}</p>
+          <h2 className="text-lg font-bold">
+            {roomData?.name.toUpperCase() || "Loading..."}
+          </h2>
+          <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
+            {roomData?.description || ""}
+          </p>
         </div>
 
         {/* Room Members */}
-      <RoomMembers toggleMembers={toggleMembers} showMembers={showMembers} tenants={roomData?.tenants}/>
+        <RoomMembers
+          toggleMembers={toggleMembers}
+          showMembers={showMembers}
+          tenants={roomData?.tenants}
+        />
 
         {/* Pending Requests */}
-       {roomData?.pendingRequests && <div className="p-4 border-b">
-          <div className="flex items-center text-sm cursor-pointer space-x-2" onClick={toggleRequests}>
-            <Zap className="w-5 h-5 text-yellow-300" />
-            <span className="flex-1  font-medium ">Join Requests</span>
-            <span className="text-xs bg-secondary text-black font-semibold px-[0.6rem] py-1 rounded-full ">{roomData?.pendingRequests?.length || 0}</span>
-          </div>
-          {showRequests && (
-            <div className="mt-3">
-              <ScrollArea className="h-[104px]">
-                <div className="space-y-2 pr-3">
-                  {roomData?.pendingRequests?.map((request) => (
-                    <div key={request._id} className="flex items-center p-2 bg-secondary/20 rounded-lg">
-                      <img src={request.userId.avatar} alt={request.userId.fullName} className="w-8 h-8 rounded-full mr-3 border" />
-                      <span className="text-sm font-medium">{request.userId.fullName}</span>
-                      <UserPlus className="ml-auto cursor-pointer hover:scale-110 transition-transform" />
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          )}
-        </div>}
+        {roomData?.pendingRequests && (
+          <PendingRequests pendingRequests={roomData?.pendingRequests} showRequests={showRequests} toggleRequests={toggleRequests}/>
+        )}
 
         {/* Menu Items */}
         <SidebarGroup>
@@ -98,7 +112,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url} className="flex items-center space-x-3 px-3 py-2 hover:bg-accent rounded-lg">
+                    <a
+                      href={item.url}
+                      className="flex items-center space-x-3 px-3 py-2 hover:bg-accent rounded-lg"
+                    >
                       <item.icon className="w-5 h-5" />
                       <span className="text-sm font-medium">{item.title}</span>
                     </a>
