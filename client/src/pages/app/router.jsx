@@ -27,6 +27,7 @@ import RoomEvents from "../room/Event/RoomEvents.jsx";
 const LandingPage = React.lazy(() => import("../LandingPage.jsx"));
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
+
 const RoomRoutes = () => {
   return (
     <SocketProvider>

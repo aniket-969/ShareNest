@@ -23,25 +23,29 @@ const SocketProvider = ({ children }) => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log("connected", socket.id);
+      console.log("Recovered?", socket.recovered);
 
-      // Rejoin rooms after reconnecting
       const roomId = localStorage.getItem("currentRoomId");
-      if (roomId) {
+      if (!socket.recovered && roomId) {
         socket.emit("joinRoom", roomId);
-        console.log(`Rejoined room: ${roomId}`);
+        console.log(`Rejoined room manually: ${roomId}`);
+      } else {
+        console.log("Recovery succeeded; no need to manually rejoin room");
       }
     });
 
     socket.on("socketError", (err) => {
       console.error("Socket connection error:", err);
     });
+
     socket.onAny((event, data) => {
       console.log(`Received event: ${event}`, data);
     });
-    
+
     return () => {
-      socket.disconnect();
-      console.log("Disconnecting user")
+      socket.off("connect");
+      socket.off("socketError");
+      socket.offAny();
     };
   }, [socket]);
 
