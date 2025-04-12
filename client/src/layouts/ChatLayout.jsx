@@ -27,19 +27,19 @@ const ChatLayout = ({
     const handleNewMessage = (newMessage) => {
       queryClient.setQueryData(["chat", roomId], (oldData) => {
         if (!oldData) return;
-    
+
         const updatedPages = [...oldData.pages];
         const lastPageIndex = updatedPages.length - 1;
-    
+
         updatedPages[lastPageIndex] = {
           ...updatedPages[lastPageIndex],
           messages: [newMessage, ...updatedPages[lastPageIndex].messages], // 👈 prepend
         };
-    
+
         return { ...oldData, pages: updatedPages };
       });
     };
-    
+
     socket.on("messageReceived", handleNewMessage);
 
     return () => {
@@ -130,37 +130,39 @@ const ChatLayout = ({
 
   return (
     <div className="flex flex-col w-full h-full">
-     <ScrollArea
-  ref={viewportRef}
-  className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
-  onScroll={handleScroll}
->
-  {messages.map((msg, index) => {
-    const prevMsg = index > 0 ? messages[index - 1] : null;
-    const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
+      <ScrollArea
+        ref={viewportRef}
+        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
+        onScroll={handleScroll}
+      >
+        {messages.map((msg, index) => {
+          const prevMsg = index > 0 ? messages[index - 1] : null;
+          const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
-    const currentDateLabel = getDateLabel(msg.createdAt);
-    const prevDateLabel = prevMsg ? getDateLabel(prevMsg.createdAt) : null;
+          const currentDateLabel = getDateLabel(msg.createdAt);
+          const prevDateLabel = prevMsg
+            ? getDateLabel(prevMsg.createdAt)
+            : null;
 
-    const showDateSeparator = currentDateLabel !== prevDateLabel;
+          const showDateSeparator = currentDateLabel !== prevDateLabel;
 
-    return (
-      <div key={msg._id}>
-        {showDateSeparator && (
-          <div className="text-center my-4 text-muted-foreground text-sm font-medium">
-            {currentDateLabel}
-          </div>
-        )}
-        <ChatMessage
-          message={msg}
-          isCurrentUser={msg.sender._id === currentUser}
-          showAvatar={showAvatar}
-          data-message-id={msg._id}
-        />
-      </div>
-    );
-  })}
-</ScrollArea>
+          return (
+            <div key={msg._id}>
+              {showDateSeparator && (
+                <div className="text-center my-4 text-muted-foreground text-sm font-medium">
+                  {currentDateLabel}
+                </div>
+              )}
+              <ChatMessage
+                message={msg}
+                isCurrentUser={msg.sender._id === currentUser}
+                showAvatar={showAvatar}
+                data-message-id={msg._id}
+              />
+            </div>
+          );
+        })}
+      </ScrollArea>
 
       {/* Chat Input */}
       <ChatInput />
