@@ -23,10 +23,11 @@ const mountJoinRoomEvent = (socket) => {
 const initializeSocketIO = (io) => {
   const room = io.sockets.adapter.rooms.get("6756e343b2fdac1824b18cc1");
   const userCount = room ? room.size : 0;
-
+ 
   console.log(`Number of users in room : ${userCount}`);
   return io.on("connection", async (socket) => {
     try {
+     
       const token =
         socket.handshake.headers.cookie
           ?.split("; ")
@@ -40,7 +41,7 @@ const initializeSocketIO = (io) => {
           ChatEventEnum.SOCKET_ERROR_EVENT,
           "Unauthorized: Token is missing."
         );
-        socket.disconnect(true); // Force disconnect the client
+        socket.disconnect(true); 
         return;
       }
 
@@ -60,6 +61,12 @@ const initializeSocketIO = (io) => {
       const user = await User.findById(decodedToken?._id).select(
         "-password -refreshToken"
       );
+      if (socket.recovered) {
+        console.log("✅ Connection recovered for user:", user._id);
+      } else {
+        console.log("🆕 Fresh connection for user:", user._id);
+      }
+
       if (!user) {
         console.log("Unauthorized socket connection: User not found.");
         socket.emit(
