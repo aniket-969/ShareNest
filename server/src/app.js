@@ -1,15 +1,15 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import {createServer} from "http"
-import {Server} from "socket.io"
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { rateLimit } from "express-rate-limit";
 import { initializeSocketIO } from "./socket/index.js";
 import { ApiError } from "./utils/ApiError.js";
 
 const app = express();
 
-const httpServer = createServer(app)
+const httpServer = createServer(app);
 
 app.use(
   cors({
@@ -24,6 +24,10 @@ const io = new Server(httpServer, {
     origin: process.env.CORS_ORIGIN,
     credentials: true,
   },
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    skipMiddlewares: false,
+  },
 });
 
 app.set("io", io);
@@ -37,11 +41,11 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  standardHeaders: true, 
-  legacyHeaders: false, 
+  windowMs: 15 * 60 * 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
   keyGenerator: (req, res) => {
-    return req.clientIp; 
+    return req.clientIp;
   },
   handler: (_, __, ___, options) => {
     throw new ApiError(
@@ -52,29 +56,29 @@ const limiter = rateLimit({
     );
   },
 });
- 
+
 // app.use(limiter);
 
 import userRouter from "./routes/user.routes.js";
 import pollRouter from "./routes/poll.routes.js";
 import awardRouter from "./routes/awards.routes.js";
-import eventRouter from "./routes/event.routes.js"
-import expenseRouter from "./routes/expense.routes.js"
-import taskRouter from "./routes/tasks.routes.js"
-import maintenanceRouter from "./routes/maintenance.routes.js"
-import roomRouter from "./routes/room.routes.js"
-import chatRouter from "./routes/chat.routes.js"
+import eventRouter from "./routes/event.routes.js";
+import expenseRouter from "./routes/expense.routes.js";
+import taskRouter from "./routes/tasks.routes.js";
+import maintenanceRouter from "./routes/maintenance.routes.js";
+import roomRouter from "./routes/room.routes.js";
+import chatRouter from "./routes/chat.routes.js";
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/room",roomRouter );
+app.use("/api/v1/room", roomRouter);
 app.use("/api/v1/poll", pollRouter);
 app.use("/api/v1/awards", awardRouter);
 app.use("/api/v1/event", eventRouter);
-app.use("/api/v1/expense",expenseRouter)
-app.use("/api/v1/tasks",taskRouter)
-app.use("/api/v1/maintenance",maintenanceRouter)
-app.use("/api/v1/chat",chatRouter)
+app.use("/api/v1/expense", expenseRouter);
+app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/maintenance", maintenanceRouter);
+app.use("/api/v1/chat", chatRouter);
 
-initializeSocketIO(io) 
+initializeSocketIO(io);
 
-export { app,httpServer };
+export { app, httpServer };
