@@ -29,9 +29,6 @@ const SocketProvider = ({ children }) => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log("connected", socket.id);
-      console.log("Recovered?", socket.recovered);
-
-     
     });
 
     socket.on("socketError", (err) => {
