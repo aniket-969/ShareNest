@@ -11,11 +11,13 @@ export const getSocket = () => {
       import.meta.env.REACT_APP_SOCKET_SERVER || "http://localhost:3000",
       {
         withCredentials: true,
+        transports: ["polling", "websocket"],
       }
     );
   }
   return socketInstance;
 };
+
 
 const SocketProvider = ({ children }) => {
   const socket = useMemo(() => getSocket(), []);
