@@ -7,17 +7,21 @@ let socketInstance;
 
 export const getSocket = () => {
   if (!socketInstance) {
+    const currentRoomId = localStorage.getItem("currentRoomId");
+
     socketInstance = io(
       import.meta.env.REACT_APP_SOCKET_SERVER || "http://localhost:3000",
       {
         withCredentials: true,
-        transports: ["polling", "websocket"],
+        transports: ["polling", "websocket"], // still keep this
+        auth: {
+          roomId: currentRoomId, // 👈 pass roomId in handshake
+        },
       }
     );
   }
   return socketInstance;
 };
-
 
 const SocketProvider = ({ children }) => {
   const socket = useMemo(() => getSocket(), []);
@@ -27,13 +31,7 @@ const SocketProvider = ({ children }) => {
       console.log("connected", socket.id);
       console.log("Recovered?", socket.recovered);
 
-      const roomId = localStorage.getItem("currentRoomId");
-      if (!socket.recovered && roomId) {
-        socket.emit("joinRoom", roomId);
-        console.log(`Rejoined room manually: ${roomId}`);
-      } else {
-        console.log("Recovery succeeded; no need to manually rejoin room");
-      }
+     
     });
 
     socket.on("socketError", (err) => {
