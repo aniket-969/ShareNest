@@ -24,10 +24,6 @@ const io = new Server(httpServer, {
     origin: process.env.CORS_ORIGIN,
     credentials: true,
   },
-  connectionStateRecovery: {
-    maxDisconnectionDuration: 2 * 60 * 1000,
-    skipMiddlewares: false,
-  },
 });
 
 app.set("io", io);

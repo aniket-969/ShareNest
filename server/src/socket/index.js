@@ -9,7 +9,6 @@ const mountJoinRoomEvent = (socket) => {
     console.log(`User joined the chat 🤝. chatId: `, roomId);
 
     socket.join(roomId);
-    socket.data.roomId = roomId;
     const room = io.sockets.adapter.rooms.get(roomId);
     const userCount = room ? room.size : 0;
 
@@ -24,17 +23,15 @@ const mountJoinRoomEvent = (socket) => {
 const initializeSocketIO = (io) => {
   const room = io.sockets.adapter.rooms.get("6756e343b2fdac1824b18cc1");
   const userCount = room ? room.size : 0;
-
   console.log(`Number of users in room : ${userCount}`);
+
   return io.on("connection", async (socket) => {
     console.log("🔁 Socket connected:", socket.id);
-    console.log("➡️ Recovery?", socket.recovered);
-
     const allSockets = Array.from(io.sockets.sockets.keys());
     console.log("🧠 Active sockets:", allSockets);
-
     const allRooms = Array.from(io.sockets.adapter.rooms.keys());
     console.log("📦 Known rooms:", allRooms);
+
     try {
       const token =
         socket.handshake.headers.cookie
@@ -62,7 +59,7 @@ const initializeSocketIO = (io) => {
           ChatEventEnum.SOCKET_ERROR_EVENT,
           "Unauthorized: Invalid or expired token."
         );
-        socket.disconnect(true); // Force disconnect
+        socket.disconnect(true);
         return;
       }
 
@@ -70,15 +67,6 @@ const initializeSocketIO = (io) => {
         "-password -refreshToken"
       );
 
-      if (socket.recovered) {
-        console.log("✅ Connection recovered for user:", user._id);
-        if (socket.data?.roomId) {
-          socket.join(socket.data.roomId);
-          console.log("✅ Rejoined room via recovery:", socket.data.roomId);
-        }
-      } else {
-        console.log("🆕 Fresh connection for user:", user._id);
-      }
       if (!user) {
         console.log("Unauthorized socket connection: User not found.");
         socket.emit(
@@ -87,6 +75,14 @@ const initializeSocketIO = (io) => {
         );
         socket.disconnect(true);
         return;
+      }
+
+      // ✅ Try auto-joining room from auth
+      const initialRoomId = socket.handshake.auth?.roomId;
+      if (initialRoomId) {
+        socket.join(initialRoomId);
+        socket.data.roomId = initialRoomId;
+        console.log("🧠 Joined room via handshake auth:", initialRoomId);
       }
 
       socket.user = user;
@@ -105,7 +101,7 @@ const initializeSocketIO = (io) => {
         console.log(
           "User disconnected 🚫. userId:",
           socket.user?._id,
-          "Reason",
+          "Reason:",
           reason
         );
         if (socket.user?._id) {
