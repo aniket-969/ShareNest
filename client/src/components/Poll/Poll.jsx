@@ -11,14 +11,12 @@ const Poll = ({ initialPolls }) => {
   const { data: user, isLoading, isError } = sessionQuery;
   const { roomId } = useParams();
   const socket = getSocket();
-// console.log(polls[0],polls[1])
+
   useEffect(() => {
     const handleCreatePoll = (newPoll) => {
-      console.log("create it");
       setPolls((prevPoll) => [...prevPoll, newPoll]);
     };
     const handleCastVote = (updatedPoll) => {
-      console.log("cast it");
       setPolls((prevPolls) =>
         prevPolls.map((poll) =>
           poll._id === updatedPoll.pollId
@@ -31,7 +29,7 @@ const Poll = ({ initialPolls }) => {
         )
       );
     };
-    
+
     socket.on("createPoll", handleCreatePoll);
     socket.on("castVote", handleCastVote);
 
@@ -41,16 +39,13 @@ const Poll = ({ initialPolls }) => {
     };
   }, [socket]);
 
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
+  if (isLoading)
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
+  if (isError)
+    return <p className="text-sm text-destructive">Something went wrong</p>;
 
-  if (isError) {
-    return <p>Something went wrong</p>;
-  }
-console.log(polls)
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 ">
       {polls.map((poll) =>
         poll.voters.includes(user._id) ? (
           <PollResults poll={poll} key={poll._id} />
