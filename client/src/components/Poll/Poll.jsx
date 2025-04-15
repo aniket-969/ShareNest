@@ -44,14 +44,23 @@ const Poll = ({ initialPolls }) => {
   if (isError)
     return <p className="text-sm text-destructive">Something went wrong</p>;
 
+  const voteForms = polls.filter((poll) => !poll.voters.includes(user._id));
+  const resultCards = polls.filter((poll) => poll.voters.includes(user._id));
+
   return (
-    <div className="flex flex-col gap-3 ">
-      {polls.map((poll) =>
-        poll.voters.includes(user._id) ? (
-          <PollResults poll={poll} key={poll._id} />
-        ) : (
-          <PollVoteForm poll={poll} key={poll._id} />
-        )
+    <div className="flex flex-col gap-3">
+      {/* Show all unvoted polls first */}
+      {voteForms.map((poll) => (
+        <PollVoteForm poll={poll} key={poll._id} />
+      ))}
+
+      {/* Then show voted results */}
+      {resultCards.length > 0 && (
+        <div className="mt-4 pt-2 border-t border-border">
+          {resultCards.map((poll) => (
+            <PollResults poll={poll} key={poll._id} />
+          ))}
+        </div>
       )}
     </div>
   );
