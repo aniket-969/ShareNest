@@ -1,4 +1,6 @@
+import TaskCard from "@/components/Tasks/TaskCard";
 import { Calendar } from "@/components/ui/calendar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { getTasksForDate } from "@/utils/helper";
 import { useEffect, useState } from "react";
 
@@ -26,33 +28,8 @@ const RoomCalendar = ({ tasks }) => {
       />
 
       {/* Scheduled Tasks */}
-      <div className="border rounded-lg shadow bg-card p-4 h-60 overflow-y-auto">
-        <h3 className="font-medium text-base mb-2">
-          Scheduled Tasks ({scheduledTasks.length})
-        </h3>
+     <TaskCard scheduledTasks={scheduledTasks}/>
 
-        {scheduledTasks.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No tasks for this date.</p>
-        ) : (
-          <ul className="space-y-3">
-            {scheduledTasks.map((task) => (
-              <li
-                key={task._id}
-                className="p-3 border rounded-md bg-muted hover:bg-muted/70 transition"
-              >
-                <p className="font-semibold text-sm">{task.title}</p>
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {task.description}
-                </p>
-                <p className="text-xs mt-1">
-                  Assignee:{" "}
-                  <span className="font-medium">{task.assignee?.fullName}</span>
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </div>
   );
 };
