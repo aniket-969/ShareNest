@@ -60,11 +60,6 @@ export function AppSidebar() {
       icon: Award,
     },
     {
-      title: "Events",
-      url: `/room/${roomId}/events`,
-      icon: CalendarDays,
-    },
-    {
       title: "Expense",
       url: `/room/${roomId}/expense`,
       icon: Wallet,

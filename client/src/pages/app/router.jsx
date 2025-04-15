@@ -22,7 +22,6 @@ import { RouteMonitor } from "@/utils/RouteMonitor.js";
 import Tasks from "../room/Task/Tasks.jsx";
 import RoomExpense from "../room/Expense/RoomExpense.jsx";
 import Maintenance from "../room/Maintenance/Maintenance.jsx";
-import RoomEvents from "../room/Event/RoomEvents.jsx";
 
 const LandingPage = React.lazy(() => import("../LandingPage.jsx"));
 const Login = React.lazy(() => import("../auth/Login.jsx"));
@@ -43,7 +42,6 @@ const RoomRoutes = () => {
             <Route path="tasks" element={<Tasks />} />
             <Route path="expense" element={<RoomExpense />} />
             <Route path="maintenance" element={<Maintenance />} />
-            <Route path="events" element={<RoomEvents />} />
           </Route>
         </Routes>
       </RoomSocketProvider>
