@@ -5,6 +5,7 @@ import ChatInput from "@/components/Chat/ChatInput";
 import { getSocket } from "@/socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { getDateLabel } from "@/utils/helper";
 
 const ChatLayout = ({
   messages,
@@ -26,19 +27,19 @@ const ChatLayout = ({
     const handleNewMessage = (newMessage) => {
       queryClient.setQueryData(["chat", roomId], (oldData) => {
         if (!oldData) return;
-    
+
         const updatedPages = [...oldData.pages];
         const lastPageIndex = updatedPages.length - 1;
-    
+
         updatedPages[lastPageIndex] = {
           ...updatedPages[lastPageIndex],
           messages: [newMessage, ...updatedPages[lastPageIndex].messages], // 👈 prepend
         };
-    
+
         return { ...oldData, pages: updatedPages };
       });
     };
-    
+
     socket.on("messageReceived", handleNewMessage);
 
     return () => {
@@ -138,14 +139,27 @@ const ChatLayout = ({
           const prevMsg = index > 0 ? messages[index - 1] : null;
           const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
+          const currentDateLabel = getDateLabel(msg.createdAt);
+          const prevDateLabel = prevMsg
+            ? getDateLabel(prevMsg.createdAt)
+            : null;
+
+          const showDateSeparator = currentDateLabel !== prevDateLabel;
+
           return (
-            <ChatMessage
-              key={msg._id}
-              message={msg}
-              isCurrentUser={msg.sender._id === currentUser}
-              showAvatar={showAvatar}
-              data-message-id={msg._id} // Add this attribute for scroll position reference
-            />
+            <div key={msg._id}>
+              {showDateSeparator && (
+                <div className="text-center my-4 text-muted-foreground text-sm font-medium">
+                  {currentDateLabel}
+                </div>
+              )}
+              <ChatMessage
+                message={msg}
+                isCurrentUser={msg.sender._id === currentUser}
+                showAvatar={showAvatar}
+                data-message-id={msg._id}
+              />
+            </div>
           );
         })}
       </ScrollArea>

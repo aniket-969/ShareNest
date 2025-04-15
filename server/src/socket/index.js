@@ -23,9 +23,15 @@ const mountJoinRoomEvent = (socket) => {
 const initializeSocketIO = (io) => {
   const room = io.sockets.adapter.rooms.get("6756e343b2fdac1824b18cc1");
   const userCount = room ? room.size : 0;
-
   console.log(`Number of users in room : ${userCount}`);
+
   return io.on("connection", async (socket) => {
+    console.log("🔁 Socket connected:", socket.id);
+    const allSockets = Array.from(io.sockets.sockets.keys());
+    console.log("🧠 Active sockets:", allSockets);
+    const allRooms = Array.from(io.sockets.adapter.rooms.keys());
+    console.log("📦 Known rooms:", allRooms);
+
     try {
       const token =
         socket.handshake.headers.cookie
@@ -40,7 +46,7 @@ const initializeSocketIO = (io) => {
           ChatEventEnum.SOCKET_ERROR_EVENT,
           "Unauthorized: Token is missing."
         );
-        socket.disconnect(true); // Force disconnect the client
+        socket.disconnect(true);
         return;
       }
 
@@ -53,13 +59,14 @@ const initializeSocketIO = (io) => {
           ChatEventEnum.SOCKET_ERROR_EVENT,
           "Unauthorized: Invalid or expired token."
         );
-        socket.disconnect(true); // Force disconnect
+        socket.disconnect(true);
         return;
       }
 
       const user = await User.findById(decodedToken?._id).select(
         "-password -refreshToken"
       );
+
       if (!user) {
         console.log("Unauthorized socket connection: User not found.");
         socket.emit(
@@ -68,6 +75,14 @@ const initializeSocketIO = (io) => {
         );
         socket.disconnect(true);
         return;
+      }
+
+      // ✅ Try auto-joining room from auth
+      const initialRoomId = socket.handshake.auth?.roomId;
+      if (initialRoomId) {
+        socket.join(initialRoomId);
+        socket.data.roomId = initialRoomId;
+        console.log("🧠 Joined room via handshake auth:", initialRoomId);
       }
 
       socket.user = user;
@@ -82,8 +97,13 @@ const initializeSocketIO = (io) => {
 
       mountJoinRoomEvent(socket);
 
-      socket.on(RoomEventEnum.DISCONNECT_EVENT, () => {
-        console.log("User disconnected 🚫. userId:", socket.user?._id);
+      socket.on(RoomEventEnum.DISCONNECT_EVENT, (reason) => {
+        console.log(
+          "User disconnected 🚫. userId:",
+          socket.user?._id,
+          "Reason:",
+          reason
+        );
         if (socket.user?._id) {
           socket.leave(socket.user._id.toString());
         }
