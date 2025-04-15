@@ -37,7 +37,7 @@ export const useAward = () => {
     },
   });
 
-  // Delete a calendar event
+  // Delete a calendar award
   const deleteAwardMutation = useMutation({
     mutationFn: ({ roomId, awardId }) => deleteRoomAward(roomId, awardId),
     onSuccess: (data, { roomId }) => {
