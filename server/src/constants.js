@@ -65,12 +65,6 @@ export const AwardEventEnum = Object.freeze({
 
 export const AvailableAwardEvents = Object.values(AwardEventEnum);
 
-export const CalendarEventEnum = Object.freeze({
-  CALENDAR_CREATED_EVENT: "createdEvent",
-  CALENDAR_DELETED_EVENT: "deletedEVent",
-});
-
-export const AvailableCalendarEvents = Object.values(CalendarEventEnum);
 
 export const ExpenseEventEnum = Object.freeze({
   EXPENSE_CREATED_EVENT: "createdExpense",

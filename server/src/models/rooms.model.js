@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Expense } from "./expense.model.js";
-import { CalendarEvent } from "./calendarEvents.model.js";
 import { Poll } from "./poll.model.js";
 
 const roomSchema = new Schema(
