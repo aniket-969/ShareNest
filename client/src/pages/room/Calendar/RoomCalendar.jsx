@@ -24,12 +24,11 @@ const RoomCalendar = ({ tasks }) => {
         mode="single"
         selected={date}
         onSelect={setDate}
-        className="rounded-xl border shadow bmain"
+        className="w-full rounded-xl border shadow bmain"
       />
 
       {/* Scheduled Tasks */}
-     <TaskCard scheduledTasks={scheduledTasks}/>
-
+      <TaskCard scheduledTasks={scheduledTasks} />
     </div>
   );
 };

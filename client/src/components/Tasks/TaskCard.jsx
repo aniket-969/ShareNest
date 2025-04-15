@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 const TaskCard = ({scheduledTasks}) => {
   return (
-    <ScrollArea className="border rounded-lg shadow bg-card p-4 h-60 overflow-y-auto">
+    <ScrollArea className="border rounded-lg shadow bg-card p-3 h-60 overflow-y-auto">
          <h3 className="font-semibold text-base mb-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>
@@ -17,7 +17,7 @@ const TaskCard = ({scheduledTasks}) => {
             {scheduledTasks.map((task) => (
               <li
                 key={task._id}
-                className="p-3 rounded-md bg-muted text-muted-foreground hover:bg-muted/70 transition"
+                className="p-3 rounded-md bg-muted text-muted-foreground hover:bg-muted/90 transition"
               >
                 <p className="font-semibold text-foreground text-sm">
                   {task.title}
