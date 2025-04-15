@@ -15,7 +15,7 @@ const TaskCard = ({ scheduledTasks }) => {
           {scheduledTasks.map((task) => (
             <li
               key={task._id}
-              className="p-3 rounded-md bg-card  hover:bg-muted/90 transition"
+              className="p-3 rounded-md  hover:bg-muted/90 transition"
             >
               <p className="font-semibold text-foreground text-sm">
                 {task.title}

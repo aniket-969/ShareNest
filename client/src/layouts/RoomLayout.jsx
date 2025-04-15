@@ -25,9 +25,9 @@ export const RoomLayout = () => {
     <SidebarProvider>
       <div className="flex w-full " >
         <AppSidebar />
-        <main className=" w-full">
+        <main className=" w-full overflow-hidden">
           <SidebarTrigger />
-          <div className="px-2 py-5 w-full">
+          <div className="p-2 w-full ">
             <Outlet />
           </div>
         </main>

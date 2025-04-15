@@ -27,10 +27,10 @@ const RoomDetails = () => {
   // ];
   // console.log(data) 
   return (
-    <div className="bb">
+    <div className="">
       <div className="flex justify-around gap-10">
         <RoomCalendar tasks={data.tasks} />
-        <div className="flex flex-col items-center gap-5 h-[92vh]">
+        <div className="flex flex-col items-center gap-5 h-full">
           <Chat />
           {/* <PollCard initialPolls={data.polls} /> */}
         </div>
