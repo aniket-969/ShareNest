@@ -7,9 +7,7 @@ const PaymentMethod = () => {
   const [show, setShowForm] = useState(false);
   return (
     <div>
-    <Button onClick = {()=>setShowForm(true)}>
-      Add Payment method
-    </Button>
+      <Button onClick={() => setShowForm(true)}>Add Payment Method</Button>
       {show && (
         <FormWrapper onClose={() => setShowForm(false)}>
           <PaymentMethodForm />
