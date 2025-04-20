@@ -9,7 +9,7 @@ import RoomListSkeleton from "../skeleton/Room/roomList";
 const RoomList = () => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
-  //   console.log(data);
+  // console.log(data);
 
   if (isLoading) {
     return <RoomListSkeleton />;
@@ -49,20 +49,31 @@ const RoomList = () => {
   return (
     <div className="flex flex-col gap-5 items-center ">
       <h1 className="text-xl font-semibold">Rooms</h1>
-      <ScrollArea>
-        <div className="flex flex-col gap-5 h-[15rem] pt-2 sm:pr-2 ">
-          {rooms.map((room) => (
-            <Link key={room._id} to={`/room/${room.roomId}`}>
-              <Button
-                className="text-white text-lg w-[95%] rounded-none "
-                variant="outline"
-              >
-                {room.name}
-              </Button>
-            </Link>
-          ))}
+      {data.rooms.length > 0 ? (
+        <ScrollArea>
+          <div className="flex flex-col gap-5 h-[15rem] pt-2 sm:pr-2 ">
+            {rooms.map((room) => (
+              <Link key={room._id} to={`/room/${room.roomId}`}>
+                <Button
+                  className="text-white text-lg w-[95%] rounded-none "
+                  variant="outline"
+                >
+                  {room.name}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </ScrollArea>
+      ) : (
+        <div className="flex flex-col items-center gap-4 text-center ">
+          <p className="text-muted-foreground text-lg">
+            🥲 No rooms yet
+          </p>
+          <Link to="/room/create">
+            <Button className="mt-2">Create / Join Room</Button>
+          </Link>
         </div>
-      </ScrollArea>
+      )}
     </div>
   );
 };
