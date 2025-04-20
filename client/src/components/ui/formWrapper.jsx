@@ -10,7 +10,7 @@ const FormWrapper = ({ children, className, onClose }) => {
     >
       <div
         className={cn(
-          "bmain w-full max-w-[30rem] p-10 rounded-[2.5rem] bg-black ",
+          "bmain w-full max-w-[30rem] p-10 rounded-[2.5rem] bg-black mx-3",
           className
         )}
         onClick={(e) => e.stopPropagation()}
