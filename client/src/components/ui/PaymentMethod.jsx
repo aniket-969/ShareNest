@@ -1,13 +1,20 @@
+import { useState } from "react";
 import { PaymentMethodForm } from "../form/PaymentMethodForm";
 import FormWrapper from "./formWrapper";
+import { Button } from "./button";
 
 const PaymentMethod = () => {
+  const [show, setShowForm] = useState(false);
   return (
     <div>
-      Add payment method
-      
-        <PaymentMethodForm />
-     
+    <Button onClick = {()=>setShowForm(true)}>
+      Add Payment method
+    </Button>
+      {show && (
+        <FormWrapper onClose={() => setShowForm(false)}>
+          <PaymentMethodForm />
+        </FormWrapper>
+      )}
     </div>
   );
 };
