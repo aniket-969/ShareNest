@@ -15,13 +15,24 @@ const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
         data: { action: "approved", requestId: id },
       });
       console.log(response);
+      toast.success("User added to the room");
     } catch (error) {
       console.log(error);
       toast.error("Failed to approve request");
     }
   };
-  const handleReject = (id) => {
-    console.log(id);
+  const handleReject = async(id) => {
+    try {
+      console.log(id);
+      const response = await adminResponseMutation.mutateAsync({
+        data: { action: "denied", requestId: id },
+      });
+      console.log(response);
+      toast.success("Request Denied");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to approve response");
+    };
   };
   return (
     <div className="p-4 border-b">
