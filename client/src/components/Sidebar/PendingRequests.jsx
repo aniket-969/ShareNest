@@ -1,7 +1,18 @@
 import { UserPlus, Zap, UserX } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
+import { useRoom } from "@/hooks/useRoom";
+import { useParams } from "react-router-dom";
 
 const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
+const {roomId} = useParams()
+const {adminResponseMutation } = useRoom(roomId)
+
+  const handleAccept = (id)=>{
+    console.log(id)
+  }
+  const handleReject = (id)=>{
+       console.log(id)
+  }
   return (
     <div className="p-4 border-b">
       <div
@@ -33,11 +44,11 @@ const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
                   </span>
                   <div className="ml-auto flex space-x-2">
                     <UserPlus
-                      className="cursor-pointer hover:scale-110 transition-transform text-green-600"
+                      className="cursor-pointer hover:scale-110 transition-transform text-green-500"
                       onClick={() => handleAccept(request._id)}
                     />
                     <UserX
-                      className="cursor-pointer hover:scale-110 transition-transform text-red-600"
+                      className="cursor-pointer hover:scale-110 transition-transform text-red-500"
                       onClick={() => handleReject(request._id)}
                     />
                   </div>
