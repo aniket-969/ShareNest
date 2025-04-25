@@ -2,17 +2,27 @@ import { UserPlus, Zap, UserX } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { useRoom } from "@/hooks/useRoom";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
-const {roomId} = useParams()
-const {adminResponseMutation } = useRoom(roomId)
+  const { roomId } = useParams();
+  const { adminResponseMutation } = useRoom(roomId);
 
-  const handleAccept = (id)=>{
-    console.log(id)
-  }
-  const handleReject = (id)=>{
-       console.log(id)
-  }
+  const handleAccept = async (id) => {
+    try {
+      console.log(id);
+      const response = await adminResponseMutation.mutateAsync({
+        data: { action: "approved", requestId: id },
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to approve request");
+    }
+  };
+  const handleReject = (id) => {
+    console.log(id);
+  };
   return (
     <div className="p-4 border-b">
       <div

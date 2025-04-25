@@ -13,7 +13,8 @@ export const addUserRequest = async (data, roomId) => {
 };
 
 export const adminResponse = async (data, roomId) => {
-  return axiosClient.post(`/${baseRoom}/${roomId}/response`, data);
+  console.log(data,roomId)
+  return axiosClient.post(`/${baseRoom}/${roomId}/responses`, data);
 };
  
 export const updateRoom = async (roomId, data) => {
