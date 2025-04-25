@@ -15,7 +15,7 @@ import { Spinner } from "./spinner";
 
 export const QRCarousel = ({ paymentMethod }) => {
   const [qrImages, setQrImages] = useState({});
-  const [showForm, setShowForm] = useState(false); // for opening form
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const generateAllQRImages = async () => {
@@ -49,39 +49,40 @@ export const QRCarousel = ({ paymentMethod }) => {
       <Carousel className="w-full max-w-[14rem] md:max-w-[20rem] sm:max-w-[15rem]">
         <CarouselContent>
           {items.map((payment, index) => (
-          <CarouselItem key={payment._id}>
-          <div className="h-full">
-            <Card className="h-full">
-              <CardContent className="flex flex-col items-center justify-center h-full font-semibold text-sm md:text-xl sm:text-base sm:gap-2 pt-2">
-                {payment.appName ? (
-                  <>
-                    <p className="font-semibold text-xl">{payment.appName}</p>
-                    <p className="text-gray-900 mb-2">{payment.type}</p>
-                    {qrImages[payment._id] ? (
-                      <img
-                        src={qrImages[payment._id]}
-                        alt={`QR Code for ${payment.appName}`}
-                        className="w-auto object-contain"
-                      />
+            <CarouselItem key={payment._id}>
+              <div className="h-full">
+                <Card className="h-full">
+                  <CardContent className="flex flex-col items-center justify-center h-full font-semibold text-sm md:text-xl sm:text-base sm:gap-2 pt-2">
+                    {payment.appName ? (
+                      <>
+                        <p className="font-semibold text-xl">
+                          {payment.appName}
+                        </p>
+                        <p className="text-gray-900 mb-2">{payment.type}</p>
+                        {qrImages[payment._id] ? (
+                          <img
+                            src={qrImages[payment._id]}
+                            alt={`QR Code for ${payment.appName}`}
+                            className="w-auto object-contain"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-32">
+                            <Spinner size="sm" />
+                          </div>
+                        )}
+                      </>
                     ) : (
-                      <div className="flex items-center justify-center h-32">
-                        <Spinner size="sm" />
-                      </div>
+                      <>
+                        <p className="text-lg mb-4">Add Payment Method</p>
+                        <Button onClick={() => setShowForm(true)}>
+                          Add Payment
+                        </Button>
+                      </>
                     )}
-                  </>
-                ) : (
-                  <>
-                    <p className="text-lg mb-4">Add Payment Method</p>
-                    <Button onClick={() => setShowForm(true)}>
-                      Add Payment
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </CarouselItem>
-        
+                  </CardContent>
+                </Card>
+              </div>
+            </CarouselItem>
           ))}
         </CarouselContent>
 
