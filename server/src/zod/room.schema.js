@@ -14,7 +14,7 @@ export const addUserRequestSchema = z.object({
 
 export const adminResponseSchema = z.object({
   requestId: objectIdValidation,
-  action: z.enum(["approved", "denined"]),
+  action: z.enum(["approved", "denied"]),
 });
 
 export const transferRoleSchema = z.object({
