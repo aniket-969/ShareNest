@@ -41,9 +41,9 @@ export const useRoom = (roomId) => {
 
  
   const adminResponseMutation = useMutation({
-    mutationFn: ({ data, roomId }) => adminResponse(data, roomId),
+    mutationFn: ({ data }) => adminResponse(data,roomId),
     onSuccess: () => {
-      queryClient.invalidateQueries(["room", roomId]); // this works only if roomId is in scope
+      queryClient.invalidateQueries(["room", roomId]); 
     },
     onError: (error) => {
       console.error("Failed to send admin response", error);
