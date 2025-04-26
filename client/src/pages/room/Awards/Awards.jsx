@@ -5,6 +5,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import AwardCard from "@/components/ui/awardCard"; // your AwardCard component
 import { useAward } from "@/hooks/useAwards";
+import AwardsSkeleton from "@/components/skeleton/Award/award";
 
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -55,7 +56,7 @@ const Awards = () => {
   const { awardsQuery } = useAward();
   const { data, isLoading, isError } = awardsQuery(roomId);
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return <AwardsSkeleton />;
   if (isError) return <>Something went wrong. Please refresh.</>;
 
   console.log(data);
