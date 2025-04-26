@@ -21,7 +21,7 @@ const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
       toast.error("Failed to approve request");
     }
   };
-  const handleReject = async(id) => {
+  const handleReject = async (id) => {
     try {
       console.log(id);
       const response = await adminResponseMutation.mutateAsync({
@@ -32,8 +32,9 @@ const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
     } catch (error) {
       console.log(error);
       toast.error("Failed to approve response");
-    };
+    }
   };
+  
   return (
     <div className="p-4 border-b">
       <div
