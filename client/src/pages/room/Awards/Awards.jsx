@@ -1,48 +1,135 @@
 import { useParams } from "react-router-dom";
-import AwardCard from "@/components/ui/awardCard";
-import { useAward } from "@/hooks/useAwards";
-import { Spinner } from "@/components/ui/spinner";
-import { Suspense, useEffect, useState, lazy } from "react";
-import { getSocket } from "@/socket";
+import { useState, Suspense, lazy } from "react";
 import { useRoom } from "@/hooks/useRoom";
+import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import AwardCard from "@/components/ui/awardCard"; // your AwardCard component
 
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
+const fakeAwards = [
+  {
+    id: "1",
+    title: "Task Master",
+    description: "Completed the most tasks this month.",
+    criteria: "Completed 15+ tasks",
+    image: "https://source.unsplash.com/random/300x300?award",
+    participants: ["Aniket", "Mira", "Chetan"],
+  },
+  {
+    id: "2",
+    title: "Team Player",
+    description: "Most accepted task requests.",
+    criteria: "Accepted 10+ requests",
+    image: "https://source.unsplash.com/random/300x300?team",
+    participants: ["Mira"],
+  },
+  {
+    id: "3",
+    title: "Outstanding Effort",
+    description: "Went above and beyond.",
+    criteria: "Recognized by peers",
+    image: "https://source.unsplash.com/random/300x300?success",
+    participants: ["Chetan"],
+  },
+  {
+    id: "4",
+    title: "Dog Lover",
+    description: "Most friendly with pets.",
+    criteria: "Cared for 3+ dogs",
+    image: "https://source.unsplash.com/random/300x300?dog",
+    participants: ["Mira"],
+  },
+];
+
 const Awards = () => {
   const { roomId } = useParams();
-
-  const [awards, setAwards] = useState([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const { roomQuery } = useRoom(roomId);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [manageMode, setManageMode] = useState(false);
+  const [selectedAwards, setSelectedAwards] = useState([]);
 
-  if (roomQuery.isLoading) {
-    return <Spinner />;
-  }
-  if (roomQuery.isError) {
-    return <>Something went wrong . Please refresh</>;
-  }
+  if (roomQuery.isLoading) return <Spinner />;
+  if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
 
   const participants = [
     ...(roomQuery.data.tenants || []),
     ...(roomQuery.data.landlord ? [roomQuery.data.landlord] : []),
   ];
 
-  return (
-    <div className=" p-6 flex flex-col w-full items-center bb gap-4">
-      {/* Award heading */}
-      <h1 className="text-2xl font-bold mb-6">Awards</h1>
-      
-      <Button onClick={() => setIsFormOpen(true)}>Create Custom Award</Button>
+  const toggleManageMode = () => {
+    setManageMode((prev) => !prev);
+    setSelectedAwards([]); // Reset selection
+  };
 
+  const handleSelectAward = (id) => {
+    setSelectedAwards((prev) =>
+      prev.includes(id) ? prev.filter((awardId) => awardId !== id) : [...prev, id]
+    );
+  };
+
+  return (
+    <div className="p-6 flex flex-col w-full items-center gap-6">
+      {/* Header */}
+      <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 className="text-2xl font-bold text-foreground">Awards</h1>
+
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            className="border-primary text-primary hover:bg-primary/10"
+            onClick={toggleManageMode}
+          >
+            {manageMode ? "Cancel" : "Manage Awards"}
+          </Button>
+
+          {!manageMode && (
+            <Button
+              className="bg-primary text-background hover:bg-primary/80"
+              onClick={() => setIsFormOpen(true)}
+            >
+              Create Custom Award
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Form (slides down) */}
       {isFormOpen && (
         <Suspense fallback={<Spinner />}>
           <FormWrapper onClose={() => setIsFormOpen(false)}>
-            {" "}
             <AwardsForm participants={participants} />
           </FormWrapper>
         </Suspense>
+      )}
+
+      {/* Awards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4 w-full">
+        {fakeAwards.map((award) => (
+          <AwardCard
+            key={award.id}
+            award={award}
+            manageMode={manageMode}
+            selected={selectedAwards.includes(award.id)}
+            onSelect={() => handleSelectAward(award.id)}
+          />
+        ))}
+      </div>
+
+      {/* Delete Selected */}
+      {manageMode && selectedAwards.length > 0 && (
+        <Button
+          className="mt-6 bg-destructive text-background hover:bg-destructive/80"
+          onClick={() => {
+            // Later: call delete API here
+            console.log("Deleting", selectedAwards);
+            setSelectedAwards([]);
+            setManageMode(false);
+          }}
+        >
+          Delete Selected ({selectedAwards.length})
+        </Button>
       )}
     </div>
   );
