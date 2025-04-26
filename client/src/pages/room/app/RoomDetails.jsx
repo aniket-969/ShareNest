@@ -34,9 +34,9 @@ const RoomDetails = () => {
   }
 
   return (
-    <div className=" flex  w-full items-center justify-around">
+    <div className=" flex  w-full items-center justify-center gap-20">
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-8 ">
         {/* Calendar */}
         <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain">
           <Calendar
@@ -58,7 +58,7 @@ const RoomDetails = () => {
         {/* Polls */}
         <PollCard initialPolls={data.polls} />
       </div>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-5 ">
         {/* Scheduled Tasks */}
         <TaskCard scheduledTasks={scheduledTasks} />
 
