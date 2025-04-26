@@ -4,6 +4,7 @@ import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import AwardCard from "@/components/ui/awardCard"; // your AwardCard component
+import { useAward } from "@/hooks/useAwards";
 
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -14,7 +15,8 @@ const fakeAwards = [
     title: "Task Master",
     description: "Completed the most tasks this month.",
     criteria: "Completed 15+ tasks",
-    image: "https://img.freepik.com/free-vector/trophy-award-laurel-wreath-composition-with-realistic-image-golden-cup-decorated-with-garland-with-reflection_1284-32301.jpg?semt=ais_hybrid&w=740",
+    image:
+      "https://img.freepik.com/free-vector/trophy-award-laurel-wreath-composition-with-realistic-image-golden-cup-decorated-with-garland-with-reflection_1284-32301.jpg?semt=ais_hybrid&w=740",
     participants: ["Aniket", "Mira", "Chetan"],
   },
   {
@@ -22,7 +24,8 @@ const fakeAwards = [
     title: "Team Player",
     description: "Most accepted task requests.",
     criteria: "Accepted 10+ requests",
-    image: "https://www.shutterstock.com/image-vector/realistic-golden-star-trophy-award-600nw-2433339699.jpg",
+    image:
+      "https://www.shutterstock.com/image-vector/realistic-golden-star-trophy-award-600nw-2433339699.jpg",
     participants: ["Mira"],
   },
   {
@@ -49,15 +52,13 @@ const Awards = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [manageMode, setManageMode] = useState(false);
   const [selectedAwards, setSelectedAwards] = useState([]);
+  const { awardsQuery } = useAward();
+  const { data, isLoading, isError } = awardsQuery(roomId);
 
-  if (roomQuery.isLoading) return <Spinner />;
-  if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
+  if (isLoading) return <Spinner />;
+  if (isError) return <>Something went wrong. Please refresh.</>;
 
-  const participants = [
-    ...(roomQuery.data.tenants || []),
-    ...(roomQuery.data.landlord ? [roomQuery.data.landlord] : []),
-  ];
-
+  console.log(data);
   const toggleManageMode = () => {
     setManageMode((prev) => !prev);
     setSelectedAwards([]); // Reset selection
@@ -65,7 +66,9 @@ const Awards = () => {
 
   const handleSelectAward = (id) => {
     setSelectedAwards((prev) =>
-      prev.includes(id) ? prev.filter((awardId) => awardId !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((awardId) => awardId !== id)
+        : [...prev, id]
     );
   };
 
@@ -85,10 +88,7 @@ const Awards = () => {
           </Button>
 
           {!manageMode && (
-            <Button
-              className=""
-              onClick={() => setIsFormOpen(true)}
-            >
+            <Button className="" onClick={() => setIsFormOpen(true)}>
               Create Custom Award
             </Button>
           )}
@@ -106,17 +106,10 @@ const Awards = () => {
 
       {/* Awards Grid */}
       <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
-  {fakeAwards.map((award) => (
-    <AwardCard
-      key={award.id}
-      award={award}
-      manageMode={manageMode}
-      selected={selectedAwards.includes(award.id)}
-      onSelect={() => handleSelectAward(award.id)}
-    />
-  ))}
-</div>
-
+        {data.map((award) => (
+          <AwardCard key={award._id} award={award} />
+        ))}
+      </div>
 
       {/* Delete Selected */}
       {manageMode && selectedAwards.length > 0 && (
