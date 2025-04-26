@@ -14,7 +14,7 @@ const fakeAwards = [
     title: "Task Master",
     description: "Completed the most tasks this month.",
     criteria: "Completed 15+ tasks",
-    image: "https://source.unsplash.com/random/300x300?award",
+    image: "https://img.freepik.com/free-vector/trophy-award-laurel-wreath-composition-with-realistic-image-golden-cup-decorated-with-garland-with-reflection_1284-32301.jpg?semt=ais_hybrid&w=740",
     participants: ["Aniket", "Mira", "Chetan"],
   },
   {
@@ -22,7 +22,7 @@ const fakeAwards = [
     title: "Team Player",
     description: "Most accepted task requests.",
     criteria: "Accepted 10+ requests",
-    image: "https://source.unsplash.com/random/300x300?team",
+    image: "https://www.shutterstock.com/image-vector/realistic-golden-star-trophy-award-600nw-2433339699.jpg",
     participants: ["Mira"],
   },
   {
@@ -70,7 +70,7 @@ const Awards = () => {
   };
 
   return (
-    <div className="p-6 flex flex-col w-full items-center gap-6">
+    <div className="px-6 flex flex-col w-full items-center gap-6 bb">
       {/* Header */}
       <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold text-foreground">Awards</h1>
@@ -86,7 +86,7 @@ const Awards = () => {
 
           {!manageMode && (
             <Button
-              className="bg-primary text-background hover:bg-primary/80"
+              className=""
               onClick={() => setIsFormOpen(true)}
             >
               Create Custom Award
@@ -105,17 +105,18 @@ const Awards = () => {
       )}
 
       {/* Awards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4 w-full">
-        {fakeAwards.map((award) => (
-          <AwardCard
-            key={award.id}
-            award={award}
-            manageMode={manageMode}
-            selected={selectedAwards.includes(award.id)}
-            onSelect={() => handleSelectAward(award.id)}
-          />
-        ))}
-      </div>
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
+  {fakeAwards.map((award) => (
+    <AwardCard
+      key={award.id}
+      award={award}
+      manageMode={manageMode}
+      selected={selectedAwards.includes(award.id)}
+      onSelect={() => handleSelectAward(award.id)}
+    />
+  ))}
+</div>
+
 
       {/* Delete Selected */}
       {manageMode && selectedAwards.length > 0 && (
