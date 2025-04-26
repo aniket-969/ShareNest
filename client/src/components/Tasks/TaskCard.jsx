@@ -1,9 +1,9 @@
-import React from "react";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ scheduledTasks }) => {
   return (
-    <ScrollArea className="border rounded-lg shadow  p-3 h-60 overflow-y-auto bmain ">
+    <ScrollArea className="border rounded-lg shadow  p-3 h-60 overflow-y-auto bmain max-w-md">
       <h3 className="font-semibold text-base mb-2">
         Scheduled Tasks ({scheduledTasks.length})
       </h3>
