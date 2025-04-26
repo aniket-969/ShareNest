@@ -10,7 +10,7 @@ import Chat from "../Chat/Chat";
 import PollCard from "@/components/Poll";
 import { getTasksForDate } from "@/utils/helper";
 import TaskCard from "@/components/Tasks/TaskCard";
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from "@/components/ui/calendar";
 
 const RoomDetails = () => {
   const { roomId } = useParams();
@@ -34,33 +34,37 @@ const RoomDetails = () => {
   }
 
   return (
-    <div className="bb grid grid-cols-1 sm:grid-cols-2 gap-6 w-full items-center align-middle">
-      {/* Calendar */}
-      <div className=" rounded-2xl border p-4 shadow-md min-h-[320px] max-w-md bmain">
-      <Calendar
-      classNames={{
-        months:
-          "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1",
-        month: "space-y-4 w-full flex flex-col",
-        table: "w-full h-full border-collapse space-y-1",
-        head_row: "",
-        row: "w-full mt-2",
-      }}
-      mode="single"
-      selected={date}
-      onSelect={setDate}
-      className="rounded-xl h-[300px] w-full"
-    />
+    <div className=" flex  w-full items-center justify-around">
+
+      <div className="flex flex-col gap-3">
+        {/* Calendar */}
+        <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain">
+          <Calendar
+            classNames={{
+              months:
+                "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1",
+              month: "space-y-4 w-full flex flex-col",
+              table: "w-full h-full border-collapse space-y-1",
+              head_row: "",
+              row: "w-full mt-2",
+            }}
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-xl h-[300px] w-full"
+          />
+        </div>
+
+        {/* Polls */}
+        <PollCard initialPolls={data.polls} />
       </div>
+      <div className="flex flex-col gap-5">
+        {/* Scheduled Tasks */}
+        <TaskCard scheduledTasks={scheduledTasks} />
 
-      {/* Scheduled Tasks */}
-      <TaskCard scheduledTasks={scheduledTasks} />
-
-      {/* Polls */}
-      <PollCard initialPolls={data.polls} />
-
-      {/* Chat */}
-      <Chat />
+        {/* Chat */}
+        <Chat />
+      </div>
     </div>
   );
 };
