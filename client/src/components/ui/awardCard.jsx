@@ -1,4 +1,4 @@
-const AwardCard = ({ award, manageMode, selected, onSelect }) => {
+const AwardCard = ({ award}) => {
   return (
     <div className="relative rounded-2xl overflow-hidden border border-primary bg-background shadow-md hover:scale-105 transition-all h-80 flex flex-col">
       {/* Image Section (70-75%) */}
@@ -14,10 +14,15 @@ const AwardCard = ({ award, manageMode, selected, onSelect }) => {
       <div className="flex flex-col justify-center flex-1 p-3 text-center">
         <h2 className="text-lg font-bold text-primary">{award.title}</h2>
         <div className="flex flex-wrap justify-center gap-2 mt-1">
-          {award.participants.map((participant, idx) => (
-            <div key={idx} className="text-sm text-foreground">
-              {participant}
-            </div>
+          {award.assignedTo.map((participant, idx) => (
+            <div key={participant._id} className="flex items-center gap-2 text-sm text-foreground">
+            <img
+              src={participant.avatar}
+              alt={participant.fullName}
+              className="h-6 w-6 rounded-full object-cover"
+            />
+            {participant.fullName}
+          </div>
           ))}
         </div>
       </div>
@@ -28,15 +33,7 @@ const AwardCard = ({ award, manageMode, selected, onSelect }) => {
         <p className="text-muted-foreground text-xs mt-2">{award.criteria}</p>
       </div>
 
-      {/* Checkbox (Manage Mode) */}
-      {manageMode && (
-        <button
-          onClick={onSelect}
-          className="absolute top-2 right-2 bg-primary text-background rounded-full p-1"
-        >
-          {selected ? "✔" : "☐"}
-        </button>
-      )}
+     
     </div>
   );
 };
