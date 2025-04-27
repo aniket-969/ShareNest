@@ -3,11 +3,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ scheduledTasks }) => {
   return (
-    <div className="bmain max-w-md border rounded-lg p-2">
-        <ScrollArea className=" shadow  h-60 overflow-y-auto p-3">
-      <h3 className="font-semibold text-base mb-2">
-        Scheduled Tasks ({scheduledTasks.length})
+    <div className="bmain max-w-md border rounded-lg p-3"> 
+     <h3 className="font-semibold text-base mx-2">Scheduled Tasks ({scheduledTasks.length})
       </h3>
+        <ScrollArea className=" h-[13rem] p-3">
 
       {scheduledTasks.length === 0 ? (
         <p className="text-muted-foreground text-sm">No tasks for this date.</p>
