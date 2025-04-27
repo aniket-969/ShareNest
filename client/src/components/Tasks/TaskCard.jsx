@@ -3,7 +3,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TaskCard = ({ scheduledTasks }) => {
   return (
-    <ScrollArea className="border rounded-lg shadow  p-3 h-60 overflow-y-auto bmain max-w-md">
+    <div className="bmain max-w-md border rounded-lg p-2">
+        <ScrollArea className=" shadow  h-60 overflow-y-auto p-3">
       <h3 className="font-semibold text-base mb-2">
         Scheduled Tasks ({scheduledTasks.length})
       </h3>
@@ -32,6 +33,8 @@ const TaskCard = ({ scheduledTasks }) => {
         </ul>
       )}
     </ScrollArea>
+    </div>
+  
   );
 };
 
