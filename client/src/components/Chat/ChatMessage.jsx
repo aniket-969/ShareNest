@@ -14,8 +14,8 @@ console.log(message)
     >
       {showAvatar && <p className="text-sm text-muted-foreground mb-1">You</p>}
       <div className="relative bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-2 max-w-[80%] sm:max-w-[60%]">
-        <p className="break-words leading-normal">{message.content}</p>
-        <p className="text-xs opacity-70 text-right mt-1">{formattedTime}</p>
+        <p className="break-words text-sm ">{message.content}</p>
+        <p className="text-[0.6rem]  opacity-70 text-right mt-1">{formattedTime}</p>
       </div>
     </div>
   ) : (
@@ -41,8 +41,8 @@ console.log(message)
         </div>
       )}
       <div className="relative bg-secondary text-secondary-foreground rounded-2xl rounded-bl-md px-4 py-2 max-w-[80%] sm:max-w-[60%]">
-        <p className="break-words">{message.content}</p>
-        <p className="text-xs opacity-70 text-right mt-1">{formattedTime}</p>
+        <p className="break-words text-sm">{message.content}</p>
+        <p className="text-[0.6rem] opacity-70 text-right mt-1">{formattedTime}</p>
       </div>
     </div>
   );
