@@ -166,7 +166,7 @@ const getAllMessages = asyncHandler(async (req, res) => {
   const messages = await ChatMessage.find(query)
     .sort({ createdAt: -1 })
     .limit(limit)
-    .populate("sender", "fullName avatar");
+    .populate("sender", "fullName avatar username");
 
   return res
     .status(200)
