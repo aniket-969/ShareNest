@@ -117,22 +117,50 @@ select:-webkit-autofill:focus {
 }
 
 
-.clip-preview {
-  width: 400px;
-  height: 400px;
-  clip-path: polygon(
-    63% 0,
-    70% 5%,
-    75% 15%,
-    80% 20%,
-    95% 25%,
-    100% 35%,
-    100% 100%,
-    0 100%,
-    0 0
-  );
+.clip{
+  clip-path: path("M0,0H328A20,20 0,0,1 348,20L348,18A20,20 0,0,0 368,38L380,38A20,20 0,0,1 400,58V260A0,0 0,0,1 400,260H0A0,0 0,0,1 0,260V0A0,0 0,0,1 0,0Z");
+  background-color: #fe2858;
+ }
+ .notification {
+  position: absolute;
+  border: 2px solid gainsboro;
+  width: 37px;
+  height: 30px;
+  right: 0.75rem;
+  top: 0.75rem;
+  transform: translate(10%, -38%);
+  z-index: 20000;
 }
 
+ /*
+.notification{
+  position: absolute;
+  border: 2px solid gainsboro;
+  width: 35px;
+  height: 30px;
+  top:5.3%;
+  left:93%;
+  z-index: 20000;
+} */
+/* .notification{
+  position: absolute;
+  border: 2px solid gainsboro;
+  width: 35px;
+  height: 30px;
+  top:38px;
+  left:852px;
+  z-index: 20000;
+} */
+/* 
+.notification{
+  position: absolute;
+  border: 2px solid gainsboro;
+  width: 32px;
+  height: 32px;
+  top:36px;
+  left:852px;
+  z-index: 20000;
+} */
 
 .bb {
   border: 2px solid blue;
