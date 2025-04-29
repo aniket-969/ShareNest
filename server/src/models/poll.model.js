@@ -12,7 +12,7 @@ const pollSchema = new Schema(
       required: true,
     },
     voteEndTime: {
-      type: String,
+      type: Date,
       required: true,
     },
     expireAt: {
