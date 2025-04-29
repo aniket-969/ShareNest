@@ -29,7 +29,7 @@ const recurrencePatternSchema = z.object({
     .optional(),
   dayOfWeek: z.number().min(0).max(6).optional(),
 });
-
+ 
 const recurringSchema = z.object({
   enabled: z.boolean(),
   patterns: z.array(recurrencePatternSchema).optional(),

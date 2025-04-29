@@ -5,7 +5,7 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar, ...props }) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-console.log(message)
+// console.log(message)
   return isCurrentUser ? (
     <div
       className="flex flex-col items-end mb-3 px-3"

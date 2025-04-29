@@ -7,6 +7,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,16 +15,17 @@ import { toast } from "react-toastify";
 import { usePoll } from "@/hooks/usePoll";
 import { useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
+import DatePicker from "../ui/datePicker";
 
 export const PollForm = () => {
   const { roomId } = useParams();
   const { createPollMutation } = usePoll();
-
+ 
   const form = useForm({
     resolver: zodResolver(pollSchema),
     defaultValues: {
       title: "",
-      voteEndTime: "",
+      voteEndTime: undefined,
       options: [""], 
     },
   });
@@ -74,13 +76,19 @@ export const PollForm = () => {
         </FormItem>
 
         {/* Vote End Time Field */}
-        <FormItem>
-          <FormLabel>Vote End Time</FormLabel>
-          <FormControl>
-            <Input type="datetime-local" {...form.register("voteEndTime")} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+        <FormField
+          control={form.control}
+          name="voteEndTime"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Start Date</FormLabel>
+              <FormControl>
+                <DatePicker name="voteEndTime" field={field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Options Field */}
         <FormItem>
