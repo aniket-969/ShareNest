@@ -43,9 +43,22 @@ const Poll = ({ initialPolls }) => {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   if (isError)
     return <p className="text-sm text-destructive">Something went wrong</p>;
+  const now = new Date();
 
-  const voteForms = polls.filter((poll) => !poll.voters.includes(user._id));
-  const resultCards = polls.filter((poll) => poll.voters.includes(user._id));
+  const voteForms = [];
+  const resultCards = [];
+
+  for (const poll of polls) {
+    const voteEnd = new Date(poll.voteEndTime);
+    const hasVoted = poll.voters.includes(user._id);
+    const isExpired = voteEnd <= now;
+
+    if (hasVoted || isExpired) {
+      resultCards.push(poll);
+    } else {
+      voteForms.push(poll);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-3">

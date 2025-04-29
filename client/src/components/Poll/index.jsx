@@ -7,7 +7,7 @@ import { ScrollArea } from "../ui/scroll-area";
 
 const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
-
+console.log(initialPolls)
   return (
     <div className="w-[25rem] h-[300px] rounded-lg shadow-md p-4 flex flex-col bmain">
       <div className="flex justify-between items-center mb-3">
