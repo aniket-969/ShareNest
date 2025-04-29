@@ -20,13 +20,13 @@ import DatePicker from "../ui/datePicker";
 export const PollForm = () => {
   const { roomId } = useParams();
   const { createPollMutation } = usePoll();
- 
+
   const form = useForm({
     resolver: zodResolver(pollSchema),
     defaultValues: {
       title: "",
       voteEndTime: undefined,
-      options: [""], 
+      options: [""],
     },
   });
 
@@ -38,13 +38,13 @@ export const PollForm = () => {
       ...values,
       options: values.options.filter((opt) => opt.trim() !== ""), // Remove empty options
     };
-    
+
     try {
       const response = await createPollMutation.mutateAsync({
         data,
         roomId,
       });
-      console.log(response)
+      console.log(response);
     } catch (error) {
       console.error("Error during registration:", error);
     }
@@ -77,18 +77,23 @@ export const PollForm = () => {
 
         {/* Vote End Time Field */}
         <FormField
-          control={form.control}
+  control={form.control}
+  name="voteEndTime"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Vote End Time</FormLabel>
+      <FormControl>
+        <DatePicker
           name="voteEndTime"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Start Date</FormLabel>
-              <FormControl>
-                <DatePicker name="voteEndTime" field={field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          field={field}
+          disableBefore={new Date()} // disable past dates
+          disableAfter={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // disable after today+7 days
         />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 
         {/* Options Field */}
         <FormItem>

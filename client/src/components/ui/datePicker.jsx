@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { Controller } from "react-hook-form";
 
-const DatePicker = ({ name, field ,disableBefore}) => {
+const DatePicker = ({ name, field, disableBefore, disableAfter }) => {
   return (
     <div className="flex flex-col">
       <Popover>
@@ -29,9 +29,11 @@ const DatePicker = ({ name, field ,disableBefore}) => {
             selected={field.value instanceof Date ? field.value : undefined}
             onSelect={(date) => field.onChange(date)}
             initialFocus
-            disabled={(date) =>
-              disableBefore ? date < disableBefore : false
-            }
+            disabled={(date) => {
+              if (disableBefore && date < disableBefore) return true;
+              if (disableAfter && date > disableAfter) return true;
+              return false;
+            }}
           />
         </PopoverContent>
       </Popover>
