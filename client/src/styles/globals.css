@@ -124,11 +124,14 @@ select:-webkit-autofill:focus {
  .notification {
   position: absolute;
   border: 2px solid gainsboro;
-  width: 37px;
+  width: 38px;
   height: 30px;
+  transform: translate(9%, -35%);
+  /* width: 32px; */
+  /* height: 32px; */
+  /* transform: translate(-10%, -35%); */
   right: 0.75rem;
   top: 0.75rem;
-  transform: translate(10%, -38%);
   z-index: 20000;
 }
 
