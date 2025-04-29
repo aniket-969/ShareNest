@@ -24,14 +24,20 @@ const createPoll = asyncHandler(async (req, res) => {
     optionText: text,
     votes: [],
   }));
+  const now = new Date();
+  const voteEnd = new Date(voteEndTime);
+
+  const expireAt = new Date(voteEnd.getTime() + 24 * 60 * 60 * 1000); // 1 day after voting ends
 
   const poll = await Poll.create({
     createdBy,
     title,
-    voteEndTime,
+    voteEndTime: voteEnd,
+    expireAt: expireAt,
     room: roomId,
-    options: formattedOptions, // Save the formatted options
+    options: formattedOptions,
   });
+
   const room = await Room.findByIdAndUpdate(
     roomId,
     { $push: { polls: poll._id } },
@@ -47,7 +53,7 @@ const createPoll = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(201, poll, "Poll created successfully"));
 });
- 
+
 const castVote = asyncHandler(async (req, res) => {
   // console.log(req.params);
   const { pollId, optionId } = req.params;
