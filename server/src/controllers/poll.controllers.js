@@ -16,24 +16,21 @@ const hasUserVoted = (poll, userId) => {
 
 const createPoll = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, voteEndTime, options } = req.body; // Use 'options' from the updated schema
+  const { title, voteEndTime, options } = req.body;
   const createdBy = req.user?._id;
 
-  // Map the options array to the required format
+  const expireAt = new Date(voteEndTime.getTime() + 24 * 60 * 60 * 1000); // 1 day after voting ends
+
   const formattedOptions = options.map((text) => ({
     optionText: text,
     votes: [],
   }));
-  const now = new Date();
-  const voteEnd = new Date(voteEndTime);
-
-  const expireAt = new Date(voteEnd.getTime() + 24 * 60 * 60 * 1000); // 1 day after voting ends
 
   const poll = await Poll.create({
     createdBy,
     title,
-    voteEndTime: voteEnd,
-    expireAt: expireAt,
+    voteEndTime,
+    expireAt,        
     room: roomId,
     options: formattedOptions,
   });
@@ -45,7 +42,7 @@ const createPoll = asyncHandler(async (req, res) => {
   );
 
   if (!room) {
-    await Poll.findByIdAndDelete(poll._id); // Cleanup orphaned poll
+    await Poll.findByIdAndDelete(poll._id);
     return res.status(404).json(new ApiResponse(404, null, "Room not found"));
   }
 
@@ -53,6 +50,7 @@ const createPoll = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(201, poll, "Poll created successfully"));
 });
+
 
 const castVote = asyncHandler(async (req, res) => {
   // console.log(req.params);
