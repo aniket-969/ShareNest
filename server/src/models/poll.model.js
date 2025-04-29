@@ -15,6 +15,11 @@ const pollSchema = new Schema(
       type: String,
       required: true,
     },
+    expireAt: {
+      type: Date,
+      required: true,
+      index: { expires: 0 },
+    },
     options: [
       {
         optionText: {
@@ -52,6 +57,5 @@ const pollSchema = new Schema(
 );
 
 pollSchema.index({ _id: 1, "votes.voter": 1 }, { unique: true });
-
 
 export const Poll = mongoose.model("Vote", pollSchema);
