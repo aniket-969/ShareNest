@@ -17,7 +17,7 @@ const RoomDetails = () => {
 
   const { roomQuery } = useRoom(roomId);
   const { data, isLoading, isError } = roomQuery;
-  console.log(data);
+  // console.log(data);
   const [date, setDate] = useState(new Date());
   const [scheduledTasks, setScheduledTasks] = useState([]);
   useEffect(() => {
