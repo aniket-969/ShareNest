@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 
+
 export const RoomLayout = () => {
   const { roomId } = useParams();
   const { joinRoom, leaveRoom } = useRoomSocket();
@@ -35,3 +36,5 @@ export const RoomLayout = () => {
     </SidebarProvider>
   );
 };
+
+export default RoomLayout

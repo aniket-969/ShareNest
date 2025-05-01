@@ -14,7 +14,7 @@ import { SocketProvider } from "@/socket.jsx";
 import { RoomSocketProvider } from "@/context/RoomSocket.jsx";
 import { RouteMonitor } from "@/utils/RouteMonitor.js";
 import LandingPage from "../LandingPage.jsx";
-import { RoomLayout } from "@/layouts/RoomLayout.jsx";
+// import { RoomLayout } from "@/layouts/RoomLayout.jsx";
 
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
@@ -26,6 +26,7 @@ const Room = React.lazy(() => import("../room/app/Room.jsx"));
 const Chat = React.lazy(() => import("../room/Chat/Chat.jsx"));
 const RoomDetails = React.lazy(() => import("../room/app/RoomDetails.jsx"));
 const CreateRoom = React.lazy(() => import("../room/app/CreateRoom.jsx"));
+const RoomLayout = React.lazy(() => import("@/layouts/RoomLayout.jsx"));
 
 const RoomRoutes = () => {
   return (
