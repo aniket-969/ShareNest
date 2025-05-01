@@ -21,13 +21,13 @@ const TaskCard = ({ scheduledTasks }) => {
           {scheduledTasks.map((task) => (
             <li
               key={task._id}
-              className="p-3 rounded-md  hover:bg-muted/90 transition"
-            >
-              <p className="font-semibold text-foreground text-sm">
+              className="p-3 rounded-md bg-secondary text-secondary-foreground  transition"
+            > 
+              <p className="font-semibold text-primary text-sm">
                 {task.title}
               </p>
               <p className="text-xs truncate">{task.description}</p>
-              <p className="text-xs mt-1 text-foreground">
+              <p className="text-xs mt-1 text-foregroun">
                 Assignee:{" "}
                 <span className="font-medium text-primary">
                   {task.assignee?.fullName}

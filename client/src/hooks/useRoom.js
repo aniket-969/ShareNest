@@ -15,7 +15,7 @@ export const useRoom = (roomId) => {
 
   const roomQuery = useQuery({
     queryKey: ["room", roomId],
-    queryFn: ()=>getRoomData(roomId),
+    queryFn: () => getRoomData(roomId),
     enabled: !!roomId,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000,
@@ -39,17 +39,15 @@ export const useRoom = (roomId) => {
     },
   });
 
- 
   const adminResponseMutation = useMutation({
-    mutationFn: ({ data }) => adminResponse(data,roomId),
+    mutationFn: ({ data }) => adminResponse(data, roomId),
     onSuccess: () => {
-      queryClient.invalidateQueries(["room", roomId]); 
+      queryClient.invalidateQueries(["room", roomId]);
     },
     onError: (error) => {
       console.error("Failed to send admin response", error);
     },
   });
-  
 
   return {
     roomQuery,
@@ -58,22 +56,21 @@ export const useRoom = (roomId) => {
     deleteRoomMutation,
   };
 };
- 
-export const useRoomMutation =()=>{
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
-    const createRoomMutation = useMutation({
-        mutationFn: createRoom,
-        onSuccess: (newRoomId) => {
-          queryClient.invalidateQueries(["auth", "session"]);
-          navigate(`/room`); 
-        },
-        onError: (error) => {
-          console.error("Room creation failed:", error);
-        },
-      });
 
-      
+export const useRoomMutation = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const createRoomMutation = useMutation({
+    mutationFn: createRoom,
+    onSuccess: (newRoomId) => {
+      queryClient.invalidateQueries(["auth", "session"]);
+      navigate(`/room`);
+    },
+    onError: (error) => {
+      console.error("Room creation failed:", error);
+    },
+  });
+
   const requestJoinRoomMutation = useMutation({
     mutationFn: addUserRequest,
     onSuccess: () => {
@@ -84,6 +81,6 @@ export const useRoomMutation =()=>{
       console.error("Failed to send join request", error);
     },
   });
-    
-      return { createRoomMutation ,requestJoinRoomMutation};
-}
+
+  return { createRoomMutation, requestJoinRoomMutation };
+};
