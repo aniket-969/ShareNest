@@ -10,22 +10,22 @@ import Layout from "@/layouts/Layout.jsx";
 import AuthLayout from "@/layouts/AuthLayout.jsx";
 import { useQueryClient } from "@tanstack/react-query";
 import { NotFound } from "../NotFound.jsx";
-import RoomDetails from "../room/app/RoomDetails.jsx";
-import { RoomLayout } from "@/layouts/RoomLayout.jsx";
-import CreateRoom from "../room/app/CreateRoom.jsx";
-import Room from "../room/app/Room.jsx";
-import Awards from "../room/Awards/Awards.jsx";
 import { SocketProvider } from "@/socket.jsx";
-import Chat from "../room/Chat/Chat.jsx";
 import { RoomSocketProvider } from "@/context/RoomSocket.jsx";
 import { RouteMonitor } from "@/utils/RouteMonitor.js";
-import Tasks from "../room/Task/Tasks.jsx";
-import RoomExpense from "../room/Expense/RoomExpense.jsx";
-import Maintenance from "../room/Maintenance/Maintenance.jsx";
+import LandingPage from "../LandingPage.jsx";
 
-const LandingPage = React.lazy(() => import("../LandingPage.jsx"));
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
+const Maintenance = React.lazy(() => import("../room/Maintenance/Maintenance.jsx"));
+const RoomExpense = React.lazy(() => import("../room/Expense/RoomExpense.jsx"));
+const Tasks = React.lazy(() => import("../room/Task/Tasks.jsx"));
+const Awards = React.lazy(() => import("../room/Awards/Awards.jsx"));
+const Room = React.lazy(() => import("../room/app/Room.jsx"));
+const Chat = React.lazy(() => import("../room/Chat/Chat.jsx"));
+const RoomDetails = React.lazy(() => import("../room/app/RoomDetails.jsx"));
+const CreateRoom = React.lazy(() => import("../room/app/CreateRoom.jsx"));
+const RoomLayout = React.lazy(() => import("@/layouts/RoomLayout.jsx"));
 
 const RoomRoutes = () => {
   return (

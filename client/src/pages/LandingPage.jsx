@@ -28,9 +28,8 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center bg-background px-6 py-16 text-center relative overflow-hidden">
       {/* 🔥 Subtle animated radial glow background */}
-      <div className="absolute inset-0 -z-10 flex items-center justify-center">
-        <div className="w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#fe285840] via-transparent to-transparent rounded-full blur-3xl animate-pulse" />
-      </div>
+      <div className="radial-swirl" />
+
 
       {/* Heading */}
       <motion.div

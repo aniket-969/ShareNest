@@ -205,3 +205,34 @@ select:-webkit-autofill:focus {
   }
 }
 
+
+/*  */
+
+@keyframes spin-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.radial-swirl {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.radial-swirl::before {
+  content: "";
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #fe285860, #2af0ea30, transparent);
+  filter: blur(80px);
+  animation: spin-slow 20s linear infinite;
+}
