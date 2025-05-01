@@ -3,9 +3,18 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 const features = [
-  { title: "Group Chat", desc: "Stay connected with your housemates in real-time." },
-  { title: "Chore Scheduling", desc: "Never forget whose turn it is to bring groceries." },
-  { title: "Expense Tracking", desc: "Split bills easily and track who owes what." },
+  {
+    title: "Group Chat",
+    desc: "Stay connected with your housemates in real-time.",
+  },
+  {
+    title: "Chore Scheduling",
+    desc: "Never forget whose turn it is to bring groceries.",
+  },
+  {
+    title: "Expense Tracking",
+    desc: "Split bills easily and track who owes what.",
+  },
   { title: "Polls", desc: "Vote on common house decisions quickly." },
   { title: "Awards", desc: "Motivate roommates with monthly awards." },
   { title: "Calendar", desc: "Stay organized with a shared event calendar." },
@@ -29,7 +38,6 @@ const LandingPage = () => {
     <div className="min-h-screen flex flex-col items-center bg-background px-6 py-16 text-center relative overflow-hidden">
       {/* 🔥 Subtle animated radial glow background */}
       <div className="radial-swirl" />
-
 
       {/* Heading */}
       <motion.div
@@ -87,9 +95,11 @@ const LandingPage = () => {
                        transition-all duration-300 hover:-translate-y-1 hover:rotate-[0.3deg]"
           >
             {/* Reflection */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 pointer-events-none opacity-10 blur-md 
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1/3 pointer-events-none opacity-10 blur-md 
                             bg-gradient-to-t from-white/10 via-white/5 to-transparent 
-                            group-hover:opacity-20 transition-opacity duration-300" />
+                            group-hover:opacity-20 transition-opacity duration-300"
+            />
 
             <h3 className="text-lg font-semibold text-primary z-10 relative">
               {feature.title}

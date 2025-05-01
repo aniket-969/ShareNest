@@ -17,7 +17,7 @@ const RoomDetails = () => {
 
   const { roomQuery } = useRoom(roomId);
   const { data, isLoading, isError } = roomQuery;
-  // console.log(data);
+  console.log(data);
   const [date, setDate] = useState(new Date());
   const [scheduledTasks, setScheduledTasks] = useState([]);
   useEffect(() => {
@@ -35,7 +35,6 @@ const RoomDetails = () => {
 
   return (
     <div className=" flex  w-full items-center justify-center gap-20">
-
       <div className="flex flex-col gap-7 ">
         {/* Calendar */}
         <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain">
