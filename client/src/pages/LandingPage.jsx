@@ -26,40 +26,53 @@ const fadeUp = {
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-background text-foreground px-6">
-      {/* Hero Section */}
+    <div className="min-h-screen flex flex-col items-center bg-background px-6 py-16 text-center relative overflow-hidden">
+      {/* 🔥 Subtle animated radial glow background */}
+      <div className="absolute inset-0 -z-10 flex items-center justify-center">
+        <div className="w-[600px] h-[600px] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#fe285840] via-transparent to-transparent rounded-full blur-3xl animate-pulse" />
+      </div>
+
+      {/* Heading */}
       <motion.div
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="text-center max-w-2xl mt-10 sm:mt-20"
+        className="max-w-3xl flex flex-col gap-3"
       >
-        <motion.h1
-          className="text-4xl sm:text-5xl font-bold mb-4 text-primary"
+        <motion.h2
+          className="text-2xl sm:text-3xl font-semibold text-primary"
           variants={fadeUp}
         >
           ShareNest
-        </motion.h1>
-        <motion.p
-          className="text-muted-foreground text-lg mb-6"
+        </motion.h2>
+        <motion.h1
+          className="text-4xl sm:text-5xl font-extrabold text-white"
           variants={fadeUp}
         >
-          Simplify shared living with group chats, tasks, expenses & more.
-        </motion.p>
+          Simplified Shared Living
+        </motion.h1>
 
-        <motion.div className="flex gap-4 justify-center" variants={fadeUp}>
+        {/* Buttons */}
+        <motion.div
+          className="flex gap-3 justify-center mt-4 mb-12"
+          variants={fadeUp}
+        >
           <Link to="/register">
-            <Button className="text-white">Get Started</Button>
+            <Button size="sm" className="text-white">
+              Get Started
+            </Button>
           </Link>
           <Link to="/login">
-            <Button variant="outline">Login</Button>
+            <Button size="sm" variant="outline">
+              Login
+            </Button>
           </Link>
         </motion.div>
       </motion.div>
 
       {/* Feature Cards */}
       <motion.div
-        className="mt-20 grid sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl"
+        className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl w-full px-2"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -69,10 +82,22 @@ const LandingPage = () => {
             key={index}
             variants={fadeUp}
             custom={index}
-            className="border rounded-xl p-5 shadow-sm hover:shadow-md transition-all"
+            className="relative group rounded-xl p-6 border border-muted/40 shadow-sm bg-gradient-to-br 
+                       from-background via-background to-[#0a0a0a] overflow-hidden 
+                       hover:shadow-xl hover:border-primary hover:bg-white/5 
+                       transition-all duration-300 hover:-translate-y-1 hover:rotate-[0.3deg]"
           >
-            <h3 className="text-lg font-semibold text-primary">{feature.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{feature.desc}</p>
+            {/* Reflection */}
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 pointer-events-none opacity-10 blur-md 
+                            bg-gradient-to-t from-white/10 via-white/5 to-transparent 
+                            group-hover:opacity-20 transition-opacity duration-300" />
+
+            <h3 className="text-lg font-semibold text-primary z-10 relative">
+              {feature.title}
+            </h3>
+            <p className="text-white text-sm mt-1 tracking-wide leading-relaxed z-10 relative">
+              {feature.desc}
+            </p>
           </motion.div>
         ))}
       </motion.div>
