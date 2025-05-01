@@ -5,8 +5,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 
-
 export const RoomLayout = () => {
+  
   const { roomId } = useParams();
   const { joinRoom, leaveRoom } = useRoomSocket();
   const session = localStorage.getItem("session");
@@ -24,7 +24,7 @@ export const RoomLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex w-full " >
+      <div className="flex w-full ">
         <AppSidebar />
         <main className=" w-full overflow-hidden">
           <SidebarTrigger />
@@ -37,4 +37,4 @@ export const RoomLayout = () => {
   );
 };
 
-export default RoomLayout
+export default RoomLayout;
