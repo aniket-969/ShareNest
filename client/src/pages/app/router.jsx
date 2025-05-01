@@ -18,7 +18,9 @@ import LandingPage from "../LandingPage.jsx";
 
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
-const Maintenance = React.lazy(() => import("../room/Maintenance/Maintenance.jsx"));
+const Maintenance = React.lazy(
+  () => import("../room/Maintenance/Maintenance.jsx")
+);
 const RoomExpense = React.lazy(() => import("../room/Expense/RoomExpense.jsx"));
 const Tasks = React.lazy(() => import("../room/Task/Tasks.jsx"));
 const Awards = React.lazy(() => import("../room/Awards/Awards.jsx"));
@@ -27,24 +29,27 @@ const Chat = React.lazy(() => import("../room/Chat/Chat.jsx"));
 const RoomDetails = React.lazy(() => import("../room/app/RoomDetails.jsx"));
 const CreateRoom = React.lazy(() => import("../room/app/CreateRoom.jsx"));
 const RoomLayout = React.lazy(() => import("@/layouts/RoomLayout.jsx"));
+import { NotificationProvider } from "@/context/NotificationContext.jsx";
 
 const RoomRoutes = () => {
   return (
     <SocketProvider>
       <RoomSocketProvider>
-        <RouteMonitor />
-        <Routes>
-          <Route path="" element={<Room />} />
-          <Route path="create" element={<CreateRoom />} />
-          <Route path=":roomId/*" element={<RoomLayout />}>
-            <Route index element={<RoomDetails />} />
-            <Route path="awards" element={<Awards />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="tasks" element={<Tasks />} />
-            <Route path="expense" element={<RoomExpense />} />
-            <Route path="maintenance" element={<Maintenance />} />
-          </Route>
-        </Routes>
+        <NotificationProvider>
+          <RouteMonitor />
+          <Routes>
+            <Route path="" element={<Room />} />
+            <Route path="create" element={<CreateRoom />} />
+            <Route path=":roomId/*" element={<RoomLayout />}>
+              <Route index element={<RoomDetails />} />
+              <Route path="awards" element={<Awards />} />
+              <Route path="chat" element={<Chat />} />
+              <Route path="tasks" element={<Tasks />} />
+              <Route path="expense" element={<RoomExpense />} />
+              <Route path="maintenance" element={<Maintenance />} />
+            </Route>
+          </Routes>
+        </NotificationProvider>
       </RoomSocketProvider>
     </SocketProvider>
   );
