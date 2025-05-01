@@ -69,7 +69,7 @@ const Poll = ({ initialPolls }) => {
 
       {/* Then show voted results */}
       {resultCards.length > 0 && (
-        <div className="mt-4 pt-2 border-t border-border">
+        <div className="  border-t border-border">
           {resultCards.map((poll) => (
             <PollResults poll={poll} key={poll._id} />
           ))}
