@@ -5,7 +5,7 @@ import {Bell} from "lucide-react"
 const TaskCard = ({ scheduledTasks }) => {
   return ( 
    <div className="relative ">
-<div className="notification rounded-3xl flex justify-center items-center">
+<div className="notification rounded-3xl flex justify-center items-center p-2">
 <Bell />
 </div>
   <div className="bmain max-w-md border rounded-lg p-3 clip"> 
@@ -21,7 +21,7 @@ const TaskCard = ({ scheduledTasks }) => {
           {scheduledTasks.map((task) => (
             <li
               key={task._id}
-              className="p-3 rounded-md bg-secondary text-secondary-foreground  transition"
+              className="p-3 rounded-2xl bg-secondary text-secondary-foreground  transition"
             > 
               <p className="font-semibold text-primary text-sm">
                 {task.title}

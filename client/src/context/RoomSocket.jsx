@@ -11,7 +11,7 @@ export const RoomSocketProvider = ({ children }) => {
   const location = useLocation();
 
   const joinRoom = (roomId) => {
-    // Only join if we're actually on a room route
+ 
     if (roomId && location.pathname.includes(`/room/${roomId}`)) {
       socket.emit("joinRoom", roomId);
       console.log(`Joined room: ${roomId}`);
