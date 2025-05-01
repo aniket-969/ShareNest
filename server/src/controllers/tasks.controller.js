@@ -40,7 +40,10 @@ const createRoomTask = asyncHandler(async (req, res) => {
   // type dynamically
   let type = "fixed";
   const pattern = recurring?.patterns?.[0] || {};
-  if (assignmentMode === "rotation" && (pattern.dayOfWeek || pattern.weekOfMonth)) {
+  if (
+    assignmentMode === "rotation" &&
+    (pattern.dayOfWeek || pattern.weekOfMonth)
+  ) {
     type = "mixed";
   } else if (assignmentMode === "rotation") {
     type = "dynamic";
@@ -56,7 +59,7 @@ const createRoomTask = asyncHandler(async (req, res) => {
     participants,
     rotationOrder: assignmentMode === "rotation" ? [...participants] : null,
     dueDate,
-    recurring:{...recurring,type},
+    recurring: { ...recurring, type },
     createdBy,
     lastCompletedDate: null,
   };
@@ -65,12 +68,15 @@ const createRoomTask = asyncHandler(async (req, res) => {
   room.tasks.push(task);
   await room.save();
 
-  const newTask = room.tasks[room.tasks.length - 1];
+  const savedTaskDoc = room.tasks[room.tasks.length - 1];
+  const taskForSocket = savedTaskDoc.toObject();
 
-  // Emit socket event
-  emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, newTask);
+  // add actor
+  taskForSocket.actor = req.user.fullName;
 
-  return res.json(new ApiResponse(200, newTask, "Task created successfully"));
+  emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, taskForSocket);
+
+  return res.json(new ApiResponse(200, savedTaskDoc, "Task created successfully"));
 });
 
 const updateRoomTask = asyncHandler(async (req, res) => {

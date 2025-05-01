@@ -53,7 +53,6 @@ const createPoll = asyncHandler(async (req, res) => {
 });
 
 
-
 const castVote = asyncHandler(async (req, res) => {
   // console.log(req.params);
   const { pollId, optionId } = req.params;
