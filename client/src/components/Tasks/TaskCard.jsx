@@ -1,12 +1,13 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {Bell} from "lucide-react"
+import NotificationBell from "../NotificationBell";
 
 const TaskCard = ({ scheduledTasks }) => {
   return ( 
    <div className="relative ">
-<div className="notification rounded-3xl flex justify-center items-center p-2">
-<Bell />
+<div className="notification rounded-3xl flex justify-center items-center ">
+<NotificationBell/>
 </div>
   <div className="bmain max-w-md border rounded-lg p-3 clip"> 
     
