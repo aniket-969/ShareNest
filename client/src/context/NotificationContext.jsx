@@ -31,8 +31,8 @@ export const NotificationProvider = ({ children }) => {
           message = `New maintenance request for ${payload.title} was created`
           break
 
-        case PollEventEnum.CREATE_POLL_EVENT:
-          message = `${payload.createdBy || "Someone"} created a poll "${payload.title}"`
+        case "createdPoll":
+          message = `${payload.actor || "Someone"} created a poll "${payload.title}"`
           break
 
         default:
