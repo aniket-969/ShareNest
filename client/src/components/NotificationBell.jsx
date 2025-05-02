@@ -50,9 +50,9 @@ const NotificationBell = () => {
       <div className="relative">
         <button onClick={toggle} className="p-2 ">
           <Bell className=" text-primary p-[0.15rem]" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-              {unreadCount}
+          {unreadCount >0 && (
+            <span className="absolute -top-1 p-[0.1rem] right-1 bg-black text-white text-xs ">
+             {unreadCount}
             </span>
           )}
         </button>
