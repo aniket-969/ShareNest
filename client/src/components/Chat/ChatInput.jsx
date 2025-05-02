@@ -54,7 +54,7 @@ const ChatInput = () => {
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message..."
-        className="overflow-hidden rounded-md px-4 py-2 outline-none border-none focus:outline-none focus:ring-none focus:border-none"
+        className="bg-[#2f2b2b8d] overflow-hidden rounded-2xl px-4 py-2 m-2 outline-none border-none focus:outline-none focus:ring-none focus:border-none"
         rows={1}
       />
       {content.trim() && (

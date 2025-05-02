@@ -6,11 +6,11 @@ const TaskCard = ({ scheduledTasks }) => {
   return (
     <div className="relative ">
       <NotificationBell />
-      <div className="bmain max-w-md border rounded-lg p-3 clip">
+      <div className="bmai max-w-md border rounded-lg p-3 clip bg-[#2f2b2b8d] ">
         <h3 className="font-semibold text-base mx-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>
-        <ScrollArea className=" h-[13rem] p-3">
+        <ScrollArea className=" h-[13rem] p-3 ">
           {scheduledTasks.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               No tasks for this date.
@@ -20,7 +20,7 @@ const TaskCard = ({ scheduledTasks }) => {
               {scheduledTasks.map((task) => (
                 <li
                   key={task._id}
-                  className="p-3 rounded-2xl bg-secondary text-secondary-foreground  transition"
+                  className="p-3 rounded-xl bg-[#121212] transition"
                 >
                   <p className="font-semibold text-primary text-sm">
                     {task.title}
