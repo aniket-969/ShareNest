@@ -25,7 +25,6 @@ const createMaintenance = asyncHandler(async (req, res) => {
     contactPhone,
     costEstimate,
   };
-  const user = req.user;
 
   room.maintenanceRequests.push(maintenance);
   await room.save();

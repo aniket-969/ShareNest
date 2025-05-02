@@ -32,7 +32,7 @@ export const ChatEventEnum = Object.freeze({
 export const AvailableChatEvents = Object.values(ChatEventEnum);
 
 export const PollEventEnum = Object.freeze({
-  CREATE_POLL_EVENT: "createPoll",
+  CREATE_POLL_EVENT: "createcPoll",
   CASTVOTE_POLL_EVENT: "castVote",
   DELETE_POLL_EVENT: "deletePoll",
 });
@@ -50,7 +50,7 @@ export const TaskEventEnum = Object.freeze({
 export const AvailableTaskEvents = Object.values(TaskEventEnum);
  
 export const MaintenanceEventEnum = Object.freeze({
-  MAINTENANCE_CREATED_EVENT: "createMaintenance",
+  MAINTENANCE_CREATED_EVENT: "createcMaintenance",
   MAINTENANCE_DELETED_EVENT: "deleteMaintenance",
   MAINTENANCE_UPDATED_EVENT: "updateMaintenace",
 });
@@ -58,14 +58,14 @@ export const MaintenanceEventEnum = Object.freeze({
 export const AvailableMaintenanceEvents = Object.values(MaintenanceEventEnum);
 
 export const AwardEventEnum = Object.freeze({
-  AWARD_CREATED_EVENT: "createAward",
+  AWARD_CREATED_EVENT: "createdAward",
   AWARD_DELETED_EVENT: "deleteAward",
   AWARD_UPDATED_EVENT: "updateAward",
 });
 
 export const AvailableAwardEvents = Object.values(AwardEventEnum);
 
-
+ 
 export const ExpenseEventEnum = Object.freeze({
   EXPENSE_CREATED_EVENT: "createdExpense",
   EXPENSE_DELETED_EVENT: "deletedExpense",
