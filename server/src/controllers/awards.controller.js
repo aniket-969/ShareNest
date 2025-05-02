@@ -18,7 +18,7 @@ const customRoomAward = asyncHandler(async (req, res) => {
     criteria,
     assignedTo,
   };
-     
+      
   room.awards.push(award);
   await room.save();
 

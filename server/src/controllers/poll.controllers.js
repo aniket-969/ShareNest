@@ -30,8 +30,8 @@ const createPoll = asyncHandler(async (req, res) => {
   const poll = await Poll.create({
     createdBy,
     title,
-    voteEndTime: voteEndDate, // ✅ real Date
-    expireAt,                 // ✅ real Date
+    voteEndTime: voteEndDate, 
+    expireAt,                
     room: roomId,
     options: formattedOptions,
   });
