@@ -19,24 +19,24 @@ export const NotificationProvider = ({ children }) => {
           message = `${payload.actor || "Someone"} created a new task "${payload.title}"`
           break
 
-        case AwardEventEnum.AWARD_CREATED_EVENT:
-          message = `${payload.actor || "Someone"} created a new award "${payload.title}"`
+        case "createdAward":
+          message = `${payload.assignedTo || "Someone"} received a new award "${payload.title}"`
           break
 
-        case ExpenseEventEnum.EXPENSE_CREATED_EVENT:
-          message = `${payload.actor || "Someone"} added a new expense "${payload.title}"`
+        case "createdExpense":
+          message = `${payload.paidBy || "Someone"} added a new expense "${payload.title}"`
           break
 
-        case MaintenanceEventEnum.MAINTENANCE_CREATED_EVENT:
-          message = `${payload.actor || "Someone"} requested maintenance "${payload.title}"`
+        case "createdMaintenance":
+          message = `New maintenance request for ${payload.title} was created`
           break
 
         case PollEventEnum.CREATE_POLL_EVENT:
-          message = `${payload.actor || "Someone"} created a poll "${payload.title}"`
+          message = `${payload.createdBy || "Someone"} created a poll "${payload.title}"`
           break
 
         default:
-          return // ignore other events
+          return 
       }
 
       // prepend the new notification
