@@ -46,8 +46,8 @@ const createPoll = asyncHandler(async (req, res) => {
     await Poll.findByIdAndDelete(poll._id);
     return res.status(404).json(new ApiResponse(404, null, "Room not found"));
   }
-
-  emitSocketEvent(req, roomId, PollEventEnum.CREATE_POLL_EVENT, poll);
+const pollWithActor = {...poll,actor:req.user?.fullName}
+  emitSocketEvent(req, roomId, PollEventEnum.CREATE_POLL_EVENT, pollWithActor);
 
   return res.json(new ApiResponse(201, poll, "Poll created successfully"));
 });
