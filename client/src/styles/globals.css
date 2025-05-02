@@ -119,7 +119,6 @@ select:-webkit-autofill:focus {
 
 .clip{
   clip-path: path("M0,0H328A20,20 0,0,1 348,20L348,18A20,20 0,0,0 368,38L380,38A20,20 0,0,1 400,58V260A0,0 0,0,1 400,260H0A0,0 0,0,1 0,260V0A0,0 0,0,1 0,0Z");
-  background-color: #fe2858;
  }
  .notification {
   position: absolute;

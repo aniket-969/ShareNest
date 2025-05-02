@@ -37,7 +37,7 @@ const RoomDetails = () => {
     <div className=" flex  w-full items-center justify-center gap-20">
       <div className="flex flex-col gap-7 ">
         {/* Calendar */}
-        {/* <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain">
+        <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain">
           <Calendar
             classNames={{
               months:
@@ -52,10 +52,10 @@ const RoomDetails = () => {
             onSelect={setDate}
             className="rounded-xl h-[300px] w-full"
           />
-        </div> */}
+        </div>
 
         {/* Polls */}
-        {/* <PollCard initialPolls={data.polls} /> */}
+        <PollCard initialPolls={data.polls} />
       </div>
       <div className="flex flex-col gap-5 ">
         {/* Scheduled Tasks */}
