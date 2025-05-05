@@ -19,7 +19,7 @@ const createPoll = asyncHandler(async (req, res) => {
   const { title, voteEndTime, options } = req.body;
   const createdBy = req.user?._id;
 
-  const voteEndDate = new Date(voteEndTime); // 🧠 force it into a Date object
+  const voteEndDate = new Date(voteEndTime); object
   const expireAt = new Date(voteEndDate.getTime() + 24 * 60 * 60 * 1000); // 1 day after voting ends
 
   const formattedOptions = options.map((text) => ({
@@ -30,8 +30,8 @@ const createPoll = asyncHandler(async (req, res) => {
   const poll = await Poll.create({
     createdBy,
     title,
-    voteEndTime: voteEndDate, 
-    expireAt,                
+    voteEndTime: voteEndDate,
+    expireAt,
     room: roomId,
     options: formattedOptions,
   });
@@ -46,12 +46,11 @@ const createPoll = asyncHandler(async (req, res) => {
     await Poll.findByIdAndDelete(poll._id);
     return res.status(404).json(new ApiResponse(404, null, "Room not found"));
   }
-const pollWithActor = {...poll,actor:req.user?.fullName}
+  const pollWithActor = { ...poll, actor: req.user?.fullName };
   emitSocketEvent(req, roomId, PollEventEnum.CREATE_POLL_EVENT, pollWithActor);
 
   return res.json(new ApiResponse(201, poll, "Poll created successfully"));
 });
-
 
 const castVote = asyncHandler(async (req, res) => {
   // console.log(req.params);
