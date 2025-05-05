@@ -30,3 +30,19 @@ export const sessionLimiter = rateLimit({
     );
   },
 });
+
+export const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, 
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req, res) => req.clientIp,
+  handler: (_, __, ___, options) => {
+    throw new ApiError(
+      options.statusCode || 429,
+      `Too many requests. You are only allowed ${
+        options.max
+      } requests per ${options.windowMs / 60000} minutes`
+    );
+  },
+});

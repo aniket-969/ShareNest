@@ -19,13 +19,13 @@ import {
 } from "../controllers/user.controllers.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { validateQRCodeData } from "../middleware/qrcode.middleware.js";
-import { loginLimiter } from "../middleware/rateLimiters.js";
+import { loginLimiter, sessionLimiter } from "../middleware/rateLimiters.js";
 
 const router = Router();
 
-router.route("/register").post(validate(registerSchema), registerUser);
-router.route("/login").post(validate(loginSchema), loginUser);
-router.route("/session").get(verifyJWT,fetchSession);
+router.route("/register").post(loginLimiter,validate(registerSchema), registerUser);
+router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
+router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
 
 // secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
