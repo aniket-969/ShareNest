@@ -32,8 +32,8 @@ export const sessionLimiter = rateLimit({
 });
 
 export const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, 
+  windowMs: 10 * 60 * 1000, 
+  max: 300, 
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req, res) => req.clientIp,

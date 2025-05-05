@@ -36,24 +36,7 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: (req, res) => {
-    return req.clientIp;
-  },
-  handler: (_, __, ___, options) => {
-    throw new ApiError(
-      options.statusCode || 500,
-      `There are too many requests. You are only allowed ${
-        options.max
-      } requests per ${options.windowMs / 60000} minutes`
-    );
-  },
-});
-
-app.use(limiter);
+app.use(globalLimiter);
 
 import userRouter from "./routes/user.routes.js";
 import pollRouter from "./routes/poll.routes.js";
@@ -63,6 +46,7 @@ import taskRouter from "./routes/tasks.routes.js";
 import maintenanceRouter from "./routes/maintenance.routes.js";
 import roomRouter from "./routes/room.routes.js";
 import chatRouter from "./routes/chat.routes.js";
+import { globalLimiter } from "./middleware/rateLimiters.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/room", roomRouter);
