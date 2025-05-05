@@ -19,6 +19,7 @@ import {
 } from "../controllers/user.controllers.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { validateQRCodeData } from "../middleware/qrcode.middleware.js";
+import { loginLimiter } from "../middleware/rateLimiters.js";
 
 const router = Router();
 
