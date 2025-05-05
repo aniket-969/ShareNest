@@ -3,7 +3,7 @@ import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 const AuthLayout = () => {
   const session = localStorage.getItem("session");
-
+ console.log(session)
   return session ? (
     <Navigate to="/room" />
   ) : (
