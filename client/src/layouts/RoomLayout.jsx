@@ -6,11 +6,11 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 
 export const RoomLayout = () => {
-  
   const { roomId } = useParams();
   const { joinRoom, leaveRoom } = useRoomSocket();
   const session = localStorage.getItem("session");
 
+  // join room socket
   useEffect(() => {
     if (roomId) {
       joinRoom(roomId);
@@ -18,8 +18,13 @@ export const RoomLayout = () => {
     }
   }, [roomId]);
 
-  if (!session || !roomId) {
+
+  if (!roomId) {
     return <Navigate to="/room" />;
+  }
+  if (!session) {
+    localStorage.clear();
+    return <Navigate to="/login" />;
   }
 
   return (

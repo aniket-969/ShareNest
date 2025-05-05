@@ -25,7 +25,10 @@ axiosClient.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       const errorMessage = error.response?.data?.message || "";
+      const currentPath = window.location.pathname;
 
+      const isPublicPage = ["/login", "/register"].includes(currentPath);
+      console.log("status code 401");
       if (errorMessage.includes("expired")) {
         console.log("Access token expired, attempting to refresh...");
 
@@ -38,10 +41,11 @@ axiosClient.interceptors.response.use(
               {},
               { withCredentials: true }
             );
-
+            console.log("in refresh token try");
             const newAccessToken = refreshResponse.data?.accessToken;
 
             if (newAccessToken) {
+              console.log("new AccessToken received");
               onTokenRefreshed(newAccessToken);
               isRefreshing = false;
 
@@ -54,11 +58,8 @@ axiosClient.interceptors.response.use(
             }
           } catch (refreshError) {
             console.error("Refresh token failed, logging out user.");
-            if (!localStorage.getItem("sessionExpired")) {
-              localStorage.setItem("sessionExpired", "true");
-              localStorage.removeItem("session");
-              window.location.href = "/login";
-            }
+            localStorage.clear();
+            // window.location.href = "/login";
           }
 
           isRefreshing = false;
@@ -72,11 +73,8 @@ axiosClient.interceptors.response.use(
         });
       } else {
         console.warn("No valid access token found. Redirecting to login.");
-        if (!localStorage.getItem("sessionExpired")) {
-          localStorage.setItem("sessionExpired", "true");
-          localStorage.removeItem("session");
-          window.location.href = "/login";
-        }
+        localStorage.clear();
+        if (!isPublicPage) window.location.href = "/login";
       }
     }
 
