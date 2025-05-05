@@ -1,3 +1,4 @@
+import React, { useState, lazy } from "react";
 import {
   Award,
   CalendarDays,
@@ -18,29 +19,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useParams } from "react-router-dom";
-import { useRoom } from "@/hooks/useRoom";
-import { useState, lazy } from "react";
-import { Spinner } from "./ui/spinner";
+import { useParams, Link } from "react-router-dom";
 
 const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
 const PendingRequests = lazy(
   () => import("@/components/Sidebar/PendingRequests")
 );
  
-export function AppSidebar() {
+const AppSidebar = ({roomData})=> {
   const { roomId } = useParams();
-  const { roomQuery } = useRoom(roomId);
-  const { data: roomData, isLoading, isError } = roomQuery;
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
-  if (isLoading || !roomId) {
-    return <Spinner />;
-  }
-  if (isError) {
-    return <p>Please Refresh</p>;
-  }
+
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
@@ -80,14 +70,16 @@ export function AppSidebar() {
       icon: Settings,
     },
   ];
-
+  
+  console.log("sidebar rendered");
+  
   return (
     <Sidebar>
       <SidebarContent>
         {/* Room Info */}
         <div className="p-4 border-b">
           <h2 className="text-lg font-bold line-clamp-1">
-            {roomData?.name.toUpperCase() || "Loading..."}
+            {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
             {roomData?.description || ""}
@@ -117,13 +109,13 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a
-                      href={item.url}
+                    <Link
+                      to={item.url}
                       className="flex items-center space-x-3 px-3 py-2 hover:bg-accent rounded-lg"
                     >
                       <item.icon className="w-5 h-5" />
                       <span className="text-sm font-medium">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -134,3 +126,6 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
+const MemoSidebar = React.memo(AppSidebar);
+export { MemoSidebar as AppSidebar };

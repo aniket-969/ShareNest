@@ -12,12 +12,13 @@ import { useNavigate } from "react-router-dom";
 export const useRoom = (roomId) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
+ 
   const roomQuery = useQuery({
     queryKey: ["room", roomId],
     queryFn: () => getRoomData(roomId),
     enabled: !!roomId,
     refetchOnWindowFocus: false,
+    refetchOnMount:false,
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
     retry: 3,

@@ -7,7 +7,7 @@ import { Navigate, Outlet } from "react-router-dom";
 
 const Room = () => {
   const session = localStorage.getItem("session");
-
+console.log("in room")
   return session ? (
     <div className=" max-h-screen ">
       <RoomHeader />
