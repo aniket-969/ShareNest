@@ -9,7 +9,6 @@ export const useRoomSocket = () => useContext(RoomSocketContext);
 export const RoomSocketProvider = ({ children }) => {
   const socket = getSocket();
   const location = useLocation();
-
   const joinRoom = (roomId) => {
  
     if (roomId && location.pathname.includes(`/room/${roomId}`)) {

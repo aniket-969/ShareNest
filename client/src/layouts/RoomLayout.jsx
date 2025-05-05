@@ -5,12 +5,15 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 import { Spinner } from "@/components/ui/spinner";
+import { useRoom } from "@/hooks/useRoom";
 
 export const RoomLayout = () => {
   const { roomId } = useParams();
   const { joinRoom, leaveRoom } = useRoomSocket();
   const session = localStorage.getItem("session");
-
+  const { roomQuery } = useRoom(roomId);
+  const { data: roomData, isLoading, isError } = roomQuery;
+  
   // join room socket
   useEffect(() => {
     if (roomId) {
@@ -32,7 +35,7 @@ export const RoomLayout = () => {
     <div className="flex w-full">
       {/*  sidebar in its own Suspense */}
       <Suspense fallback={<div className="p-4"><Spinner /></div>}>
-        <AppSidebar />
+        <AppSidebar roomData={roomData}/>
       </Suspense>
 
       <main className="w-full overflow-hidden">

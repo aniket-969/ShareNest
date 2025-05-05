@@ -13,13 +13,13 @@ export const AppProvider = ({ children }) => {
   );
 
   return (
-    // <React.Suspense
-    //   fallback={
-    //     <div className="flex h-screen w-screen items-center justify-center">
-    //       <Spinner size="xl" />
-    //     </div>
-    //   }
-    // >
+    <React.Suspense
+      fallback={
+        <div className="flex h-screen w-screen items-center justify-center">
+          <Spinner size="xl" />
+        </div>
+      }
+    >
       <ErrorBoundary
         FallbackComponent={({ error, resetErrorBoundary }) => (
           <div>
@@ -33,6 +33,6 @@ export const AppProvider = ({ children }) => {
           {children}
         </QueryClientProvider>
       </ErrorBoundary>
-    // </React.Suspense>
+     </React.Suspense>
   );
 };
