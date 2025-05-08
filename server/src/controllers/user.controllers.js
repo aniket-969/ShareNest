@@ -12,7 +12,7 @@ const generateTokens = async (userId) => {
   await user.save({ validateBeforeSave: false });
   //   console.log(accessToken, refreshToken);
   return { accessToken, refreshToken };
-};
+}; 
 
 const registerUser = asyncHandler(async (req, res) => {
   console.log("this is body", req.body);
@@ -76,7 +76,7 @@ const loginUser = asyncHandler(async (req, res) => {
   };
   return res
   .cookie("accessToken", accessToken, { ...options, path: "/" }) 
-  .cookie("refreshToken", refreshToken, { ...options, path: "/users/refreshTokens" }) 
+  .cookie("refreshToken", refreshToken, { ...options, path: "/api/v1/users/refreshTokens" }) 
   .json(new ApiResponse(200, loggedInUser, "User logged in successfully"));
 });
 
@@ -109,42 +109,40 @@ const logoutUser = asyncHandler(async (req, res) => {
  
 const refreshTokens = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
-
+console.log(incomingRefreshToken,"Inside refresh first entry")
   if (!incomingRefreshToken) {
     throw new ApiError(401, "unauthorized request");
   }
-  console.log(req.body, incomingRefreshToken);
+  console.log("This is refresh",req.body, incomingRefreshToken);
   const decodedToken = jwt.verify(
     incomingRefreshToken,
     process.env.REFRESH_TOKEN_SECRET
   );
+  console.log(decodedToken,"At token decode")
   const user = await User.findById(decodedToken?._id);
-
+console.log("user",user._id)
   if (!user) {
     throw new ApiError(401, "Invalid refresh token");
   }
 
   if (incomingRefreshToken !== user?.refreshToken) {
+    console.log("invalid refreshToken")
     throw new ApiError(401, "Refresh token is expired or used");
   }
   const options = {
     httpOnly: true,
     secure: true,
   };
-
+console.log("about to generate tokens")
   const { accessToken, refreshToken } = await generateTokens(user._id);
-
-  return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+console.log("Got the tokens",accessToken)
+return res
+.cookie("accessToken", accessToken, { ...options, path: "/" }) 
+.cookie("refreshToken", refreshToken, { ...options, path: "/api/v1/users/refreshTokens" }) 
     .json(
       new ApiResponse(
         200,
-        {
-          accessToken,
-          refreshToken,
-        },
+        {},
         "User Token updated successfully"
       )
     );
