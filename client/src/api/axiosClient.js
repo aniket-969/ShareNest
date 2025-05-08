@@ -19,7 +19,7 @@ const onTokenRefreshed = (newAccessToken) => {
 const addRefreshSubscriber = (callback) => {
   refreshSubscribers.push(callback);
 };
-
+ 
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -42,8 +42,8 @@ axiosClient.interceptors.response.use(
               { withCredentials: true }
             );
             console.log("in refresh token try");
-            const newAccessToken = refreshResponse.data?.accessToken;
-
+            const newAccessToken = refreshResponse.data?.data?.accessToken;
+console.log(refreshResponse)
             if (newAccessToken) {
               console.log("new AccessToken received");
               onTokenRefreshed(newAccessToken);
