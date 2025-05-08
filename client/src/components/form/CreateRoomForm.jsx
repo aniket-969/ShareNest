@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { createRoomSchema } from "@/schema/roomSchema";
-import { zodResolver } from "@hookform/resolvers/zod/src/zod";
+
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Form,
   FormItem,

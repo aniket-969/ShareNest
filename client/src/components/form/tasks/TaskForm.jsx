@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { createRoomTaskSchema } from "@/schema/taskSchema";
-import { zodResolver } from "@hookform/resolvers/zod/src/zod";
 import {
   Form,
   FormItem,
@@ -26,11 +25,13 @@ import {
 } from "../../ui/select";
 import DatePicker from "@/components/ui/datePicker";
 import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from '@hookform/resolvers/zod';
+
 
 const TaskForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createTaskMutation } = useTask(roomId);
- 
+
   const form = useForm({
     resolver: zodResolver(createRoomTaskSchema),
     defaultValues: {

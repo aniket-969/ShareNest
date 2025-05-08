@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { createMaintenanceSchema } from "@/schema/maintenanceSchema";
-import { zodResolver } from "./../../../node_modules/@hookform/resolvers/zod/src/zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import {
   Form,
   FormItem,

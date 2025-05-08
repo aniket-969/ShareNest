@@ -15,7 +15,8 @@ import { Button } from "../ui/button";
 import { AvatarSelector } from "../AvatarSelector";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { zodResolver } from "./../../../node_modules/@hookform/resolvers/zod/src/zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+
 
 export const SignUp = () => {
   const { registerMutation } = useAuth();
