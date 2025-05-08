@@ -130,65 +130,83 @@ const adminResponse = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { requestId, action } = req.body;
 
-  const room = await Room.findById(roomId);
-  if (!room) {
-    throw new ApiError(404, "Room not found");
-  }
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (room.admin.toString() !== req.user._id.toString()) {
-    throw new ApiError(401, "Only admin can respond to requests");
-  }
+  try {
+    const room = await Room.findById(roomId).session(session);
+    if (!room) {
+      throw new ApiError(404, "Room not found");
+    }
 
-  const requestIndex = room.pendingRequests.findIndex(
-    (request) => request.id.toString() === requestId
-  );
-  if (requestIndex === -1) {
-    throw new ApiError(400, "No such pending request");
-  }
+    if (room.admin.toString() !== req.user._id.toString()) {
+      throw new ApiError(401, "Only admin can respond to requests");
+    }
 
-  const { userId, role } = room.pendingRequests[requestIndex];
+    const requestIndex = room.pendingRequests.findIndex(
+      (request) => request.id.toString() === requestId
+    );
+    if (requestIndex === -1) {
+      throw new ApiError(400, "No such pending request");
+    }
 
-  if (action === "approved") {
-    if (role === "landlord") {
-      if (room.landlord) {
-        throw new ApiError(400, "Room already has a landlord");
+    const { userId, role } = room.pendingRequests[requestIndex];
+
+    if (action === "approved") {
+      if (role === "landlord") {
+        if (room.landlord) {
+          throw new ApiError(400, "Room already has a landlord");
+        }
+        room.landlord = userId;
+      } else if (role === "tenant") {
+        room.tenants.push(userId);
       }
-      room.landlord = userId;
-    } else if (role === "tenant") {
-      room.tenants.push(userId);
+
+      room.pendingRequests.splice(requestIndex, 1);
+
+      const user = await User.findById(userId).session(session);
+      if (!user) {
+        throw new ApiError(404, "User not found");
+      }
+
+      user.rooms.push({ roomId: room._id, name: room.name });
+
+      await user.save({ session });
+      await room.save({ session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
+        action: "approved",
+        roomId: room._id,
+        roomName: room.name,
+      });
+
+      return res.json(
+        new ApiResponse(200, {}, "User approved and added to the room")
+      );
+    } else {
+      room.pendingRequests.splice(requestIndex, 1);
+      await room.save({ session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
+        action: "denied",
+        roomId: room._id,
+        roomName: room.name,
+      });
+
+      return res.json(
+        new ApiResponse(200, {}, "User denied and removed from pending requests")
+      );
     }
-
-    room.pendingRequests.splice(requestIndex, 1);
-
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
-
-    user.rooms.push({ roomId: room._id, name: room.name });
-    await user.save();
-    await room.save();
-
-    emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
-      action: "approved",
-      roomId: room._id,
-      roomName: room.name,
-    });
-    return res.json(
-      new ApiResponse(200, {}, "User approved and added to the room")
-    );
-  } else {
-    room.pendingRequests.splice(requestIndex, 1);
-    await room.save();
-
-    emitSocketEvent(req, userId, RoomEventEnum.REQUEST_ROOM_RESPONSE_EVENT, {
-      action: "denied",
-      roomId: room._id,
-      roomName: room.name,
-    });
-    return res.json(
-      new ApiResponse(200, {}, "User denied and removed from pending requests")
-    );
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
   }
 });
 

@@ -13,7 +13,7 @@ export const RoomLayout = () => {
   const session = localStorage.getItem("session");
   const { roomQuery } = useRoom(roomId);
   const { data: roomData, isLoading, isError } = roomQuery;
-  
+
   // join room socket
   useEffect(() => {
     if (roomId) {
@@ -32,23 +32,29 @@ export const RoomLayout = () => {
 
   return (
     <SidebarProvider>
-    <div className="flex w-full">
-      {/*  sidebar in its own Suspense */}
-      <Suspense fallback={<div className="p-4"><Spinner /></div>}>
-        <AppSidebar roomData={roomData}/>
-      </Suspense>
+      <div className="flex w-full">
+        {/*  sidebar in its own Suspense */}
+        <Suspense
+          fallback={
+            <div className="p-4">
+              <Spinner />
+            </div>
+          }
+        >
+          <AppSidebar roomData={roomData} />
+        </Suspense>
 
-      <main className="w-full overflow-hidden">
-        <SidebarTrigger />
-        <div className="px-2 py-5 w-full">
-          {/*  outlet content in its own Suspense */}
-          <Suspense fallback={<Spinner />}>
-            <Outlet />
-          </Suspense>
-        </div>
-      </main>
-    </div>
-  </SidebarProvider>
+        <main className="w-full overflow-hidden">
+          <SidebarTrigger />
+          <div className="px-2 py-5 w-full">
+            {/*  outlet content in its own Suspense */}
+            <Suspense fallback={<Spinner />}>
+              <Outlet />
+            </Suspense>
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
