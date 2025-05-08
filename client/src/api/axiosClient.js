@@ -3,82 +3,63 @@ import axios from "axios";
 const axiosClient = axios.create({
   baseURL: import.meta.env.REACT_APP_API_URL || "http://localhost:3000/api/v1",
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
 let isRefreshing = false;
-let refreshSubscribers = []; // Store pending requests while refreshing
+let refreshSubscribers = [];
 
-const onTokenRefreshed = (newAccessToken) => {
-  refreshSubscribers.forEach((callback) => callback(newAccessToken));
+const onTokenRefreshed = (newToken) => {
+  refreshSubscribers.forEach((cb) => cb(newToken));
   refreshSubscribers = [];
 };
 
-const addRefreshSubscriber = (callback) => {
-  refreshSubscribers.push(callback);
+const addRefreshSubscriber = (cb) => {
+  refreshSubscribers.push(cb);
 };
- 
+
 axiosClient.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      const errorMessage = error.response?.data?.message || "";
-      const currentPath = window.location.pathname;
+  (error) => {
+    const { response, config } = error;
+    const expired =
+      response?.status === 401 &&
+      response.data?.message?.toLowerCase().includes("expired");
+    const currentPath = window.location.pathname;
 
-      const isPublicPage = ["/login", "/register"].includes(currentPath);
-      console.log("status code 401");
-      if (errorMessage.includes("expired")) {
-        console.log("Access token expired, attempting to refresh...");
-
-        if (!isRefreshing) {
-          isRefreshing = true;
-
-          try {
-            const refreshResponse = await axios.post(
-              "http://localhost:3000/api/v1/users/refreshTokens",
-              {},
-              { withCredentials: true }
-            );
-            console.log("in refresh token try");
-            const newAccessToken = refreshResponse.data?.data?.accessToken;
-console.log(refreshResponse)
-            if (newAccessToken) {
-              console.log("new AccessToken received");
-              onTokenRefreshed(newAccessToken);
-              isRefreshing = false;
-
-              return new Promise((resolve) => {
-                addRefreshSubscriber((token) => {
-                  error.config.headers["Authorization"] = `Bearer ${token}`;
-                  resolve(axiosClient(error.config));
-                });
-              });
-            }
-          } catch (refreshError) {
-            console.error("Refresh token failed, logging out user.");
-            localStorage.clear();
-            // window.location.href = "/login";
-          }
-
-          isRefreshing = false;
-        }
-
-        return new Promise((resolve) => {
-          addRefreshSubscriber((token) => {
-            error.config.headers["Authorization"] = `Bearer ${token}`;
-            resolve(axiosClient(error.config));
-          });
-        });
-      } else {
-        console.warn("No valid access token found. Redirecting to login.");
-        localStorage.clear();
-        if (!isPublicPage) window.location.href = "/login";
-      }
+    const isPublicPage = ["/login", "/register"].includes(currentPath);
+    if (!expired) {
+      localStorage.clear()
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    //  return a promise that will retry this request
+    const retryRequest = new Promise((resolve) => {
+      addRefreshSubscriber((token) => {
+        config.headers["Authorization"] = `Bearer ${token}`;
+        resolve(axiosClient(config));
+      });
+    });
+
+    
+    if (!isRefreshing) {
+      isRefreshing = true;
+      axiosClient
+        .post("/users/refreshTokens")
+        .then(({ data }) => {
+          const newToken = data.data.accessToken;
+          onTokenRefreshed(newToken);
+        })
+        .catch(() => {
+          localStorage.clear();
+          if (!isPublicPage) window.location.href = "/login";
+        })
+        .finally(() => {
+          isRefreshing = false;
+        });
+    }
+
+    return retryRequest;
   }
 );
 
