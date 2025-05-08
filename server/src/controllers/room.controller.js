@@ -270,7 +270,6 @@ const getRoomData = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
 });
 
-
 const leaveRoom = asyncHandler(async (req, res) => {
   console.log("This is user", req.user);
   const userId = req.user?._id;
