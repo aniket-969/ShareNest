@@ -19,10 +19,10 @@ const router = Router();
 router.use(verifyJWT);
 router
   .route("/:roomId")
-  .post(validate(createRoomTaskSchema), adminOnly, createRoomTask);
+  .post(validate(createRoomTaskSchema),  createRoomTask);
 router
   .route("/:taskId/:roomId")
-  .patch(validate(updateRoomTaskSchema), adminOnly, updateRoomTask);
+  .patch(validate(updateRoomTaskSchema),  updateRoomTask);
 router.route("/:taskId/:roomId").delete(adminOnly, deleteRoomTask);
 router
   .route("/taskSwitch/:taskId/:roomId")

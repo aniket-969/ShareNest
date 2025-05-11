@@ -13,13 +13,13 @@ const hasUserVoted = (poll, userId) => {
     option.votes.some((vote) => vote.voter.toString() === userId.toString())
   );
 };
-
+ 
 const createPoll = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { title, voteEndTime, options } = req.body;
   const createdBy = req.user?._id;
 
-  const voteEndDate = new Date(voteEndTime); object
+  const voteEndDate = new Date(voteEndTime); 
   const expireAt = new Date(voteEndDate.getTime() + 24 * 60 * 60 * 1000); // 1 day after voting ends
 
   const formattedOptions = options.map((text) => ({
