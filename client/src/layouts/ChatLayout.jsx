@@ -6,6 +6,7 @@ import { getSocket } from "@/socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getDateLabel } from "@/utils/helper";
+import { useDebouncedCallback } from "@/hooks/use-debounce";
 
 const ChatLayout = ({
   messages,
@@ -128,12 +129,14 @@ const ChatLayout = ({
     }
   };
 
+const debouncedHandleScroll = useDebouncedCallback(handleScroll,200)
+
   return (
     <div className="flex flex-col w-full h-full">
       <ScrollArea
         ref={viewportRef}
         className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
-        onScroll={handleScroll}
+        onScroll={debouncedHandleScroll}
       >
         {messages.map((msg, index) => {
           const prevMsg = index > 0 ? messages[index - 1] : null;
