@@ -139,10 +139,10 @@ console.log("Got the tokens",accessToken)
 return res
 .cookie("accessToken", accessToken, { ...options, path: "/" }) 
 .cookie("refreshToken", refreshToken, { ...options, path: "/api/v1/users/refreshTokens" }) 
-    .json(
+    .json( 
       new ApiResponse(
         200,
-        {},
+        {accessToken},
         "User Token updated successfully"
       )
     );
