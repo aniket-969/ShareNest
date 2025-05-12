@@ -129,7 +129,7 @@ const ChatLayout = ({
     }
   };
 
-const debouncedHandleScroll = useDebouncedCallback(handleScroll,200)
+  const debouncedHandleScroll = useDebouncedCallback(handleScroll, 200);
 
   return (
     <div className="flex flex-col w-full h-full">

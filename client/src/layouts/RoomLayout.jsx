@@ -32,7 +32,7 @@ export const RoomLayout = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex w-full">
+      <div className="flex w-full ">
         {/*  sidebar in its own Suspense */}
         <Suspense
           fallback={
@@ -44,9 +44,9 @@ export const RoomLayout = () => {
           <AppSidebar roomData={roomData} />
         </Suspense>
 
-        <main className="w-full overflow-hidden">
+        <main className="w-full overflow-hidden ">
           <SidebarTrigger />
-          <div className="px-2 py-5 w-full">
+          <div className="px-2 py-1 w-full ">
             {/*  outlet content in its own Suspense */}
             <Suspense fallback={<Spinner />}>
               <Outlet />
