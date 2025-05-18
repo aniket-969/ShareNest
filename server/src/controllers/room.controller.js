@@ -200,7 +200,11 @@ const adminResponse = asyncHandler(async (req, res) => {
       });
 
       return res.json(
-        new ApiResponse(200, {}, "User denied and removed from pending requests")
+        new ApiResponse(
+          200,
+          {},
+          "User denied and removed from pending requests"
+        )
       );
     }
   } catch (err) {
@@ -245,7 +249,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   // Fetch room with/without pendingRequests based on admin status
   let roomQuery = Room.findById(roomId).select("-groupCode");
-  
+
   // Check if user is admin (without making an extra DB call)
   const isAdmin = await Room.exists({ _id: roomId, admin: userId });
 
@@ -259,6 +263,15 @@ const getRoomData = asyncHandler(async (req, res) => {
     { path: "landlord", select: "username fullName avatar _id" },
     { path: "awards" },
     { path: "tasks.currentAssignee", select: "username fullName" },
+    ,
+    {
+      path: "tasks.participants",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.rotationOrder",
+      select: "username fullName avatar _id",
+    },
     { path: "polls" },
     ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []), // Only populate pendingRequests if admin
   ]);
