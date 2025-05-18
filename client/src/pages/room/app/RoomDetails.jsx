@@ -20,15 +20,17 @@ const RoomDetails = () => {
   // console.log(data);
   const [date, setDate] = useState(new Date());
   const [scheduledTasks, setScheduledTasks] = useState([]);
+console.log(scheduledTasks)
   useEffect(() => {
-    if (data && data.tasks && data.tasks.length > 0) {
-      const tasksForDate = getTasksForDate(data.tasks, date);
-      setScheduledTasks(tasksForDate);
-    }
+    if (data?.tasks) {
+    setScheduledTasks(getTasksForDate(data.tasks, date));
+  }
   }, [data, date]);
+
   if (isLoading) {
     return <Spinner />;
   }
+
   if (isError) {
     return <>Something went wrong . Please refresh</>;
   }
