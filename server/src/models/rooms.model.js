@@ -2,6 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Poll } from "./poll.model.js";
+import { Expense } from "./expense.model.js";
 
 const roomSchema = new Schema(
   {
@@ -143,17 +144,13 @@ const roomSchema = new Schema(
             ref: "User",
           },
         ],
+
+        // Recurrence rules
         recurring: {
-          enabled: {
-            type: Boolean,
-            default: false,
-          },
+          enabled: { type: Boolean, default: false },
           type: {
             type: String,
             enum: ["fixed", "dynamic", "mixed"],
-            // fixed: specific days/dates
-            // dynamic: every X days
-            // mixed: combination of both
           },
           patterns: [
             {
@@ -161,43 +158,53 @@ const roomSchema = new Schema(
                 type: String,
                 enum: ["daily", "weekly", "monthly", "custom"],
               },
-              interval: {
-                type: Number,
-                default: 1, // every X days/weeks/months
-              },
-              days: [Number], // 0-6 for weekdays, 1-31 for monthdays
+              interval: { type: Number, default: 1 },
+              days: [Number],
               weekOfMonth: {
                 type: String,
                 enum: ["first", "second", "third", "fourth", "last"],
               },
-              dayOfWeek: {
-                type: Number, // 0-6 representing Sunday to Saturday
-              },
+              dayOfWeek: Number,
             },
           ],
           startDate: Date,
           dueDate: Date,
         },
+
+        // Swap-turn requests for a specific occurrence
+        swapRequests: [
+          {
+            _id: {
+              type: Schema.Types.ObjectId,
+              default: () => new mongoose.Types.ObjectId(),
+            },
+            occurrenceDate: { type: Date, required: true },
+            from: {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+              required: true,
+            },
+            to: {
+              type: Schema.Types.ObjectId,
+              ref: "User",
+              required: true,
+            },
+            status: {
+              type: String,
+              enum: ["pending", "approved", "rejected"],
+              default: "pending",
+            },
+            requestedAt: { type: Date, default: Date.now },
+            respondedAt: Date,
+            resolver: { type: Schema.Types.ObjectId, ref: "User" },
+          },
+        ],
+
         status: {
           type: String,
           enum: ["pending", "completed", "skipped"],
           default: "pending",
         },
-        completionHistory: [
-          {
-            date: Date,
-            completedBy: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-            },
-            status: {
-              type: String,
-              enum: ["completed", "skipped", "reassigned"],
-            },
-            notes: String,
-          },
-        ],
-        lastCompletedDate: Date,
       },
     ],
 
@@ -218,7 +225,6 @@ roomSchema.pre(
       const roomId = this._id;
 
       await Expense.deleteMany({ room: roomId }).session(session);
-      await CalendarEvent.deleteMany({ room: roomId }).session(session);
       await Poll.deleteMany({ room: roomId }).session(session);
 
       await session.commitTransaction();

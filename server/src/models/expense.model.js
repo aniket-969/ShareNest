@@ -64,3 +64,4 @@ expenseSchema.index({ createdAt: 1 });
 expenseSchema.index({ room: 1, "participants.hasPaid": 1 });
 
 export const Expense = mongoose.model("Expense", expenseSchema);
+ 
