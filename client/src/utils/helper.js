@@ -38,58 +38,34 @@ export const getDateLabel = (date) => {
   });
 };
 
-
 export function getTasksForDate(tasks, selectedDate) {
-  // Normalize the selected date to midnight for proper comparison
+  // Normalize date to midnight
   const targetDate = new Date(selectedDate);
   targetDate.setHours(0, 0, 0, 0);
 
+  const weekOfMonth = getWeekOfMonth(targetDate);
   const scheduledTasks = [];
 
-  // Format date components for easier comparisons
-  const targetDay = targetDate.getDate(); // Day of month (1-31)
-  const targetDayOfWeek = targetDate.getDay(); // Day of week (0-6, 0 is Sunday)
-  const targetMonth = targetDate.getMonth(); // Month (0-11)
-  const targetYear = targetDate.getFullYear();
-
-  // Get the week of month (first, second, third, fourth, last)
-  const weekOfMonth = getWeekOfMonth(targetDate);
-
   tasks.forEach((task) => {
-    // Skip completed tasks
-    if (task.status === "completed") return;
+    // Build a unified patterns array: either your recurring ones, or a single "one-time" entry
+    const patterns = task.recurring?.enabled
+      ? task.recurring.patterns
+      : [{ frequency: "one-time", date: task.recurring?.dueDate }];
 
-    // Handle non-recurring tasks - they are always visible
-    if (!task.recurring.enabled) {
-      scheduledTasks.push({
-        ...task,
-        scheduledDate: new Date(targetDate),
-        assignee: task.currentAssignee,
-      });
-      return;
-    }
-
-    // Check if the task occurs on the target date based on its recurring pattern
-    const isScheduled = isTaskScheduledForDate(
-      task,
-      targetDate,
-      targetDay,
-      targetDayOfWeek,
-      targetMonth,
-      targetYear,
-      weekOfMonth
+    // Find the single pattern that matches today
+    const matched = patterns.find((pattern) =>
+      isPatternMatch(task, targetDate, pattern, weekOfMonth)
     );
+    if (!matched) return;
 
-    if (isScheduled) {
-      // Determine the current assignee (considering rotation if applicable)
-      const assignee = determineAssignee(task, targetDate);
+    // Compute the correct assignee for this occurrence
+    const assignee = determineAssignee(task, targetDate, matched);
 
-      scheduledTasks.push({
-        ...task,
-        scheduledDate: new Date(targetDate),
-        assignee,
-      });
-    }
+    scheduledTasks.push({
+      ...task,
+      scheduledDate: targetDate,
+      assignee,
+    });
   });
 
   return scheduledTasks;
@@ -98,18 +74,15 @@ export function getTasksForDate(tasks, selectedDate) {
 function getWeekOfMonth(date) {
   const day = date.getDate();
   const weekNumber = Math.ceil(day / 7);
-
-  // Check if it's the last week
-  const lastDayOfMonth = new Date(
+  const lastDay = new Date(
     date.getFullYear(),
     date.getMonth() + 1,
     0
   ).getDate();
-  if (day > lastDayOfMonth - 7) return "last";
 
-  // Otherwise return based on week number
-  const weekNames = ["first", "second", "third", "fourth"];
-  return weekNames[weekNumber - 1] || "fourth";
+  if (day > lastDay - 7) return "last";
+  const names = ["first", "second", "third", "fourth"];
+  return names[weekNumber - 1] || "fourth";
 }
 
 /**
@@ -209,80 +182,114 @@ function isTaskScheduledForDate(
     }
   });
 }
+function isPatternMatch(task, targetDate, pattern, weekOfMonth) {
+  const {
+    frequency,
+    interval = 1,
+    days = [],
+    weekOfMonth: pattWeek,
+    dayOfWeek,
+    date,
+  } = pattern;
 
+  // ONE-TIME
+  if (frequency === "one-time") {
+    if (!date) return false;
+    const oneTime = new Date(date);
+    oneTime.setHours(0, 0, 0, 0);
+    return oneTime.getTime() === targetDate.getTime();
+  }
+
+  const start = task.recurring?.startDate
+    ? new Date(task.recurring.startDate)
+    : new Date(0);
+  const diffMs = targetDate - start;
+
+  switch (frequency) {
+    case "daily": {
+      const daysSince = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      return daysSince >= 0 && daysSince % interval === 0;
+    }
+
+    case "weekly": {
+      const targetDOW = targetDate.getDay(); // 0–6
+      if (!days.includes(targetDOW)) return false;
+
+      const weeksSince = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
+      return weeksSince % interval === 0;
+    }
+
+    case "monthly": {
+      const y1 = start.getFullYear(),
+        m1 = start.getMonth();
+      const y2 = targetDate.getFullYear(),
+        m2 = targetDate.getMonth();
+      const monthsSince = (y2 - y1) * 12 + (m2 - m1);
+      if (monthsSince < 0 || monthsSince % interval !== 0) return false;
+
+      const dayOfMonth = targetDate.getDate();
+      if (days.length && days.includes(dayOfMonth)) return true;
+
+      if (pattWeek && typeof dayOfWeek === "number") {
+        const dow = targetDate.getDay();
+        return weekOfMonth === pattWeek && dow === dayOfWeek;
+      }
+      return false;
+    }
+
+    default:
+      return false;
+  }
+}
 /**
  * Determine which participant should be assigned based on rotation or fixed assignment
  */
-function determineAssignee(task, targetDate) {
-  // For single assignment mode, return the current assignee
-  if (task.assignmentMode === "single") {
+function determineAssignee(task, targetDate, pattern) {
+  // ONE-TIME OR SINGLE
+  if (task.assignmentMode === "single" || pattern.frequency === "one-time") {
     return task.currentAssignee;
   }
 
-  // For rotation mode, calculate who should be assigned based on the rotation order
-  const { rotationOrder } = task;
-
-  // If no rotation order or only one participant, return current assignee
-  if (!rotationOrder || rotationOrder.length <= 1) {
+  // ROTATION
+  const { rotationOrder = [] } = task;
+  if (rotationOrder.length <= 1) {
     return task.currentAssignee;
   }
 
-  // Calculate how many rotations should have occurred since the task started
-  const taskStartDate = task.recurring.startDate || new Date(0);
-  let rotationIndex = 0;
+  // Compute how many occurrences have happened so far for this pattern
+  let index = 0;
+  const start = task.recurring.startDate
+    ? new Date(task.recurring.startDate)
+    : new Date(0);
+  const diffMs = targetDate - start;
 
-  if (
-    task.recurring &&
-    task.recurring.patterns &&
-    task.recurring.patterns.length > 0
-  ) {
-    const pattern = task.recurring.patterns[0];
-
-    switch (pattern.frequency) {
-      case "daily":
-        // Calculate days since start
-        const daysSinceStart = Math.floor(
-          (targetDate - taskStartDate) / (1000 * 60 * 60 * 24)
-        );
-        rotationIndex =
-          Math.floor(daysSinceStart / pattern.interval) % rotationOrder.length;
-        break;
-
-      case "weekly":
-        // Calculate weeks since start
-        const weeksSinceStart = Math.floor(
-          (targetDate - taskStartDate) / (1000 * 60 * 60 * 24 * 7)
-        );
-        rotationIndex =
-          Math.floor(weeksSinceStart / pattern.interval) % rotationOrder.length;
-        break;
-
-      case "monthly":
-        // Calculate months since start
-        const targetMonthsSinceEpoch =
-          targetDate.getFullYear() * 12 + targetDate.getMonth();
-        const startMonthsSinceEpoch =
-          taskStartDate.getFullYear() * 12 + taskStartDate.getMonth();
-        const monthsSinceStart = targetMonthsSinceEpoch - startMonthsSinceEpoch;
-        rotationIndex =
-          Math.floor(monthsSinceStart / pattern.interval) %
-          rotationOrder.length;
-        break;
-
-      default:
-        rotationIndex = 0;
+  switch (pattern.frequency) {
+    case "daily": {
+      const daysSince = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      index = Math.floor(daysSince / pattern.interval);
+      break;
+    }
+    case "weekly": {
+      const weeksSince = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
+      index = Math.floor(weeksSince / pattern.interval);
+      break;
+    }
+    case "monthly": {
+      const y1 = start.getFullYear(),
+        m1 = start.getMonth();
+      const y2 = targetDate.getFullYear(),
+        m2 = targetDate.getMonth();
+      const monthsSince = (y2 - y1) * 12 + (m2 - m1);
+      index = Math.floor(monthsSince / pattern.interval);
+      break;
     }
   }
 
-  // Get the assignee from the rotation order based on the calculated index
-  const nextAssigneeId = rotationOrder[rotationIndex];
+  // Use modulo to cycle through rotationOrder
+  const rotIndex = index % rotationOrder.length;
+  const assigneeId = rotationOrder[rotIndex]?.toString();
 
-  // Find the full user object from participants array
-  const assignee = task.participants.find(
-    (participant) =>
-      participant._id === nextAssigneeId ||
-      (typeof participant === "object" && participant._id === nextAssigneeId)
-  );
-
-  return assignee || task.currentAssignee;
+  // Fast lookup via a Map
+  const map = new Map(task.participants.map((p) => [p._id.toString(), p]));
+  return map.get(assigneeId) || task.currentAssignee;
 }
