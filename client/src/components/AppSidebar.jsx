@@ -71,7 +71,7 @@ const AppSidebar = ({roomData})=> {
     },
   ];
   
-  console.log("sidebar rendered");
+  // console.log("sidebar rendered");
   
   return (
     <Sidebar>
