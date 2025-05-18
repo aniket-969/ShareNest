@@ -59,15 +59,19 @@ const Poll = ({ initialPolls }) => {
       voteForms.push(poll);
     }
   }
-
+  if (voteForms.length == 0 || resultCards.length == 0) {
+    return (
+      <p className="text-muted-foreground text-sm">Room has no polls.</p>
+    );
+  }
   return (
     <div className="flex flex-col gap-3">
-      {/* Show all unvoted polls first */}
+      {/* unvoted/active polls first */}
       {voteForms.map((poll) => (
         <PollVoteForm poll={poll} key={poll._id} />
       ))}
 
-      {/* Then show voted results */}
+      {/*  voted results/end polls */}
       {resultCards.length > 0 && (
         <div className="  border-t border-border">
           {resultCards.map((poll) => (
