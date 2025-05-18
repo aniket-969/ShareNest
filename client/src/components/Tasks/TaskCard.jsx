@@ -41,5 +41,5 @@ const TaskCard = ({ scheduledTasks }) => {
     </div>
   );
 };
-
+  
 export default TaskCard;

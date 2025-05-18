@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
-import { getSocket } from "@/socket"; // adjust import path
+import { getSocket } from "@/socket"; 
 
 export const RouteMonitor = () => {
   const location = useLocation();
   const navigationType = useNavigationType();
   const socket = getSocket();
-
+ 
   useEffect(() => {
     const cleanupRoom = () => {
       const currentPath = location.pathname;
