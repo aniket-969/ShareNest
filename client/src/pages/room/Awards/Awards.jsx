@@ -4,7 +4,7 @@ import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import AwardCard from "@/components/ui/awardCard";
-import { useAward } from "@/hooks/useAwards";
+// import { useAward } from "@/hooks/useAwards";
 import AwardsSkeleton from "@/components/skeleton/Award/award";
 
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
