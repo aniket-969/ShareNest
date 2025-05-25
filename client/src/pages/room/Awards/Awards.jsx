@@ -26,8 +26,10 @@ console.log(roomQuery.data)
     ...(roomQuery.data.tenants || []),
     ...(roomQuery.data.landlord ? [roomQuery.data.landlord] : []),
   ];
+  console.log(participants)
   const {awards} = roomQuery.data
   console.log(awards);
+
   const toggleManageMode = () => {
     setManageMode((prev) => !prev);
     setSelectedAwards([]); // Reset selection
@@ -77,7 +79,7 @@ console.log(roomQuery.data)
       {/* Award Grid */}
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 m-4">
         {awards.map((award) => (
-          <AwardCard
+          <AwardCard participants={participants}
             key={award._id}
             award={award}
             manageMode={manageMode}

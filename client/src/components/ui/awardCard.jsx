@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-const AwardCard = ({ award }) => {
+const AwardCard = ({ award,participants }) => {
   return (
     <Card className="relative group overflow-hidden border border-muted bg-card rounded-2xl shadow-md transition-transform hover:-translate-y-1 hover:shadow-lg duration-200 h-80 flex flex-col">
   
@@ -19,15 +19,21 @@ const AwardCard = ({ award }) => {
   <CardContent className="flex flex-col items-center justify-center text-center py-2 flex-1 w-full bg-[#121418]">
     <h3 className="text-base font-semibold text-white">{award.title}</h3>
     <div className="flex flex-wrap justify-center gap-2 mt-1">
-      {award.assignedTo.map((user) => (
-        <div key={user._id} className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Avatar className="h-5 w-5">
-            <AvatarImage src={user.avatar} />
-            <AvatarFallback>{user.fullName?.charAt(0)}</AvatarFallback>
-          </Avatar>
-          {user.fullName}
-        </div>
-      ))}
+      {award.assignedTo.map((userId) => {
+  const user = participants.find((p) => p._id === userId);
+  if (!user) return null;
+
+  return (
+    <div key={user._id} className="flex items-center gap-1 text-xs text-muted-foreground">
+      <Avatar className="h-5 w-5">
+        <AvatarImage src={user.avatar} />
+        <AvatarFallback>{user.fullName?.charAt(0)}</AvatarFallback>
+      </Avatar>
+      {user.fullName}
+    </div>
+  );
+})}
+
     </div>
   </CardContent>
 
