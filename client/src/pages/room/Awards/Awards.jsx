@@ -3,10 +3,10 @@ import { useState, Suspense, lazy } from "react";
 import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
-import AwardCard from "@/components/ui/awardCard"; 
+import AwardCard from "@/components/ui/awardCard";
 import { useAward } from "@/hooks/useAwards";
 import AwardsSkeleton from "@/components/skeleton/Award/award";
- 
+
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
@@ -74,12 +74,14 @@ const Awards = () => {
   };
 
   return (
-    <div className="px-6 flex flex-col w-full items-center gap-6 bb">
+    <div className="w-full max-w-6xl mx-auto px-6 flex flex-col items-center gap-6">
+
       {/* Header */}
-      <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="w-full flex flex-col sm:flex-row justify-between items-center px-5">
         <h1 className="text-2xl font-bold text-foreground">Awards</h1>
 
-        <div className="flex gap-4">
+        {/* Buttons */}
+        <div className="flex gap-4 mt-4 sm:mt-0">
           <Button
             variant="outline"
             className="border-primary text-primary hover:bg-primary/10"
@@ -89,14 +91,14 @@ const Awards = () => {
           </Button>
 
           {!manageMode && (
-            <Button className="" onClick={() => setIsFormOpen(true)}>
+            <Button onClick={() => setIsFormOpen(true)}>
               Create Custom Award
             </Button>
           )}
         </div>
       </div>
 
-      {/* Form (slides down) */}
+      {/* Award Creation Form */}
       {isFormOpen && (
         <Suspense fallback={<Spinner />}>
           <FormWrapper onClose={() => setIsFormOpen(false)}>
@@ -105,22 +107,28 @@ const Awards = () => {
         </Suspense>
       )}
 
-      {/* Awards Grid */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
+      {/* Award Grid */}
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 m-4">
         {data.map((award) => (
-          <AwardCard key={award._id} award={award} />
+          <AwardCard
+            key={award._id}
+            award={award}
+            manageMode={manageMode}
+            selectedAwards={selectedAwards}
+            setSelectedAwards={setSelectedAwards}
+          />
         ))}
       </div>
 
-      {/* Delete Selected */}
+      {/* Delete Button */}
       {manageMode && selectedAwards.length > 0 && (
         <Button
           className="mt-6 bg-destructive text-background hover:bg-destructive/80"
           onClick={() => {
-            // Later: call delete API here
             console.log("Deleting", selectedAwards);
             setSelectedAwards([]);
             setManageMode(false);
+            // Later: Trigger actual delete API
           }}
         >
           Delete Selected ({selectedAwards.length})
