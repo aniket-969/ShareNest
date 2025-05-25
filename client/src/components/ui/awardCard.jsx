@@ -34,7 +34,7 @@ const AwardCard = ({ award }) => {
   {/* Hover Overlay */}
   <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-center items-center text-center px-4">
     <p className="text-white text-sm">{award.description}</p>
-    <Badge variant="secondary" className="mt-2">{award.criteria}</Badge>
+    <Badge variant="secondary" className="mt-2 px-3 py-1">{award.criteria}</Badge>
   </div>
 </Card>
 

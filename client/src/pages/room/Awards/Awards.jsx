@@ -10,56 +10,24 @@ import AwardsSkeleton from "@/components/skeleton/Award/award";
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
-const fakeAwards = [
-  {
-    id: "1",
-    title: "Task Master",
-    description: "Completed the most tasks this month.",
-    criteria: "Completed 15+ tasks",
-    image:
-      "https://img.freepik.com/free-vector/trophy-award-laurel-wreath-composition-with-realistic-image-golden-cup-decorated-with-garland-with-reflection_1284-32301.jpg?semt=ais_hybrid&w=740",
-    participants: ["Aniket", "Mira", "Chetan"],
-  },
-  {
-    id: "2",
-    title: "Team Player",
-    description: "Most accepted task requests.",
-    criteria: "Accepted 10+ requests",
-    image:
-      "https://www.shutterstock.com/image-vector/realistic-golden-star-trophy-award-600nw-2433339699.jpg",
-    participants: ["Mira"],
-  },
-  {
-    id: "3",
-    title: "Outstanding Effort",
-    description: "Went above and beyond.",
-    criteria: "Recognized by peers",
-    image: "https://source.unsplash.com/random/300x300?success",
-    participants: ["Chetan"],
-  },
-  {
-    id: "4",
-    title: "Dog Lover",
-    description: "Most friendly with pets.",
-    criteria: "Cared for 3+ dogs",
-    image: "https://source.unsplash.com/random/300x300?dog",
-    participants: ["Mira"],
-  },
-];
-
 const Awards = () => {
   const { roomId } = useParams();
   const { roomQuery } = useRoom(roomId);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [manageMode, setManageMode] = useState(false);
   const [selectedAwards, setSelectedAwards] = useState([]);
-  const { awardsQuery } = useAward();
-  const { data, isLoading, isError } = awardsQuery(roomId);
-
-  if (isLoading) return <AwardsSkeleton />;
-  if (isError) return <>Something went wrong. Please refresh.</>;
-
-  console.log(data);
+  // const { awardsQuery } = useAward();
+  // const { data, isLoading, isError } = awardsQuery(roomId);
+  
+console.log(roomQuery.data)
+  if ( roomQuery.isLoading) return <AwardsSkeleton />;
+  if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
+  const participants = [
+    ...(roomQuery.data.tenants || []),
+    ...(roomQuery.data.landlord ? [roomQuery.data.landlord] : []),
+  ];
+  const {awards} = roomQuery.data
+  console.log(awards);
   const toggleManageMode = () => {
     setManageMode((prev) => !prev);
     setSelectedAwards([]); // Reset selection
@@ -75,7 +43,6 @@ const Awards = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 flex flex-col items-center gap-6">
-
       {/* Header */}
       <div className="w-full flex flex-col sm:flex-row justify-between items-center px-5">
         <h1 className="text-2xl font-bold text-foreground">Awards</h1>
@@ -84,7 +51,7 @@ const Awards = () => {
         <div className="flex gap-4 mt-4 sm:mt-0">
           <Button
             variant="outline"
-            className="border-primary text-primary hover:bg-primary/10"
+            className="border-primary text-primary "
             onClick={toggleManageMode}
           >
             {manageMode ? "Cancel" : "Manage Awards"}
@@ -109,7 +76,7 @@ const Awards = () => {
 
       {/* Award Grid */}
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 m-4">
-        {data.map((award) => (
+        {awards.map((award) => (
           <AwardCard
             key={award._id}
             award={award}
