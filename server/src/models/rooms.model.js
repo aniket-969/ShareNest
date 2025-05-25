@@ -167,7 +167,7 @@ const roomSchema = new Schema(
               dayOfWeek: Number,
             },
           ],
-          startDate: Date,
+         startDate: { type: Date, default: () => Date.now() },
           dueDate: Date,
         },
 
