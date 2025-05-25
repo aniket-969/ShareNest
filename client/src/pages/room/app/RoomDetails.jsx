@@ -37,7 +37,7 @@ const RoomDetails = () => {
   }
 
   return (
-    <div className=" flex  w-full items-center justify-center gap-20">
+    <div className=" flex  w-full items-center justify-center gap-20  my-5">
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}
         <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain ">
