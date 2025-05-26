@@ -212,3 +212,11 @@ function determineAssignee(task, targetDate, pattern) {
   return candidate || task.currentAssignee;
 }
 
+export function cldUrl(url, { width, height, quality = "auto", format = "auto" }) {
+  if (!url?.includes("res.cloudinary.com")) return url;
+  return url.replace(
+    "/upload/",
+    `/upload/f_${format},q_${quality},w_${width || ""},h_${height || ""},c_limit/`
+  );
+}
+
