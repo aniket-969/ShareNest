@@ -16,6 +16,7 @@ import {
   refreshTokens,
   registerUser,
   updateAccountDetails,
+  updateFcmToken,
 } from "../controllers/user.controllers.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { validateQRCodeData } from "../middleware/qrcode.middleware.js";
@@ -26,19 +27,22 @@ const router = Router();
 router.route("/register").post(loginLimiter,validate(registerSchema), registerUser);
 router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
 router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
-
+ 
 // secured routes
-router.route("/logout").post(verifyJWT, logoutUser);
+router
+  .route("/me")
+  .patch(verifyJWT,validate(updateUserSchema), updateAccountDetails);
 
+router.route("/me/logout").post(verifyJWT, logoutUser);
+router
+  .route("/me/token")
+  .patch(updateFcmToken);
 router.route("/refreshTokens").post(refreshTokens);
 router
-  .route("/change-password")
-  .post(validate(changePasswordSchema), verifyJWT, changePassword);
+  .route("/me/password")
+  .patch(validate(changePasswordSchema), changePassword);
 router
-  .route("/update-user")
-  .patch(validate(updateUserSchema), verifyJWT, updateAccountDetails);
-router
-  .route("/payment")
+  .route("/me/payments")
   .patch(validate(paymentMethodSchema), verifyJWT, validateQRCodeData,addPaymentMethod);
 
 export default router;
