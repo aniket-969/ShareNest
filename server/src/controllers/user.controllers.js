@@ -190,6 +190,18 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
+const updateFcmToken = asyncHandler(async(req,res)=>{
+  const {token} = req.body
+  const user = await User.findByIdAndUpdate(req.user?._id,{
+    $set:{
+      notificationToken:token
+    }
+  },{new:true})
+   return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully"));
+})
+
 const fetchSession = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user?._id).select(
     "-password -refreshToken"
@@ -242,4 +254,5 @@ export {
   updateAccountDetails,
   fetchSession,
   addPaymentMethod,
+  updateFcmToken
 };
