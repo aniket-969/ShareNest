@@ -1,6 +1,5 @@
-// NotificationContext.jsx
 import { createContext, useContext, useEffect, useState } from "react"
-import { getSocket } from "@/socket" // wherever your enums live
+import { getSocket } from "@/socket" 
 
 const NotificationContext = createContext()
 export const useNotifications = () => useContext(NotificationContext)
