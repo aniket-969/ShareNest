@@ -1,40 +1,41 @@
 import axiosClient from "../axiosClient";
 
-const baseAuth = "users";
+const base = "users";
 
 export const fetchSession = async () => {
-  // console.log("calling session");
-
-  const response = await axiosClient.get(`/${baseAuth}/session`);
-  // console.log("Fetched session data",response.data.data)
+  const response = await axiosClient.get(`/${base}/session`);
   localStorage.setItem("session", JSON.stringify(response.data.data));
   return response.data?.data;
 };
 
-export const registerUser = async (data) => {
-  return axiosClient.post(`/${baseAuth}/register`, data);
+export const registerUser = (data) => {
+  return axiosClient.post(`/${base}/register`, data);
 };
 
-export const loginUser = async (data) => {
-  return axiosClient.post(`/${baseAuth}/login`, data);
+export const loginUser = (data) => {
+  return axiosClient.post(`/${base}/login`, data);
 };
 
-export const logOut = async (data) => {
-  return axiosClient.post(`/${baseAuth}/logout`, data);
+export const logoutUser = () => {
+  return axiosClient.post(`/${base}/me/logout`);
 };
 
-export const refreshTokens = async (data) => {
-  return axiosClient.post(`/${baseAuth}/refreshTokens`, data);
+export const refreshTokens = (data) => {
+  return axiosClient.post(`/${base}/refreshTokens`, data);
 };
 
-export const updateUser = async (data) => {
-  return axiosClient.patch(`/${baseAuth}/update-user`, data);
-};
- 
-export const addPayment = async (data) => {
-  return axiosClient.patch(`/${baseAuth}/payment`, data);
+export const updateUser = (data) => {
+  return axiosClient.patch(`/${base}/me`, data);
 };
 
-export const changePassword = async (data) => {
-  return axiosClient.post(`/${baseAuth}/change-password`, data);
+export const updateNotificationToken = (data) => {
+  return axiosClient.patch(`/${base}/me/token`, data);
+};
+
+export const changePassword = (data) => {
+  return axiosClient.patch(`/${base}/me/password`, data);
+};
+
+export const addPayment = (data) => {
+  return axiosClient.patch(`/${base}/me/payments`, data);
 };
