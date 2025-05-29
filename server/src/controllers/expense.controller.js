@@ -52,7 +52,7 @@ const createExpense = asyncHandler(async (req, res) => {
     expense
   );
 
-  //  FCM push to all participants (single token each)
+  //  FCM push to all participants 
   try {
    
     const recipientIds = formattedParticipants.map((p) => p.user);
