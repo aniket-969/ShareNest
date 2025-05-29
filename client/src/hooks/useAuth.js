@@ -7,6 +7,7 @@ import {
   logOut,
   refreshTokens,
   registerUser,
+  updateNotificationToken,
   updateUser,
 } from "@/api/queries/auth";
 import { useNavigate } from "react-router-dom";
@@ -93,6 +94,17 @@ export const useAuth = () => {
       console.error("update user error", error);
     },
   });
+
+  const updateNotificationTokenMutation = useMutation({
+    mutationFn: updateNotificationToken,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["auth", "profile"]);
+    },
+    onError: (error) => {
+      console.error("update user error", error);
+    },
+  });
+
   // Update Payment Mutation
   const addPaymentMutation = useMutation({
     mutationFn: addPayment,
@@ -115,6 +127,8 @@ export const useAuth = () => {
     },
   });
 
+
+
   return {
     sessionQuery,
     registerMutation,
@@ -124,5 +138,6 @@ export const useAuth = () => {
     logoutMutation,
     updateUserMutation,
     addPaymentMutation,
+    updateNotificationTokenMutation
   };
 };
