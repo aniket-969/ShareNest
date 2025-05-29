@@ -33,10 +33,6 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["tenant", "landlord"],
-    },
     rooms: [
       {
         roomId: {
@@ -69,6 +65,9 @@ const userSchema = new Schema(
       }
     ]
     ,
+    notificationToken:{
+      type:String,
+    },
     refreshToken: {
       type: String,
     },
