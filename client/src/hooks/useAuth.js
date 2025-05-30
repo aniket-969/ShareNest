@@ -92,6 +92,7 @@ export const useAuth = () => {
     },
     onError: (error) => {
       console.error("update user error", error);
+      
     },
   });
 

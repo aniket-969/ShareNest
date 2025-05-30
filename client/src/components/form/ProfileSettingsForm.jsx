@@ -43,8 +43,9 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
         toast.success('Profile updated');
         onSave();
       },
-      onError: () => {
-        toast.error('Failed to update profile');
+      onError: (err) => {
+        
+        toast.error(err?.response?.data?.message || 'Failed to update profile');
       },
     });
   };
