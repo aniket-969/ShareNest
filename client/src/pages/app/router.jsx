@@ -22,6 +22,7 @@ import { RouteMonitor } from "@/utils/RouteMonitor.js";
 // Pages
 import LandingPage from "../LandingPage.jsx";
 import { NotFound } from "../NotFound.jsx";
+
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
 const Room = React.lazy(() => import("../room/app/Room.jsx"));
@@ -33,6 +34,7 @@ const Tasks = React.lazy(() => import("../room/Task/Tasks.jsx"));
 const RoomExpense = React.lazy(() => import("../room/Expense/RoomExpense.jsx"));
 const Maintenance = React.lazy(() => import("../room/Maintenance/Maintenance.jsx"));
 const RoomLayout = React.lazy(() => import("@/layouts/RoomLayout.jsx"));
+const Settings = React.lazy(() => import("./../room/Settings/index"));
 
 const RoomShell = () => (
   <SocketProvider>
@@ -73,6 +75,7 @@ export const AppRouter = () => {
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="expense" element={<RoomExpense />} />
                 <Route path="maintenance" element={<Maintenance />} />
+                <Route path="settings" element={<Settings />} />
               </Route>
             </Route>
 
