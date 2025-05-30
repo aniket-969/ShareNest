@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import { fcm } from "../firebase/config.js";
 
 const generateTokens = async (userId) => {
   const user = await User.findById(userId);
@@ -191,16 +192,39 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateFcmToken = asyncHandler(async(req,res)=>{
+  console.log("Updating fcm")
   const {token} = req.body
+  console.log(req.user._id)
   const user = await User.findByIdAndUpdate(req.user?._id,{
     $set:{
       notificationToken:token
     }
   },{new:true})
+  console.log("This is user",user)
    return res
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 })
+
+export const testNotification = asyncHandler(async (req, res) => {
+  console.log("here")
+  const userId = req.user._id ;
+  const user = await User.findById(userId).select("notificationToken");
+  console.log("This ",user)
+  if (!user?.notificationToken) {
+    throw new ApiError(400, "No FCM token registered for this user");
+  }
+
+  await fcm.send({
+    token: user.notificationToken,
+    notification: {
+      title: "🔔 Test Notification",
+      body:  "If you see this, push is working 🎉",
+    },
+  });
+console.log("After fcm")
+  return res.json(new ApiResponse(200, null, "Test push sent"));
+});
 
 const fetchSession = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user?._id).select(

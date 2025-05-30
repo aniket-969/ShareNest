@@ -17,7 +17,7 @@ app.use(
     credentials: true,
   })
 );
-
+ 
 const io = new Server(httpServer, {
   pingTimeout: 60000,
   cors: {
@@ -25,9 +25,9 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
-
+ 
 app.set("io", io);
-
+ 
 app.use(express.json({ limit: "16kb" }));
 
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));

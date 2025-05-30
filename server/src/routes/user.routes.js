@@ -15,6 +15,7 @@ import {
   logoutUser,
   refreshTokens,
   registerUser,
+  testNotification,
   updateAccountDetails,
   updateFcmToken,
 } from "../controllers/user.controllers.js";
@@ -33,10 +34,16 @@ router
   .route("/me")
   .patch(verifyJWT,validate(updateUserSchema), updateAccountDetails);
 
+router
+  .route("/me/test-notification")
+  .post(
+    verifyJWT,          
+    testNotification
+  );
 router.route("/me/logout").post(verifyJWT, logoutUser);
 router
   .route("/me/token")
-  .patch(updateFcmToken);
+  .patch(verifyJWT,updateFcmToken);
 router.route("/refreshTokens").post(refreshTokens);
 router
   .route("/me/password")
