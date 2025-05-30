@@ -55,36 +55,34 @@ export const NotificationProvider = ({ children }) => {
     };
   }, [socket]);
 
-// Permission
-useEffect(() => {
-  let permStatus;
-  navigator.permissions
-    .query({ name: "notifications" })
-    .then((status) => {
-      permStatus = status;
-console.log("in permission")
-      status.onchange = async () => {
-        if (status.state === "denied") {
-          console.log("denied")
-          await deleteToken(messaging);
-         console.log("deleted")
-          updateToken({ token: null });
-        }
-        if (status.state === "granted") {
-          
-          console.log("granted")
-        }
-      };
-    })
-    .catch((err) => {
-      console.log(err)
-    });
+  // Notification Permission
+  useEffect(() => {
+    let permStatus;
+    navigator.permissions
+      .query({ name: "notifications" })
+      .then((status) => {
+        permStatus = status;
+        console.log("in permission");
+        status.onchange = async () => {
+          if (status.state === "denied") {
+            console.log("denied");
+            await deleteToken(messaging);
+            console.log("deleted");
+            updateToken({ token: null });
+          }
+          if (status.state === "granted") {
+            console.log("granted");
+          }
+        };
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-  return () => {
-    if (permStatus) permStatus.onchange = null;
-  };
-}, [updateToken]);
-
+    return () => {
+      if (permStatus) permStatus.onchange = null;
+    };
+  }, [updateToken]);
 
   // FCM registration / token sync
   useEffect(() => {
