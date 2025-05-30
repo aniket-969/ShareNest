@@ -171,25 +171,39 @@ const changePassword = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  console.log("this is request", req);
   const { fullName, username, avatar } = req.body;
+  const userId = req.user._id;
+
+  // build a diff of only the fields that were provided
+  const updates = {};
+  if (fullName)  updates.fullName  = fullName;
+  if (avatar)    updates.avatar    = avatar;
+
+  if (username) {
+    // check uniqueness (excluding self)
+    const conflict = await User.findOne({
+      username,
+      _id: { $ne: userId }
+    }).lean();
+
+    if (conflict) {
+      res.status(400);
+      throw new Error("Username already in use");
+    }
+    updates.username = username;
+  }
 
   const user = await User.findByIdAndUpdate(
-    req.user?._id,
-    {
-      $set: {
-        fullName,
-        username,
-        avatar,
-      },
-    },
-    { new: true }
+    userId,
+    { $set: updates },
+    { new: true, runValidators: true }
   ).select("username email fullName avatar");
-  console.log("this is user", user);
+
   return res
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
+
 
 const updateFcmToken = asyncHandler(async(req,res)=>{
   console.log("Updating fcm")
