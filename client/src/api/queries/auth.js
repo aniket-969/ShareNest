@@ -4,7 +4,7 @@ const base = "users";
 
 export const fetchSession = async () => {
   const response = await axiosClient.get(`/${base}/session`);
-  localStorage.setItem("session", JSON.stringify(response.data.data));
+  localStorage.setItem("session", JSON.stringify(response.data?.data));
   return response.data?.data;
 };
 
@@ -24,8 +24,11 @@ export const refreshTokens = (data) => {
   return axiosClient.post(`/${base}/refreshTokens`, data);
 };
 
-export const updateUser = (data) => {
-  return axiosClient.patch(`/${base}/me`, data);
+export const updateUser = async(data) => {
+  console.log(data)
+const response = await axiosClient.patch(`/${base}/me`, data);
+console.log(response)
+  return response.data?.data
 };
 
 export const updateNotificationToken = async(data) => { 
