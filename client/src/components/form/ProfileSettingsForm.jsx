@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,16 +8,29 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
 import { AvatarSelector } from "../AvatarSelector";
 
+
 const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   const [formData, setFormData] = useState({
     fullName: initialData.fullName,
     username: initialData.username,
     avatar: initialData.avatar,
   });
-
   const { updateUserMutation } = useAuth();
 
+  const isUnchanged = useMemo(() => {
+    return (
+      formData.fullName === initialData.fullName &&
+      formData.username === initialData.username &&
+      formData.avatar === initialData.avatar
+    );
+  }, [formData, initialData]);
+
   const handleSave = () => {
+    if (isUnchanged) {
+      onCancel();
+      return;
+    }
+
     updateUserMutation.mutate(formData, {
       onSuccess: () => {
         toast.success("Profile updated");
@@ -30,7 +43,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   };
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col gap-6 p-4 rounded-2xl text-white shadow-md ">
+    <div className="max-w-xl mx-auto flex flex-col gap-6 p-4 rounded-2xl text-white shadow-md">
       {/* Avatar */}
       <div className="flex flex-col items-center gap-2">
         <img
@@ -81,14 +94,14 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
         </div>
       </div>
 
-      {/* Button */}
+      {/* Actions */}
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
         <Button
           onClick={handleSave}
-          disabled={updateUserMutation.isLoading}
+          disabled={isUnchanged || updateUserMutation.isLoading}
         >
           {updateUserMutation.isLoading ? (
             <Spinner size="sm" />
@@ -102,3 +115,4 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
 };
 
 export default ProfileSettingsForm;
+
