@@ -60,7 +60,14 @@ export const changePasswordSchema = z.object({
 export const updateUserSchema = z.object({
   username: stringValidation(1, 20, "username").optional(),
   fullName: stringValidation(1, 20, "fullName").optional(),
-  avatar: stringValidation(1, 20, "avatar").optional(),
+  avatar: z
+    .string()
+    .url("Avatar must be a valid URL")
+    .regex(
+      /^https:\/\/avatar\.iran\.liara\.run\/public\/\d+$/,
+      "Avatar must come from avatar.iran.liara.run"
+    )
+    .optional(),
 });
 
 export const paymentMethodSchema = z
