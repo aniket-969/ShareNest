@@ -1,4 +1,4 @@
-import React from "react";
+
 import RoomSettings from "./roomSettings";
 import ProfileSettings from "./profileSettings";
 import { Separator } from "@/components/ui/separator";

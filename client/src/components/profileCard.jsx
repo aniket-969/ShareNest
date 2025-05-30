@@ -24,7 +24,7 @@ const ProfileCard = () => {
         <p >{data.username}</p>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default ProfileCard;
