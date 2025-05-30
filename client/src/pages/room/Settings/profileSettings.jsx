@@ -2,9 +2,9 @@
 import  { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Spinner } from "@/components/ui/spinner";
-import ProfileSkeleton from "./skeleton/Room/profile";
+import ProfileSkeleton from "@/components/skeleton/Room/profile";
 import ProfileSettingsView from "@/components/Settings/ProfileSettingsView";
-import ProfileSettingsForm from "./ProfileSettingsForm";
+import ProfileSettingsForm from "@/components/form/ProfileSettingsForm";
 
 const ProfileSettings = () => {
   const { sessionQuery } = useAuth();
