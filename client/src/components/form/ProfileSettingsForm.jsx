@@ -30,7 +30,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   };
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col gap-6 p-4 bg-[#1c1f26] rounded-2xl text-white shadow-md">
+    <div className="max-w-xl mx-auto flex flex-col gap-6 p-4 rounded-2xl text-white shadow-md ">
       {/* Avatar */}
       <div className="flex flex-col items-center gap-2">
         <img
@@ -81,7 +81,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
         </div>
       </div>
 
-      {/* Actions */}
+      {/* Button */}
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onCancel}>
           Cancel
