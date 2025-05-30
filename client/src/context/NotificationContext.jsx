@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { getSocket } from "@/socket";
 import { useAuth } from "@/hooks/useAuth";
-import { getToken } from "firebase/messaging";
+import { deleteToken, getToken } from "firebase/messaging";
 import { messaging } from "@/firebase/config";
 
 const NotificationContext = createContext();
@@ -10,6 +10,7 @@ export const useNotifications = () => useContext(NotificationContext);
 export const NotificationProvider = ({ children }) => {
   const { sessionQuery, updateNotificationTokenMutation } = useAuth();
   const storedToken = sessionQuery.data?.notificationToken;
+  console.log(sessionQuery.data);
   const { mutate: updateToken } = updateNotificationTokenMutation;
 
   const socket = getSocket();
@@ -41,11 +42,11 @@ export const NotificationProvider = ({ children }) => {
           return;
       }
 
-      setNotifications(prev => [
+      setNotifications((prev) => [
         { id: Date.now(), message, seen: false },
         ...prev,
       ]);
-      setUnreadCount(c => c + 1);
+      setUnreadCount((c) => c + 1);
     };
 
     socket.onAny(handleAny);
@@ -54,20 +55,51 @@ export const NotificationProvider = ({ children }) => {
     };
   }, [socket]);
 
+// Permission
+useEffect(() => {
+  let permStatus;
+  navigator.permissions
+    .query({ name: "notifications" })
+    .then((status) => {
+      permStatus = status;
+console.log("in permission")
+      status.onchange = async () => {
+        if (status.state === "denied") {
+          console.log("denied")
+          await deleteToken(messaging);
+         console.log("deleted")
+          updateToken({ token: null });
+        }
+        if (status.state === "granted") {
+          
+          console.log("granted")
+        }
+      };
+    })
+    .catch((err) => {
+      console.log(err)
+    });
+
+  return () => {
+    if (permStatus) permStatus.onchange = null;
+  };
+}, [updateToken]);
+
+
   // FCM registration / token sync
   useEffect(() => {
-    console.log("Starting noti ")
+    console.log("Starting noti ");
     if (!sessionQuery.isSuccess) return;
-    if (storedToken) return;     
-console.log("found the token")
+    if (storedToken) return;
+    console.log("found the token");
     const registerFcmToken = async () => {
       if (Notification.permission === "default") {
-        console.log("Before permission")
+        console.log("Before permission");
         await Notification.requestPermission();
-        console.log("after permission")
+        console.log("after permission");
       }
       if (Notification.permission !== "granted") return;
-console.log("Permission granted")
+      console.log("Permission granted");
       try {
         const currentToken = await getToken(messaging, {
           vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
@@ -81,14 +113,10 @@ console.log("Permission granted")
     };
 
     registerFcmToken();
-  }, [
-    sessionQuery.isSuccess,
-    storedToken,
-    updateToken,
-  ]);
+  }, [sessionQuery.isSuccess, storedToken, updateToken]);
 
   const markAllSeen = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, seen: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, seen: true })));
     setUnreadCount(0);
   };
 
