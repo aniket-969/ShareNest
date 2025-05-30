@@ -1,19 +1,22 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { getSocket } from "@/socket";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken } from "firebase/messaging";
+import { messaging } from "@/firebase/config";
 
 const NotificationContext = createContext();
 export const useNotifications = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
-  const { sessionQuery,updateNotificationTokenMutation } = useAuth();
+  const { sessionQuery, updateNotificationTokenMutation } = useAuth();
   const storedToken = sessionQuery.data?.notificationToken;
-  console.log(storedToken);
+  const { mutate: updateToken } = updateNotificationTokenMutation;
+
   const socket = getSocket();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // In-app socket notifications
   useEffect(() => {
     const handleAny = (event, payload) => {
       let message = null;
@@ -22,33 +25,27 @@ export const NotificationProvider = ({ children }) => {
         case "createdTask":
           message = `${payload.actor || "Someone"} created a new task "${payload.title}"`;
           break;
-
         case "createdAward":
           message = `${payload.assignedTo || "Someone"} received a new award "${payload.title}"`;
           break;
-
         case "createdExpense":
           message = `${payload.paidBy || "Someone"} added a new expense "${payload.title}"`;
           break;
-
         case "createdMaintenance":
-          message = `New maintenance request for ${payload.title} was created`;
+          message = `New maintenance request for "${payload.title}" was created`;
           break;
-
         case "createdPoll":
           message = `${payload.actor || "Someone"} created a poll "${payload.title}"`;
           break;
-
         default:
           return;
       }
 
-      // prepend the new notification
-      setNotifications((prev) => [
+      setNotifications(prev => [
         { id: Date.now(), message, seen: false },
         ...prev,
       ]);
-      setUnreadCount((c) => c + 1);
+      setUnreadCount(c => c + 1);
     };
 
     socket.onAny(handleAny);
@@ -57,30 +54,41 @@ export const NotificationProvider = ({ children }) => {
     };
   }, [socket]);
 
+  // FCM registration / token sync
   useEffect(() => {
+    console.log("Starting noti ")
     if (!sessionQuery.isSuccess) return;
-
-    if (Notification.permission !== "granted") return;
-
-    getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-    })
-      .then((token) => {
-        const stored = sessionQuery.data.notificationToken;
-
-        if (token && token !== stored) {
-          updateNotificationTokenMutation.mutate({ token });
+    if (storedToken) return;     
+console.log("found the token")
+    const registerFcmToken = async () => {
+      if (Notification.permission === "default") {
+        console.log("Before permission")
+        await Notification.requestPermission();
+        console.log("after permission")
+      }
+      if (Notification.permission !== "granted") return;
+console.log("Permission granted")
+      try {
+        const currentToken = await getToken(messaging, {
+          vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+        });
+        if (currentToken && currentToken !== storedToken) {
+          updateToken({ token: currentToken });
         }
-      })
-      .catch((err) => console.error("FCM getToken failed:", err));
+      } catch (err) {
+        console.error("FCM getToken failed:", err);
+      }
+    };
+
+    registerFcmToken();
   }, [
     sessionQuery.isSuccess,
-    sessionQuery.data?.notificationToken,
-    updateNotificationTokenMutation,
+    storedToken,
+    updateToken,
   ]);
 
   const markAllSeen = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, seen: true })));
+    setNotifications(prev => prev.map(n => ({ ...n, seen: true })));
     setUnreadCount(0);
   };
 
