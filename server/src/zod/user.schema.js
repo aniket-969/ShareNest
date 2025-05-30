@@ -33,20 +33,39 @@ export const changePasswordSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-    username:stringValidation(1,20,"username").optional(),
-    fullName:stringValidation(1,20,"fullName").optional(),
-    avatar:stringValidation(1,20,"avatar").optional(),
-})
+  username: stringValidation(1, 20, "username").optional(),
+  fullName: stringValidation(1, 20, "fullName").optional(),
+  avatar: z
+    .string()
+    .url("Avatar must be a valid URL")
+    .regex(
+      /^https:\/\/avatar\.iran\.liara\.run\/public\/\d+$/,
+      "Avatar must come from avatar.iran.liara.run"
+    )
+    .optional(),
+});
 
-export const paymentMethodSchema = 
-    z.object({
-      appName: stringValidation(1, 100, "App name is required").optional(),
-      paymentId: stringValidation(1, 100, "Payment ID is required").optional(),
-      type: z.enum(['UPI', 'PayPal', 'Stripe', 'BankTransfer', 'ApplePay', 'CashApp', 'WeChatPay']).optional(),
-      qrCodeData: z.string().min(1, "qrCodeData should be at least 1 character long").optional(),
-    })
-    .refine((data) => data.paymentId || data.qrCodeData, {
-      message: "Either paymentId or qrCodeData is required",
-      path: ["paymentId", "qrCodeData"], 
-    })
-  
+export const paymentMethodSchema = z
+  .object({
+    appName: stringValidation(1, 100, "App name is required").optional(),
+    paymentId: stringValidation(1, 100, "Payment ID is required").optional(),
+    type: z
+      .enum([
+        "UPI",
+        "PayPal",
+        "Stripe",
+        "BankTransfer",
+        "ApplePay",
+        "CashApp",
+        "WeChatPay",
+      ])
+      .optional(),
+    qrCodeData: z
+      .string()
+      .min(1, "qrCodeData should be at least 1 character long")
+      .optional(),
+  })
+  .refine((data) => data.paymentId || data.qrCodeData, {
+    message: "Either paymentId or qrCodeData is required",
+    path: ["paymentId", "qrCodeData"],
+  });
