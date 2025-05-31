@@ -47,7 +47,7 @@ router
 router.route("/refreshTokens").post(refreshTokens);
 router
   .route("/me/password")
-  .patch(validate(changePasswordSchema), changePassword);
+  .patch(verifyJWT,validate(changePasswordSchema), changePassword);
 router
   .route("/me/payments")
   .patch(validate(paymentMethodSchema), verifyJWT, validateQRCodeData,addPaymentMethod);

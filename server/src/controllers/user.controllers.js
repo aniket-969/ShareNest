@@ -174,13 +174,12 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, username, avatar } = req.body;
   const userId = req.user._id;
 
-  // build a diff of only the fields that were provided
   const updates = {};
   if (fullName)  updates.fullName  = fullName;
   if (avatar)    updates.avatar    = avatar;
 
   if (username) {
-    // check uniqueness (excluding self)
+    // check uniqueness 
     const conflict = await User.findOne({
       username,
       _id: { $ne: userId }
