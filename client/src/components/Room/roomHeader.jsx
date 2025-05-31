@@ -4,9 +4,10 @@ import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider,SidebarTrigger } from "../ui/sidebar";
 import { AppSidebar } from "../AppSidebar";
+import LogOut from "../LogOut";
 
 export const RoomHeader = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const { logoutMutation } = useAuth();
   const onClick = async () => {
     try {
@@ -31,16 +32,8 @@ export const RoomHeader = () => {
           </Button>
         </Link>
 
-        <Link>
-          <Button
-            onClick={() => onClick()}
-            className="text-primary "
-            variant="link"
-            size="sm"
-          >
-            Logout
-          </Button>
-        </Link>
+          <LogOut/>
+        
       </div>
     </div>
   );
