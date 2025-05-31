@@ -52,10 +52,17 @@ export const loginSchema = z.object({
   password: passwordSchema,
 });
 
-export const changePasswordSchema = z.object({
-  oldPassword: passwordSchema,
-  newPassword: passwordSchema,
-});
+
+export const changePasswordSchema = z
+  .object({
+    oldPassword: passwordSchema,              
+    newPassword: passwordSchema,              
+    confirmNewPassword: z.string(),        
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords must match",
+    path: ["confirmNewPassword"],
+  });
 
 export const updateUserSchema = z.object({
   username: stringValidation(1, 20, "username").optional(),
