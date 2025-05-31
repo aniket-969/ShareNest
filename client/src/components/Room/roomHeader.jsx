@@ -32,7 +32,7 @@ export const RoomHeader = () => {
           </Button>
         </Link>
 
-          <LogOut/>
+          <LogOut variant="link"/>
         
       </div>
     </div>

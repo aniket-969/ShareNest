@@ -3,12 +3,13 @@ import ProfileCard from "../profileCard";
 import { Pencil } from "lucide-react";
 
 const ProfileSettingsView = ({ onEdit }) => (
-  <div className="relative py-4">
+  <div className="flex justify-center items-center gap-5 py-4">
     <ProfileCard />
     <button
-      className="absolute top-2 right-2 p-1 hover:bg-muted rounded"
+      className=" p-1 hover:bg-muted rounded"
       onClick={onEdit}
     >
+    
       <Pencil size={16} />
     </button>
   </div>

@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
-const LogOut = () => {
+const LogOut = ({variant=""}) => {
   const { logoutMutation } = useAuth();
   const onClick = async () => {
     try {
@@ -16,8 +16,8 @@ const LogOut = () => {
   return (
     <Button
       onClick={() => onClick()}
-      className="text-primary "
-      variant="link"
+      
+      variant={variant}
       size="sm"
     >
       Logout

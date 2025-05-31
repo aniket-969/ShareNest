@@ -39,7 +39,7 @@ const ChangePasswordModal = () => {
   };
 
   const onSubmit = (values) => {
-    // We only send oldPassword + newPassword to the backend
+    
     changePasswordMutation.mutate(
       {
         oldPassword: values.oldPassword,
@@ -59,7 +59,7 @@ const ChangePasswordModal = () => {
 
   return (
     <>
-      <Button onClick={openModal}>Change Password</Button>
+      <Button className="" onClick={openModal}>Change Password</Button>
 
       {isOpen && (
         <FormWrapper onClose={closeModal}>
