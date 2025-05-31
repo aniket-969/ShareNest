@@ -38,8 +38,11 @@ export const updateNotificationToken = async(data) => {
   return 
 };
 
-export const changePassword = (data) => {
-  return axiosClient.patch(`/${base}/me/password`, data);
+export const changePassword = async(data) => {
+  console.log("changin pass",data)
+  const response = await axiosClient.patch(`/${base}/me/password`, data);
+  console.log(response)
+  return response?.data
 };
 
 export const addPayment = (data) => {

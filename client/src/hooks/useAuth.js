@@ -121,7 +121,7 @@ export const useAuth = () => {
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
-      queryClient.invalidateQueries(["auth", "profile"]);
+      
     },
     onError: (error) => {
       console.error("change password error:", error);

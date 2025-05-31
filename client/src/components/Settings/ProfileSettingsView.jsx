@@ -3,7 +3,7 @@ import ProfileCard from "../profileCard";
 import { Pencil } from "lucide-react";
 
 const ProfileSettingsView = ({ onEdit }) => (
-  <div className="relative ">
+  <div className="relative py-4">
     <ProfileCard />
     <button
       className="absolute top-2 right-2 p-1 hover:bg-muted rounded"
