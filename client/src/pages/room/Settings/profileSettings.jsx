@@ -16,13 +16,10 @@ const ProfileSettings = () => {const { sessionQuery } = useAuth();
 
   return (
     <>
-      {!isEditing && (
+    {/* User Details */}
+      {!isEditing ? (
         <ProfileSettingsView onEdit={() => setIsEditing(true)} />
-      )}
-
-      {isEditing && (
-        <Suspense fallback={<Spinner />}>
-          <FormWrapper onClose={() => setIsEditing(false)}>
+      ):<FormWrapper onClose={() => setIsEditing(false)}>
             <ProfileSettingsForm
               initialData={user}
               onCancel={() => setIsEditing(false)}
@@ -32,8 +29,8 @@ const ProfileSettings = () => {const { sessionQuery } = useAuth();
               }}
             />
           </FormWrapper>
-        </Suspense>
-      )}
+        }
+
     </>
   );
 };
