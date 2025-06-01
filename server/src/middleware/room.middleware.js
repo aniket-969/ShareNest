@@ -20,22 +20,26 @@ const checkMember = asyncHandler(async (req, res, next) => {
   if (!isMember) throw new ApiError(403, "Unauthorized member");
 console.log(isMember,"member")
   next();
-});
+}); 
 
-const adminOnly = asyncHandler(async (req, res, next) => {
+ const adminOnly = asyncHandler(async (req, res, next) => {
   const roomId = req.body?.roomId || req.params?.roomId;
   if (!roomId) {
     throw new ApiError(404, "Room Id is required");
   }
-  console.log("verifying admin");
-  const createdBy = req.user?._id;
+
   const room = await Room.findById(roomId);
-  if (!room) throw new ApiError(404, "Room not found");
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
 
-  const isAdmin = room.admin.toString() === createdBy.toString();
+  // Check admin
+  const currentUserId = req.user._id.toString();
+  if (room.admin.toString() !== currentUserId) {
+    throw new ApiError(403, "Only admin can send this request");
+  }
 
-  if (!isAdmin) throw new ApiError(403, "Only admin can send this request");
-
+  req.room = room;
   next();
 });
 
