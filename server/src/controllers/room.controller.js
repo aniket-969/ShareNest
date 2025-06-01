@@ -8,6 +8,7 @@ import { Poll } from "../models/poll.model.js";
 import { Expense } from "../models/expense.model.js";
 import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+import { mongoose } from 'mongoose';
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -240,7 +241,7 @@ const deleteRoom = asyncHandler(async (req, res) => {
       new ApiResponse(200, {}, "Room and related data deleted successfully")
     );
 });
-
+ 
 const getRoomData = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
@@ -282,23 +283,30 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
 });
-
+ 
 const leaveRoom = asyncHandler(async (req, res) => {
-  console.log("This is user", req.user);
+
   const userId = req.user?._id;
-  const { roomId } = req.params;
-
+  const user = req.user;const { roomId } = req.params;
+  console.log("User",user.rooms)
+  user.rooms = user.rooms.filter(
+    (room) => room.roomId.toString() !== roomId.toString()
+  );
+  console.log("after rooms",user.rooms)
+  
   const room = await Room.findById(roomId);
-
+console.log("This room", room.tenants)
   if (room.admin.toString() === userId.toString()) {
     throw new ApiError(400, "Admin can't leave the room");
   }
 
   room.tenants = room.tenants.filter(
     (tenant) => tenant.toString() !== userId.toString()
-  );
+  ); 
+  console.log(room.tenants)
+  return
   await room.save();
-  const user = req.user;
+  // const user = req.user;
   user.rooms = user.rooms.filter(
     (room) => room.id.toString() !== roomId.toString()
   );
