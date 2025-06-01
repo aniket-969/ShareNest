@@ -35,6 +35,7 @@ export const getRoomData = async (roomId) => {
 
 export const leaveRoom = async (roomId) => {
   console.log("leave room", roomId);
+  
   const response = await axiosClient.patch(
     `/${baseRoom}/${roomId}/leave`,
    {}
@@ -43,6 +44,8 @@ export const leaveRoom = async (roomId) => {
   return response.data?.data;
 };
 
-export const adminTransfer = async (data) => {
-  return axiosClient.post(`/${baseRoom}/${roomId}/admin/transfer`);
+export const adminTransfer = async (roomId,newAdminId) => {
+  console.log(roomId,newAdminId)
+  
+  return axiosClient.post(`/${baseRoom}/${roomId}/admin/${newAdminId}`);
 };

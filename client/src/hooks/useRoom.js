@@ -6,6 +6,7 @@ import {
   updateRoom,
   deleteRoom,
   leaveRoom,
+  adminTransfer,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -59,7 +60,19 @@ export const useRoom = (roomId) => {
     },
     onError: (error) => {
       console.error("Failed to left room", error);
-      toast.error("Unable to left room"||error?.data?.message)
+      toast.error(error?.response?.data?.message||"Unable to left room")
+    },
+  });
+
+  const adminTransferMutation = useMutation({
+    mutationFn: ({newAdminId}) => adminTransfer(roomId,newAdminId),
+    onSuccess: () => {
+      navigate(`/room/${roomId}`);
+      toast.success("Admin changed successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to change admin", error);
+      toast.error(error?.response?.data?.message||"Failed to change admin")
     },
   });
 
@@ -68,7 +81,8 @@ export const useRoom = (roomId) => {
     adminResponseMutation,
     updateRoomMutation,
     deleteRoomMutation,
-    leaveRoomMutation
+    leaveRoomMutation,
+    adminTransferMutation
   };
 };
 
