@@ -284,41 +284,95 @@ const getRoomData = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
 });
  
-const leaveRoom = asyncHandler(async (req, res) => {
+// const leaveRoom = asyncHandler(async (req, res) => {
 
-  const userId = req.user?._id;
-  const user = req.user;const { roomId } = req.params;
-  console.log("User",user.rooms)
-  user.rooms = user.rooms.filter(
-    (room) => room.roomId.toString() !== roomId.toString()
-  );
-  console.log("after rooms",user.rooms)
+//   const userId = req.user?._id;
+//   const user = req.user;const { roomId } = req.params;
+//   console.log("User",user.rooms)
+//   user.rooms = user.rooms.filter(
+//     (room) => room.roomId.toString() !== roomId.toString()
+//   );
+//   console.log("after rooms",user.rooms)
   
-  const room = await Room.findById(roomId);
-console.log("This room", room.tenants)
-  if (room.admin.toString() === userId.toString()) {
-    throw new ApiError(400, "Admin can't leave the room");
-  }
+//   const room = await Room.findById(roomId);
+// console.log("This room", room.tenants)
+//   if (room.admin.toString() === userId.toString()) {
+//     throw new ApiError(400, "Admin can't leave the room");
+//   }
 
-  room.tenants = room.tenants.filter(
-    (tenant) => tenant.toString() !== userId.toString()
-  ); 
-  console.log(room.tenants)
-  return
-  await room.save();
-  // const user = req.user;
-  user.rooms = user.rooms.filter(
-    (room) => room.id.toString() !== roomId.toString()
-  );
-  await user.save();
-  emitSocketEvent(
-    req,
-    roomId,
-    RoomEventEnum.LEAVE_ROOM_EVENT,
-    `${user.fullName} left the room 🥺`
-  );
-  return res.json(new ApiResponse(200, {}, "User has left the room"));
+//   room.tenants = room.tenants.filter(
+//     (tenant) => tenant.toString() !== userId.toString()
+//   ); 
+//   console.log(room.tenants)
+//   return
+//   await room.save();
+//   // const user = req.user;
+//   user.rooms = user.rooms.filter(
+//     (room) => room.id.toString() !== roomId.toString()
+//   );
+//   await user.save();
+//   emitSocketEvent(
+//     req,
+//     roomId,
+//     RoomEventEnum.LEAVE_ROOM_EVENT,
+//     `${user.fullName} left the room 🥺`
+//   );
+//   return res.json(new ApiResponse(200, {}, "User has left the room"));
+// });
+
+
+const leaveRoom = asyncHandler(async (req, res) => {
+  const userId = req.user._id.toString();
+  const { roomId } = req.params;
+
+  // transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    
+    const room = await Room.findById(roomId).session(session);
+    if (!room) {
+      throw new ApiError(404, "Room not found");
+    }
+    if (room.admin.toString() === userId.toString()) {
+      throw new ApiError(400, "Admin can't leave the room");
+    }
+
+    //  Remove user from room.tenants
+    room.tenants = room.tenants.filter(
+      (tenantId) => tenantId.toString() !== userId
+    );
+    await room.save({ session });
+
+    const user = req.user
+
+    //  Remove room from user rooms array
+    user.rooms = user.rooms.filter(
+      (room) => room.roomId.toString() !== roomId.toString()
+    );
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    emitSocketEvent(
+      req,
+      roomId,
+      RoomEventEnum.LEAVE_ROOM_EVENT,
+      `${user.fullName} left the room 🥺`
+    );
+
+    return res.json(new ApiResponse(200, {}, "User has left the room"));
+  } catch (err) {
+    
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
 });
+
+
 
 const transferAdminControl = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
