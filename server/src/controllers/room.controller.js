@@ -283,42 +283,6 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
 });
- 
-// const leaveRoom = asyncHandler(async (req, res) => {
-
-//   const userId = req.user?._id;
-//   const user = req.user;const { roomId } = req.params;
-//   console.log("User",user.rooms)
-//   user.rooms = user.rooms.filter(
-//     (room) => room.roomId.toString() !== roomId.toString()
-//   );
-//   console.log("after rooms",user.rooms)
-  
-//   const room = await Room.findById(roomId);
-// console.log("This room", room.tenants)
-//   if (room.admin.toString() === userId.toString()) {
-//     throw new ApiError(400, "Admin can't leave the room");
-//   }
-
-//   room.tenants = room.tenants.filter(
-//     (tenant) => tenant.toString() !== userId.toString()
-//   ); 
-//   console.log(room.tenants)
-//   return
-//   await room.save();
-//   // const user = req.user;
-//   user.rooms = user.rooms.filter(
-//     (room) => room.id.toString() !== roomId.toString()
-//   );
-//   await user.save();
-//   emitSocketEvent(
-//     req,
-//     roomId,
-//     RoomEventEnum.LEAVE_ROOM_EVENT,
-//     `${user.fullName} left the room 🥺`
-//   );
-//   return res.json(new ApiResponse(200, {}, "User has left the room"));
-// });
 
 
 const leaveRoom = asyncHandler(async (req, res) => {
@@ -374,7 +338,7 @@ const leaveRoom = asyncHandler(async (req, res) => {
 
 
 const transferAdminControl = asyncHandler(async (req, res) => {
-  const { newAdminId } = req.body;
+  const { newAdminId } = req.params;
   const room = req.room; 
 
   // Check for newAdminId is a member
