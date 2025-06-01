@@ -373,38 +373,30 @@ const leaveRoom = asyncHandler(async (req, res) => {
 });
 
 
-
 const transferAdminControl = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
   const { newAdminId } = req.body;
-  const currentAdminId = req.user?._id;
+  const room = req.room; 
 
-  const room = await Room.findById(roomId);
-
-  if (!room) {
-    throw new ApiError(404, "Room not found");
-  }
-
-  if (room.admin.toString() !== currentAdminId.toString()) {
-    throw new ApiError(403, "Only the current admin can transfer admin rights");
-  }
-
+  // Check for newAdminId is a member
   if (!room.tenants.includes(newAdminId)) {
     throw new ApiError(400, "New admin must be a member of the room");
   }
 
   room.admin = newAdminId;
   await room.save();
+
   emitSocketEvent(
     req,
-    roomId,
+    room._id.toString(),
     RoomEventEnum.ADMIN_ROOM_CHANGE,
-    `Room admin changed`
+    "Room admin changed"
   );
+
   return res
     .status(200)
     .json(new ApiResponse(200, room, "Admin rights transferred successfully"));
 });
+
 
 export {
   createRoom,
