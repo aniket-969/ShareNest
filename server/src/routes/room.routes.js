@@ -14,6 +14,6 @@ router.route("/:roomId").patch(verifyJWT,updateRoom);
 router.route("/:roomId").delete(verifyJWT,deleteRoom);
 router.route("/:roomId").get(verifyJWT,checkMember,getRoomData);
 router.route("/:roomId/leave").patch(verifyJWT,checkMember,leaveRoom);
-router.route("/:roomId/admin/:newAdminId").patch(verifyJWT,adminOnly,validate(transferRoleSchema),transferAdminControl);
+router.route("/:roomId/admin/:newAdminId").patch(verifyJWT,adminOnly,transferAdminControl);
 
 export default router;
