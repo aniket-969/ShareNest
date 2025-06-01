@@ -361,6 +361,65 @@ const transferAdminControl = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, room, "Admin rights transferred successfully"));
 });
  
+export const kickUser = asyncHandler(async (req, res) => {
+  const adminId = req.user._id.toString();
+  const { roomId, targetUserId } = req.params;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+ 
+    const room = await Room.findById(roomId).session(session);
+    if (!room) throw new ApiError(404, "Room not found");
+
+    if (room.admin.toString() !== adminId) {
+      throw new ApiError(403, "Only admin can kick members");
+    }
+
+    if (adminId === targetUserId) {
+      throw new ApiError(400, "Admin cannot kick themselves");
+    }
+
+    const tenantIndex = room.tenants.findIndex(
+      (t) => t.toString() === targetUserId
+    );
+    if (tenantIndex === -1) {
+      throw new ApiError(400, "User is not a member of this room");
+    }
+    room.tenants.splice(tenantIndex, 1);
+    await room.save({ session });
+
+    const user = await User.findById(targetUserId).session(session);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    user.rooms = user.rooms.filter(
+      (r) => r.roomId.toString() !== roomId.toString()
+    );
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    emitSocketEvent(
+      req,
+      roomId,
+      RoomEventEnum.KICK_MEMBER_EVENT,
+      `A member was removed by the admin`
+    );
+
+    return res.json(
+      new ApiResponse(200, {}, "User has been kicked from the room")
+    );
+  } catch (err) {
+   
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
+});
+
 
 export {
   createRoom,
