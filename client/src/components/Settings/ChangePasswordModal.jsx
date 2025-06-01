@@ -65,7 +65,7 @@ const ChangePasswordModal = () => {
         <FormWrapper onClose={closeModal}>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-6 max-w-md mx-auto p-6 bg-[#1c1f26] rounded-2xl text-white shadow-md"
+            className="flex flex-col gap-6 max-w-md mx-auto p-6 rounded-2xl text-white shadow-md"
           >
             {/* Old Password */}
             <div>
@@ -76,7 +76,7 @@ const ChangePasswordModal = () => {
                 id="oldPassword"
                 type="password"
                 {...register("oldPassword")}
-                className="bg-[#121418] text-white"
+               
               />
               {errors.oldPassword && (
                 <p className="mt-1 text-sm text-destructive">
@@ -94,7 +94,7 @@ const ChangePasswordModal = () => {
                 id="newPassword"
                 type="password"
                 {...register("newPassword")}
-                className="bg-[#121418] text-white"
+               
               />
               {errors.newPassword && (
                 <p className="mt-1 text-sm text-destructive">
@@ -112,7 +112,7 @@ const ChangePasswordModal = () => {
                 id="confirmNewPassword"
                 type="password"
                 {...register("confirmNewPassword")}
-                className="bg-[#121418] text-white"
+              
               />
               {errors.confirmNewPassword && (
                 <p className="mt-1 text-sm text-destructive">
@@ -139,7 +139,7 @@ const ChangePasswordModal = () => {
             </div>
           </form>
         </FormWrapper>
-      )}
+      )} 
     </>
   );
 };
