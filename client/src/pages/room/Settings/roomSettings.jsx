@@ -1,6 +1,7 @@
-import React from 'react'
 
-const RoomSettings = () => {
+const RoomSettings = ({roomData}) => {
+ 
+  console.log(roomData)
   return (
     <div>RoomSettings</div>
   )

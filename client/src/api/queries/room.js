@@ -27,14 +27,20 @@ export const deleteRoom = async (data, roomId) => {
 };
 
 export const getRoomData = async (roomId) => {
-  console.log("here")
+  console.log("here");
   const response = await axiosClient.get(`/${baseRoom}/${roomId}`);
   console.log(response);
   return response.data?.data;
 };
 
 export const leaveRoom = async (data, roomId) => {
-  return axiosClient.patch(`/${baseRoom}/${roomId}/leave`, data);
+  console.log("leave room", data);
+  const response = await axiosClient.patch(
+    `/${baseRoom}/${roomId}/leave`,
+    data
+  );
+  console.log(response);
+  return response.data?.data;
 };
 
 export const adminTransfer = async (data) => {

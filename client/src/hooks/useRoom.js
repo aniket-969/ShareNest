@@ -23,7 +23,7 @@ export const useRoom = (roomId) => {
     cacheTime: 10 * 60 * 1000,
     retry: 3,
   });
-
+ 
   const updateRoomMutation = useMutation({
     queryFn: updateRoom,
     onSuccess: (roomId) => {
