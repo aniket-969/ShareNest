@@ -18,8 +18,11 @@ export const adminResponse = async (data, roomId) => {
 };
 
 export const updateRoom = async (roomId, data) => {
+  console.log(roomId,data)
+ 
   const response = axiosClient.patch(`/${baseRoom}/${roomId}`, data);
-  return response.data?.data?._id;
+  console.log(response)
+  return response?.data;
 };
 
 export const deleteRoom = async (data, roomId) => {
@@ -29,7 +32,7 @@ export const deleteRoom = async (data, roomId) => {
 export const getRoomData = async (roomId) => {
   console.log("here");
   const response = await axiosClient.get(`/${baseRoom}/${roomId}`);
-  console.log(response);
+  // console.log(response);
   return response.data?.data;
 }; 
 

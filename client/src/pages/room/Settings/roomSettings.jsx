@@ -1,22 +1,39 @@
-import AdminTransfer from "@/components/Settings/room/AdminTransfer"
-import LeaveRoom from "@/components/Settings/room/LeaveRoom"
+import { useState } from "react";
+import RoomDetailsView from "@/components/Settings/room/RoomDetailsView";
+import EditRoomDetailsModal from "@/components/Settings/room/EditRoomModal";
+import LeaveRoom from "@/components/Settings/room/LeaveRoom";
+import AdminTransfer from "@/components/Settings/room/AdminTransfer";
 
-const RoomSettings = ({roomData,roomId}) => {
- 
+const RoomSettings = ({
+  room,
+  isAdmin,
+  roomId,
+  updateRoomMutation,
+  onRoomUpdate,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+
   return (
     <div className="flex flex-col items-start gap-5">
-     <div className="mx-auto p-4 border-b">
-          <h2 className="text-xl font-bold line-clamp-1">
-            {roomData?.name?.toUpperCase() || "Loading..."}
-          </h2>
-          <p className="text-md text-muted-foreground line-clamp-3 max-w-full">
-            {roomData?.description || ""}
-          </p>
-        </div>
-      <LeaveRoom roomId={roomId}/>
-      <AdminTransfer roomId={roomId} participants ={roomData?.tenants}/>
-    </div>
-  ) 
-}
+      <RoomDetailsView
+        room={room}
+        isAdmin={isAdmin}
+        onEdit={() => setIsEditing(true)}
+      />
 
-export default RoomSettings
+      <EditRoomDetailsModal
+        open={isEditing}
+        room={room}
+        updateRoomMutation={updateRoomMutation}
+        onClose={() => setIsEditing(false)}
+        onSuccess={onRoomUpdate}
+      />
+
+      <LeaveRoom roomId={roomId} />
+
+      {isAdmin && <AdminTransfer roomId={roomId} participants={room.tenants} />}
+    </div>
+  );
+};
+
+export default RoomSettings;

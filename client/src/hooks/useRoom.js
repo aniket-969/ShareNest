@@ -28,11 +28,14 @@ export const useRoom = (roomId) => {
   });
 
   const updateRoomMutation = useMutation({
-    queryFn: updateRoom,
-    onSuccess: (roomId) => {
-      queryClient.invalidateQueries(["room", roomId]);
-    },
-  });
+  
+  mutationFn: (newValues) => updateRoom(roomId, newValues),
+  onSuccess: (newRoomId) => {
+    queryClient.invalidateQueries(["room", newRoomId]);
+    toast.success("Room details updated");
+  },
+});
+
 
   const deleteRoomMutation = useMutation({
     queryFn: deleteRoom,

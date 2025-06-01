@@ -7,7 +7,7 @@ export const createRoomSchema = z.object({
     role:z.enum(["tenant","landlord"])
 })
 
-export const updateRoomSchema = creatRoomSchema
+export const updateRoomSchema = createRoomSchema
   .partial()
   .omit({ role: true });
 
