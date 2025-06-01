@@ -5,6 +5,7 @@ import {
   adminResponse,
   updateRoom,
   deleteRoom,
+  leaveRoom,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -12,18 +13,18 @@ import { useNavigate } from "react-router-dom";
 export const useRoom = (roomId) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
- 
+
   const roomQuery = useQuery({
     queryKey: ["room", roomId],
     queryFn: () => getRoomData(roomId),
     enabled: !!roomId,
     refetchOnWindowFocus: false,
-    refetchOnMount:false,
+    refetchOnMount: false,
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
     retry: 3,
   });
- 
+
   const updateRoomMutation = useMutation({
     queryFn: updateRoom,
     onSuccess: (roomId) => {
@@ -47,6 +48,18 @@ export const useRoom = (roomId) => {
     },
     onError: (error) => {
       console.error("Failed to send admin response", error);
+    },
+  });
+
+  const leaveRoomMutation = useMutation({
+    mutationFn: () => leaveRoom(roomId),
+    onSuccess: () => {
+      navigate("/room");
+      toast.success("Left room successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to left room", error);
+      toast.error("Unable to left room"||error?.data?.message)
     },
   });
 

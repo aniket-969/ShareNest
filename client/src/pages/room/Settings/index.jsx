@@ -11,8 +11,8 @@ const Settings = () => {
    const {roomId} = useParams()
   const {roomQuery} = useRoom(roomId)
   const { sessionQuery } = useAuth();
-    const { data: user, isLoading:userLoading, isError:userError, refetch } = sessionQuery;
-  const {data:roomData,isLoading,isError} = roomQuery
+    const { data: user, isLoading:userLoading, isError:userError } = sessionQuery;
+  const {data:roomData,isLoading,isError,refetch} = roomQuery
   if(isLoading || userLoading)return <>Spinner</>
   if(isError || userError)return <>Something went wrong</>
 
@@ -21,7 +21,7 @@ const Settings = () => {
      <Card className="bg-[#121418] text-white shadow-md rounded-2xl">
         <CardContent className="py-6">
           <h2 className="text-xl font-semibold mb-4 text-white">Profile Settings</h2>
-          <ProfileSettings user={user}/>
+          <ProfileSettings refetch={refetch} user={user}/>
         </CardContent>
       </Card>
       <Separator className="my-4 bg-muted/40" />

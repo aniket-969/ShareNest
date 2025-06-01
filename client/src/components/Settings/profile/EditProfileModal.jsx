@@ -1,4 +1,4 @@
-import ProfileSettingsForm from "../form/ProfileSettingsForm";
+import ProfileSettingsForm from "@/components/form/ProfileSettingsForm";
 import FormWrapper from "@/components/ui/formWrapper";
 
 

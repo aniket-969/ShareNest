@@ -31,13 +31,13 @@ export const getRoomData = async (roomId) => {
   const response = await axiosClient.get(`/${baseRoom}/${roomId}`);
   console.log(response);
   return response.data?.data;
-};
+}; 
 
-export const leaveRoom = async (data, roomId) => {
-  console.log("leave room", data);
+export const leaveRoom = async (roomId) => {
+  console.log("leave room", roomId);
   const response = await axiosClient.patch(
     `/${baseRoom}/${roomId}/leave`,
-    data
+   {}
   );
   console.log(response);
   return response.data?.data;

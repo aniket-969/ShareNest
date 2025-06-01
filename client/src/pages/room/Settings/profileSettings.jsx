@@ -1,11 +1,11 @@
 import { useState } from "react";
-import ProfileSettingsView from "@/components/Settings/ProfileSettingsView";
-import EditProfileModal from "@/components/Settings/EditProfileModal";
-import ChangePasswordModal from "@/components/Settings/ChangePasswordModal";
+import ProfileSettingsView from "@/components/Settings/profile/ProfileSettingsView";
+import EditProfileModal from "@/components/Settings/profile/EditProfileModal";
+import ChangePasswordModal from "@/components/Settings/profile/ChangePasswordModal";
 import { Button } from "@/components/ui/button";
 import LogOut from "@/components/LogOut";
 
-const ProfileSettings = ({user}) => {
+const ProfileSettings = ({user,refetch}) => {
   
   const [isEditing, setIsEditing] = useState(false);
   const [isPwModalOpen, setIsPwModalOpen] = useState(false);

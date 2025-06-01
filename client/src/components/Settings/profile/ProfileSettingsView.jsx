@@ -1,5 +1,5 @@
 
-import ProfileCard from "../profileCard";
+import ProfileCard from "@/components/profileCard";
 import { Pencil } from "lucide-react";
 
 const ProfileSettingsView = ({ onEdit }) => (
