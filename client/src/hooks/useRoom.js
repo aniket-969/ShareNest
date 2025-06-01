@@ -3,7 +3,7 @@ import {
   createRoom,
   getRoomData,
   adminResponse,
-  updateRoom,
+  updateRoom, 
   deleteRoom,
   leaveRoom,
   adminTransfer,
@@ -11,6 +11,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { kickUser } from "@/api/queries/room";
 
 export const useRoom = (roomId) => {
   const queryClient = useQueryClient();
@@ -69,7 +70,7 @@ export const useRoom = (roomId) => {
   });
 
   const adminTransferMutation = useMutation({
-    mutationFn: ({newAdminId}) => adminTransfer(roomId,newAdminId),
+    mutationFn: ({targetUserId}) => adminTransfer(roomId,targetUserId),
     onSuccess: () => {
       navigate(`/room/${roomId}`);
       toast.success("Admin changed successfully");
@@ -80,13 +81,27 @@ export const useRoom = (roomId) => {
     },
   });
 
+   const kickUserMutation = useMutation({
+    mutationFn: ({targetUserId}) => kickUser(roomId,targetUserId),
+    onSuccess: () => {
+     
+      toast.success("User kicked out successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to kick user", error);
+      toast.error(error?.response?.data?.message||"Failed to kick out user")
+    },
+  });
+
+
   return {
     roomQuery,
     adminResponseMutation,
     updateRoomMutation,
     deleteRoomMutation,
     leaveRoomMutation,
-    adminTransferMutation
+    adminTransferMutation,
+    kickUserMutation
   };
 };
 

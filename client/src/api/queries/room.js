@@ -52,3 +52,9 @@ export const adminTransfer = async (roomId,newAdminId) => {
   
   return axiosClient.patch(`/${baseRoom}/${roomId}/admin/${newAdminId}`);
 };
+
+export const kickUser = async (roomId,targetUserId) => {
+  console.log(roomId,targetUserId)
+  
+  return axiosClient.patch(`/${baseRoom}/${roomId}/kick/${targetUserId}`);
+};

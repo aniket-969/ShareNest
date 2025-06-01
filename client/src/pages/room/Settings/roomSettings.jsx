@@ -3,6 +3,7 @@ import RoomDetailsView from "@/components/Settings/room/RoomDetailsView";
 import EditRoomDetailsModal from "@/components/Settings/room/EditRoomModal";
 import LeaveRoom from "@/components/Settings/room/LeaveRoom";
 import AdminTransfer from "@/components/Settings/room/AdminTransfer";
+import KickUserModal from "@/components/Settings/room/KickUserModal";
 
 const RoomSettings = ({
   room,
@@ -32,6 +33,10 @@ const RoomSettings = ({
       <LeaveRoom roomId={roomId} />
 
       {isAdmin && <AdminTransfer roomId={roomId} participants={room.tenants} />}
+
+      {isAdmin && <KickUserModal roomId={roomId} participants={room.tenants} />}
+
+
     </div>
   );
 };
