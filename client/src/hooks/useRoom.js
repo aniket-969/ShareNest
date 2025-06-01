@@ -68,6 +68,7 @@ export const useRoom = (roomId) => {
     adminResponseMutation,
     updateRoomMutation,
     deleteRoomMutation,
+    leaveRoomMutation
   };
 };
 

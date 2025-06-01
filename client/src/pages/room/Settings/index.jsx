@@ -28,7 +28,7 @@ const Settings = () => {
   <Card className="bg-[#121418] text-white shadow-md rounded-2xl ">
         <CardContent className="py-6">
           <h2 className="text-xl font-semibold mb-4 text-white">Room Settings</h2>
-          <RoomSettings roomData={roomData}/>
+          <RoomSettings roomId={roomId} roomData={roomData}/>
         </CardContent>
       </Card>
 

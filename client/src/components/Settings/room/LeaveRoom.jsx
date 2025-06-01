@@ -6,13 +6,17 @@ import { useRoom } from "@/hooks/useRoom";
 
 const LeaveRoom = ({ roomId }) => {
   const { leaveRoomMutation } = useRoom(roomId);
-
+  console.log(leaveRoomMutation);
   const handleLeave = () => {
     leaveRoomMutation.mutate();
   };
 
   return (
-    <Button onClick={handleLeave} className="flex items-center gap-2">
+    <Button
+      onClick={handleLeave}
+      disabled={leaveRoomMutation.isLoading}
+      className="flex items-center gap-2"
+    >
       Leave Room
     </Button>
   );

@@ -1,11 +1,11 @@
 import LeaveRoom from "@/components/Settings/room/LeaveRoom"
 
-const RoomSettings = ({roomData}) => {
+const RoomSettings = ({roomData,roomId}) => {
  
   console.log(roomData)
   return (
     <div>
-      <LeaveRoom/>
+      <LeaveRoom roomId={roomId}/>
     </div>
   ) 
 }
