@@ -8,14 +8,13 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
   const [selectionOrder, setSelectionOrder] = useState({});
 
   const getSortedParticipants = () => {
-    // for single mode, wrap `selected` in an array so sorting logic still works
+   
     const selectedIds = single
       ? selected
         ? [selected]
         : []
       : selected;
 
-    // first, pull out whichever ones are “selected”
     const selectedParticipants = participants.filter((u) =>
       selectedIds.includes(u._id)
     );

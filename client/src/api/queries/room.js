@@ -47,5 +47,5 @@ export const leaveRoom = async (roomId) => {
 export const adminTransfer = async (roomId,newAdminId) => {
   console.log(roomId,newAdminId)
   
-  return axiosClient.post(`/${baseRoom}/${roomId}/admin/${newAdminId}`);
+  return axiosClient.patch(`/${baseRoom}/${roomId}/admin/${newAdminId}`);
 };

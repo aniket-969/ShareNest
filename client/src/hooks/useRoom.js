@@ -10,6 +10,7 @@ import {
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const useRoom = (roomId) => {
   const queryClient = useQueryClient();
@@ -57,7 +58,7 @@ export const useRoom = (roomId) => {
     onSuccess: () => {
       navigate("/room");
       toast.success("Left room successfully");
-    },
+    }, 
     onError: (error) => {
       console.error("Failed to left room", error);
       toast.error(error?.response?.data?.message||"Unable to left room")

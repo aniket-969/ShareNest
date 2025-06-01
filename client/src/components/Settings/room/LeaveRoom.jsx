@@ -6,7 +6,6 @@ import { useRoom } from "@/hooks/useRoom";
 
 const LeaveRoom = ({ roomId }) => {
   const { leaveRoomMutation } = useRoom(roomId);
-  console.log(leaveRoomMutation);
   const handleLeave = () => {
     leaveRoomMutation.mutate();
   };
