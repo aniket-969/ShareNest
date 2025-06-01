@@ -1,10 +1,9 @@
-// AdminTransfer.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
 import FormWrapper from "@/components/ui/formWrapper";
-import ParticipantSelector from "@/components/ParticipantsSelector"; // updated selector supports single
+import ParticipantSelector from "@/components/ParticipantsSelector"; 
 import { useRoom } from "@/hooks/useRoom";
 
 const AdminTransfer = ({ roomId, participants }) => {
@@ -42,7 +41,7 @@ const AdminTransfer = ({ roomId, participants }) => {
         onClick={openModal}
         className="flex items-center gap-2"
       >
-        Transfer Admin
+        Change Admin
       </Button>
 
       {isOpen && (
