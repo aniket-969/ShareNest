@@ -360,7 +360,7 @@ const transferAdminControl = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, room, "Admin rights transferred successfully"));
 });
-
+ 
 
 export {
   createRoom,
