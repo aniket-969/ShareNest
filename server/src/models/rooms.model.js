@@ -116,7 +116,9 @@ const roomSchema = new Schema(
           type: String,
           required: true,
         },
-        description: String,
+        description: {
+          type: String,
+        },
         createdBy: {
           type: Schema.Types.ObjectId,
           ref: "User",
@@ -167,7 +169,7 @@ const roomSchema = new Schema(
               dayOfWeek: Number,
             },
           ],
-         startDate: { type: Date, default: () => Date.now() },
+          startDate: { type: Date, default: () => Date.now() },
           dueDate: Date,
         },
 
@@ -208,7 +210,6 @@ const roomSchema = new Schema(
       },
     ],
 
-    lastMessage: { type: Schema.Types.ObjectId, ref: "ChatMessage" },
     polls: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vote" }],
   },
   { timestamps: true }

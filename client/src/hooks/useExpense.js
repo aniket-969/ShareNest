@@ -11,7 +11,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useExpense = (roomId) => {
   const queryClient = useQueryClient();
-
+ 
   // Fetch expense details
   const expenseQuery = (expenseId) =>
     useQuery({
@@ -30,7 +30,6 @@ export const useExpense = (roomId) => {
     refetchOnWindowFocus: false,
     staleTime: 30 * 60 * 1000,
     cacheTime: 60 * 60 * 1000,
-    enabled: false,
   });
 
   // Fetch pending payments

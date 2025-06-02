@@ -139,7 +139,7 @@ const getUserExpenses = asyncHandler(async (req, res) => {
   }
 
   return res.json(
-    new ApiResponse(200, expense, "user expenses fetched successfully")
+    new ApiResponse(200, expenses, "user expenses fetched successfully")
   );
 });
 

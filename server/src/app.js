@@ -36,7 +36,7 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
  
-app.use(globalLimiter);
+// app.use(globalLimiter);
 
 import userRouter from "./routes/user.routes.js";
 import pollRouter from "./routes/poll.routes.js";

@@ -8,7 +8,7 @@ import { emitSocketEvent } from "../socket/index.js";
 const customRoomAward = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { title, description, image, criteria, assignedTo } = req.body;
- 
+  
   const room = await Room.findById(roomId);
  
   const award = {

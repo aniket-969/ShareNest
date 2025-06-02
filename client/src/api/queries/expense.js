@@ -9,8 +9,8 @@ export const createExpense = async (data, roomId) => {
 
 export const deleteExpense = async (expenseId) => {
   return axiosClient.delete(`/${baseExpense}/${expenseId}`);
-};
-
+}; 
+ 
 export const updateExpense = async (expenseId, data) => {
   return axiosClient.patch(`/${baseExpense}/${expenseId}`, data);
 };
@@ -20,11 +20,16 @@ export const getExpenseDetails = async (expenseId) => {
 };
 
 export const getPendingPayments = async (expenseId) => {
-  return axiosClient.get(`/${baseExpense}/pending`);
+  const response = await axiosClient.get(`/${baseExpense}/pending`);
+  console.log(response)
+  return response
 };
 
 export const getUserExpense = async () => {
-  return axiosClient.get(`/${baseExpense}/user`);
+  console.log("in get user expense api query")
+  const response = await axiosClient.get(`/${baseExpense}/`);
+  console.log(response)
+  return response
 };
 
 export const updatePayment = async (data) => {

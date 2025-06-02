@@ -109,6 +109,10 @@ const updateRoomTask = asyncHandler(async (req, res) => {
   );
 });
 
+const updateNonRecurringTask = asyncHandler(async(req,res)=>{
+
+})
+
 const deleteRoomTask = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;
   const room = await Room.findById(roomId);
@@ -203,4 +207,6 @@ export {
   deleteRoomTask,
   createSwitchRequest,
   switchRequestResponse,
+  updateNonRecurringTask,
+  
 };

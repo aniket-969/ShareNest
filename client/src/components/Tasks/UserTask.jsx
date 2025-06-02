@@ -11,7 +11,7 @@ const sessionData = JSON.parse(localStorage.getItem("session"))
 
 
     if(isLoading){
-        return<><Spinner/></>
+        return<Spinner/>
     }
     if(isError){
         return <>Something went wrong , Refresh</>
@@ -20,8 +20,8 @@ const userTasks = data.tasks?.filter((task)=>task.createdBy == sessionData._id)
 console.log(userTasks)
   return (
     <div className=''>
-      <h3>Your Tasks</h3>
-      
+      <h3 className='text-lg'>Your Tasks</h3>
+
     </div>
   )
 }
