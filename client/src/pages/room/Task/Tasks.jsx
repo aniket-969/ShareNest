@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
-// Lazy load the forms and form wrapper
 const TaskForm = lazy(() => import("@/components/form/tasks/TaskForm"));
 const RecurringTaskForm = lazy(() => import("@/components/form/tasks/RecurringTaskForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
+import UserTask from './../../../components/Tasks/UserTask';
 
 const Tasks = () => {
   const { roomId } = useParams();
@@ -86,6 +86,7 @@ const Tasks = () => {
           </FormWrapper>
         </Suspense>
       )}
+      <UserTask/>
     </div>
   );
 };
