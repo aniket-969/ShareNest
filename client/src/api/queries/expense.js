@@ -21,15 +21,15 @@ export const getExpenseDetails = async (expenseId) => {
 
 export const getPendingPayments = async (expenseId) => {
   const response = await axiosClient.get(`/${baseExpense}/pending`);
-  console.log(response)
-  return response
+  // console.log(response)
+  return response?.data?.data
 };
 
 export const getUserExpense = async () => {
   console.log("in get user expense api query")
   const response = await axiosClient.get(`/${baseExpense}/`);
-  console.log(response)
-  return response
+  // console.log(response)
+  return response?.data?.data
 };
 
 export const updatePayment = async (data) => {

@@ -5,9 +5,11 @@ import { useParams } from 'react-router-dom';
 const PendingExpense = ({userPendingExpenseQuery}) => {
     
     const {data,isLoading,isError} = userPendingExpenseQuery
-    console.log(data)
+    // console.log("Pending",data.data)
   return (
-    <div>PendingExpense</div>
+    <div>
+        <h3>Paid by you</h3>
+    </div>
   )
 }
 

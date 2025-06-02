@@ -16,7 +16,8 @@ const RoomExpense = () => {
   const { roomQuery } = useRoom(roomId);
   const { data, isLoading, isError } = roomQuery;
   const [isFormOpen, setIsFormOpen] = useState(false);
-
+const userData = localStorage.getItem("session")
+const userId = JSON.parse(userData)?._id
   if (isLoading) return <Spinner />;
   if (isError) return <>Something went wrong. Please refresh</>;
 
@@ -42,8 +43,8 @@ const RoomExpense = () => {
         </Suspense>
       )}
       <div>
-        <UserExpense userExpenseQuery={userExpenseQuery}/>
-        <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery}/>
+        <UserExpense userExpenseQuery={userExpenseQuery} userId = {userId}/>
+        <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery} userId={userId}/>
       </div>
     </div>
   );
