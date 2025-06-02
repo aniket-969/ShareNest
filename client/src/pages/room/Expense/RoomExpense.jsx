@@ -12,7 +12,7 @@ const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
 const RoomExpense = () => {
   const { roomId } = useParams();
-  const { createExpenseMutation } = useExpense(roomId);
+  const { createExpenseMutation,userExpenseQuery,userPendingExpenseQuery } = useExpense(roomId);
   const { roomQuery } = useRoom(roomId);
   const { data, isLoading, isError } = roomQuery;
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -42,8 +42,8 @@ const RoomExpense = () => {
         </Suspense>
       )}
       <div>
-        <UserExpense/>
-        <PendingExpense/>
+        <UserExpense userExpenseQuery={userExpenseQuery}/>
+        <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery}/>
       </div>
     </div>
   );
