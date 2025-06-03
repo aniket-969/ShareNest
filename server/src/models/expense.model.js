@@ -22,7 +22,7 @@ const expenseSchema = new Schema(
     },
     participants: [
       {
-        user: { type: Schema.Types.ObjectId, ref: "User" },
+        user: { type: Schema.Types.ObjectId, ref: "User" }, 
         hasPaid: { type: Boolean, default: false },
         paidDate: { type: Date, default: null },
         baseAmount: { type: Number, required: true },
@@ -51,6 +51,18 @@ const expenseSchema = new Schema(
         },
       },
     ],
+    totalAmountPaid: {
+  type: Number,
+  required: true
+}
+,
+currency: {
+  type: String,
+  default: "INR",
+  match: /^[A-Z]{3}$/
+}
+
+
   },
   { timestamps: true }
 );
