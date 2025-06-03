@@ -27,7 +27,9 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
       <h3>To Pay</h3>
 
       <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[20rem] my-4">
-        <CarouselContent className="-ml-4 flex items-center justify-center">
+        <CarouselContent  className={`-ml-4 flex touch-pan-x snap-x snap-mandatory ${
+    expenses.length < 3 ? "justify-center items-center" : ""
+  }`}>
           {expenses.map((expense) => (
             <CarouselItem
               key={expense._id}
