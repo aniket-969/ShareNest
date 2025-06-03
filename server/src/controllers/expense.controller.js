@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ExpenseEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { fcm } from './../firebase/config.js';
-
+ 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { title, totalAmount, imageUrl, dueDate, participants } = req.body;
@@ -86,51 +86,79 @@ const createExpense = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, expense, "Expense created successfully"));
 });
-
+ 
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   const { expenseId, roomId } = req.params;
   const { paymentMode } = req.body;
-  const expense = await Expense.findById(expenseId);
 
+  const expense = await Expense.findOne({
+    _id: expenseId,
+    "participants.user": userId,
+  });
   if (!expense) {
-    throw new ApiError(404, "Expense doesn't exist");
+    throw new ApiError(404, "Expense not found or you’re not a participant");
   }
 
-  const participant = expense.participants.find(
-    (part) => part.user.toString() === userId.toString()
+  const participant = expense.participants.find((p) =>
+    p.user.equals(userId)
   );
-
-  if (!participant) {
-    throw new ApiError(403, "You are not part of participant in this expense");
-  }
-
   if (participant.hasPaid) {
     throw new ApiError(400, "You have already paid for this expense");
   }
 
-  participant.hasPaid = true;
-  participant.paidDate = new Date();
+  const paymentAmount = participant.totalAmountOwed;
 
-  expense.paymentHistory.push({
-    user: userId,
-    amount: participant.amountOwed,
-    paymentDate: new Date(),
-    description: paymentMode,
-  });
+  const updatedExpense = await Expense.findOneAndUpdate(
+    {
+      _id: expenseId,
+      "participants.user": userId,
+    },
+    {
+      $set: {
+        "participants.$.hasPaid": true,
+        "participants.$.paidDate": new Date(),
+      },
+      $push: {
+        paymentHistory: {
+          user: userId,
+          amount: paymentAmount,
+          paymentDate: new Date(),
+          description: paymentMode || "",
+        },
+      },
+      $inc: {
+        totalAmountPaid: paymentAmount,
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
-  await expense.save();
-  const user = req.user;
-  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_UPDATED_EVENT, expense);
+  if (!updatedExpense) {
+    throw new ApiError(500, "Failed to update payment");
+  }
+
+ 
+  emitSocketEvent(
+    req,
+    roomId,
+    ExpenseEventEnum.EXPENSE_UPDATED_EVENT,
+    updatedExpense
+  );
+
   return res.json(
-    new ApiResponse(200, expense, "Payment updated successfully")
+    new ApiResponse(200, updatedExpense, "Payment updated successfully")
   );
 });
+
 
 const getUserExpenses = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
 
-  const expenses = await Expense.find({ "participants.user": userId })
+  const expenses = await Expense.find({ "participants.user": userId }).select("-paymentHistory")
     .populate("paidBy", "fullName avatar")
     .populate("participants.user", "fullName avatar");
 
@@ -196,7 +224,7 @@ const getExpenseDetails = asyncHandler(async (req, res) => {
 
 const updateExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
-  const userId = req.user.id; // Assuming authenticated user ID is available in req.user
+  const userId = req.user.id;
   const {
     name,
     totalAmount,

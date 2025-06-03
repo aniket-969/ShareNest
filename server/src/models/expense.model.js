@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
- 
+
 const expenseSchema = new Schema(
   {
     title: {
@@ -22,7 +22,7 @@ const expenseSchema = new Schema(
     },
     participants: [
       {
-        user: { type: Schema.Types.ObjectId, ref: "User" }, 
+        user: { type: Schema.Types.ObjectId, ref: "User" },
         hasPaid: { type: Boolean, default: false },
         paidDate: { type: Date, default: null },
         baseAmount: { type: Number, required: true },
@@ -52,17 +52,14 @@ const expenseSchema = new Schema(
       },
     ],
     totalAmountPaid: {
-  type: Number,
-  required: true
-}
-,
-currency: {
-  type: String,
-  default: "INR",
-  match: /^[A-Z]{3}$/
-}
-
-
+      type: Number,
+      required: true,
+    },
+    currency: {
+      type: String,
+      default: "INR",
+      match: /^[A-Z]{3}$/,
+    },
   },
   { timestamps: true }
 );
@@ -76,4 +73,3 @@ expenseSchema.index({ createdAt: 1 });
 expenseSchema.index({ room: 1, "participants.hasPaid": 1 });
 
 export const Expense = mongoose.model("Expense", expenseSchema);
- 
