@@ -16,7 +16,7 @@ import { fcm } from './../firebase/config.js';
     throw new ApiError(400, "At least one participant is required");
   }
 
-  const baseAmount = totalAmount / participants.length;
+  const baseAmount = Math.round(totalAmount / participants.length);
   const formattedParticipants = participants.map(({ userId, additionalCharges }) => {
     const charges = (additionalCharges || []).map(({ amount, reason }) => ({ amount, reason }));
     const additionalTotal = charges.reduce((sum, c) => sum + c.amount, 0);
