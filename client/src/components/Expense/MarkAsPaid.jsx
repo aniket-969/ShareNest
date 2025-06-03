@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import FormWrapper from "@/components/ui/formWrapper";
 
 const MarkAsPaid = ({ expenseId, roomId }) => {
+
   const [isOpen, setIsOpen] = useState(false);
   const [paymentMode, setPaymentMode] = useState("");
   const { updatePaymentMutation } = useExpense(roomId);
@@ -26,7 +27,7 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
 
   return (
     <>
-      <Button size="sm" onClick={() => setIsOpen(true)}>
+      <Button className="" size="sm" onClick={() => setIsOpen(true)}>
         Mark as Paid
       </Button>
 

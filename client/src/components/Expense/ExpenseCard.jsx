@@ -35,7 +35,7 @@ const ExpenseCard = ({ expense, userId }) => {
   const youStatus = youPaid ? "Paid" : "Pending";
 
   return (
-    <Card className="w-full max-w-md rounded-sm shadow-md ">
+    <Card className="w-full max-w-md rounded-sm ">
       <CardHeader className="px-6 py-4">
         {/* Title + Total Amount */}
         <div className="flex items-center justify-between">
@@ -140,7 +140,7 @@ const ExpenseCard = ({ expense, userId }) => {
       </CardContent>
 
       <CardFooter className="px-6 py-4 flex justify-end">
-        <MarkAsPaid/>
+        <MarkAsPaid expenseId={expense?._id} roomId={expense?.roomId}/>
       </CardFooter>
     </Card>
   );

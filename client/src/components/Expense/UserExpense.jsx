@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import { Spinner } from "./../ui/spinner";
 import ExpenseCard from "./ExpenseCard";
 import { ScrollArea } from "../ui/scroll-area";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel";
+import { Card, CardContent } from "../ui/card";
 
 const UserExpense = ({ userExpenseQuery, userId }) => {
   const { data: expenses, isLoading, isError, error } = userExpenseQuery;
@@ -17,15 +19,31 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
   return (
     <div>
       <h3>To Pay</h3>
-      <ScrollArea>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 h-[530px] p-4 m-2 ">
-          {expenses.map((expense) => (
-            <ExpenseCard key={expense._id} userId={userId} expense={expense} />
-          ))}{" "}
-        </div>
-      </ScrollArea>
+      
+         <Carousel
+      opts={{
+        align: "start",
+      }}
+      className="w-[40rem]"
+    >
+      <CarouselContent>
+        {expenses.map((expense) => (
+          <CarouselItem key={expense._id} className="md:basis-1/2 lg:basis-1/3">
+            <div className="p-1">
+            
+                  <ExpenseCard key={expense._id} userId={userId} expense={expense} />
+                
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+       
+     
     </div>
   );
 };
-
+//  <ExpenseCard key={expense._id} userId={userId} expense={expense} />
 export default UserExpense;
