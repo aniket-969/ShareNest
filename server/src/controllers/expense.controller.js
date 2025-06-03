@@ -5,17 +5,17 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ExpenseEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { fcm } from './../firebase/config.js';
- 
-const createExpense = asyncHandler(async (req, res) => {
+ import { User } from "../models/user.model.js";
+
+ const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, imageUrl, dueDate, participants } = req.body;
+  const { title, totalAmount, imageUrl, dueDate, participants, currency } = req.body;
   const paidBy = req.user._id;
 
   if (!participants?.length) {
     throw new ApiError(400, "At least one participant is required");
   }
 
-  // Format participants & calculate owed amounts
   const baseAmount = totalAmount / participants.length;
   const formattedParticipants = participants.map(({ userId, additionalCharges }) => {
     const charges = (additionalCharges || []).map(({ amount, reason }) => ({ amount, reason }));
@@ -34,17 +34,17 @@ const createExpense = asyncHandler(async (req, res) => {
     title,
     paidBy,
     roomId,
-    totalAmount,
     imageUrl,
     dueDate,
     participants: formattedParticipants,
+    totalAmountPaid: 0,
+    currency: currency || "INR",
   });
 
   if (!expense) {
     throw new ApiError(500, "Expense creation failed");
   }
 
-  //  socket event for in-app notifications
   emitSocketEvent(
     req,
     roomId,
@@ -52,21 +52,14 @@ const createExpense = asyncHandler(async (req, res) => {
     expense
   );
 
-  //  FCM push to all participants 
   try {
-   
     const recipientIds = formattedParticipants.map((p) => p.user);
-
     const users = await User.find(
       { _id: { $in: recipientIds } },
       "notificationToken"
     ).lean();
 
-   
-    const tokens = users
-      .map((u) => u.notificationToken)
-      .filter(Boolean);
-
+    const tokens = users.map((u) => u.notificationToken).filter(Boolean);
     if (tokens.length) {
       const actorName = req.user.fullName || req.user.username || "Someone";
       await fcm.sendToDevice(tokens, {
@@ -79,7 +72,6 @@ const createExpense = asyncHandler(async (req, res) => {
     }
   } catch (err) {
     console.error("FCM push error:", err);
-    
   }
 
   return res

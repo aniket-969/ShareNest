@@ -30,7 +30,7 @@ const ExpenseCard = ({ expense, userId }) => {
   const userParticipant = expense.participants.find(
     (p) => p.user._id === userId
   );
-  const youOwe = userParticipant?.amountOwed ?? 0;
+  const youOwe = userParticipant?.totalAmountOwed ?? 0;
   const youPaid = userParticipant?.hasPaid ?? false;
   const youStatus = youPaid ? "Paid" : "Pending";
 
@@ -40,7 +40,7 @@ const ExpenseCard = ({ expense, userId }) => {
         {/* Title + Total Amount */}
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
-            {expense.name}
+            {expense.title}
           </CardTitle>
           <span className="text-lg font-bold text-accent-light">
             ₹{expense.totalAmount}

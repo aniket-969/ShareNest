@@ -4,6 +4,7 @@ const baseExpense = "expense";
 
 export const createExpense = async (data, roomId) => { 
   console.log(data,roomId)
+ 
   return axiosClient.post(`/${baseExpense}/${roomId}`, data);
 };
 
@@ -33,7 +34,7 @@ export const getUserExpense = async () => {
 };
 
 export const updatePayment = async (expenseId, updatedData) => {
-  console.log(data)
+  console.log(updatedData,expenseId)
   return
-  return axiosClient.patch(`/${baseExpense}/${expenseId}/payment`, data);
+  return axiosClient.patch(`/${baseExpense}/${expenseId}/payment`, updatedData);
 };

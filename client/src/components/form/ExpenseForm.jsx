@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { createExpenseSchema } from "@/schema/expenseSchema";
-import { zodResolver } from '@hookform/resolvers/zod';
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormItem,
@@ -17,19 +16,20 @@ import { toast } from "react-toastify";
 import { useExpense } from "@/hooks/useExpense";
 import { useParams } from "react-router-dom";
 import ParticipantSelector from "../ParticipantsSelector";
-import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
+import { currencyOptions } from "@/utils/helper";
 
 const ExpenseForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
+
   const onSubmit = async (values) => {
     console.log(values, roomId);
     // return;
     try {
-      const response = await createExpenseMutation.mutateAsync(values, roomId);
+      const response = await createExpenseMutation.mutateAsync(values);
       console.log(response);
       toast("Splitted Expense ");
     } catch (error) {
@@ -42,17 +42,19 @@ const ExpenseForm = ({ participants }) => {
     defaultValues: {
       title: "",
       totalAmount: 0,
-      imageUrl: "",
+      imageUrl: undefined,
       dueDate: undefined,
       paidBy: "",
       participants: [],
+      currency: "INR",
     },
   });
+
   console.log(form.formState.errors);
   return (
     <Form {...form}>
-      {/* title */}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+        {/* title */}
         <FormField
           control={form.control}
           name="title"
@@ -112,7 +114,11 @@ const ExpenseForm = ({ participants }) => {
             <FormItem>
               <FormLabel>Bill image link</FormLabel>
               <FormControl>
-                <Input placeholder="add link of expense" {...field} />
+                <Input
+                  placeholder="add link of expense"
+                  value={field.value || ""}
+                  onChange={(e) => field.onChange(e.target.value || undefined)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -136,11 +142,34 @@ const ExpenseForm = ({ participants }) => {
             </FormItem>
           )}
         />
-
-        <Button type="submit">Submit</Button>
+        <FormField
+          control={form.control}
+          name="currency"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Currency</FormLabel>
+              <FormControl>
+                <select
+                  {...field}
+                  className="w-full rounded border px-3 py-2 bg-background text-foreground"
+                >
+                  {currencyOptions.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={createExpenseMutation.isLoading}>
+          Submit
+        </Button>
       </form>
     </Form>
   );
 };
 
-export default ExpenseForm
+export default ExpenseForm;

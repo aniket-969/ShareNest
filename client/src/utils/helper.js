@@ -220,3 +220,32 @@ export function cldUrl(url, { width, height, quality = "auto", format = "auto" }
   );
 }
 
+// data/currencies.js
+export const currencyOptions = [
+  { code: "INR", label: "Indian Rupee (₹)" },
+  { code: "USD", label: "US Dollar ($)" },
+  { code: "EUR", label: "Euro (€)" },
+  { code: "GBP", label: "British Pound (£)" },
+  { code: "JPY", label: "Japanese Yen (¥)" },
+  { code: "CNY", label: "Chinese Yuan (¥)" },
+  { code: "AUD", label: "Australian Dollar (A$)" },
+  { code: "CAD", label: "Canadian Dollar (C$)" },
+  { code: "CHF", label: "Swiss Franc (CHF)" },
+  { code: "SGD", label: "Singapore Dollar (S$)" },
+  { code: "HKD", label: "Hong Kong Dollar (HK$)" },
+  { code: "NZD", label: "New Zealand Dollar (NZ$)" },
+  { code: "KRW", label: "South Korean Won (₩)" },
+  { code: "ZAR", label: "South African Rand (R)" },
+  { code: "SEK", label: "Swedish Krona (kr)" },
+  { code: "NOK", label: "Norwegian Krone (kr)" },
+  { code: "DKK", label: "Danish Krone (kr)" },
+  { code: "BRL", label: "Brazilian Real (R$)" },
+  { code: "MXN", label: "Mexican Peso (MX$)" },
+  { code: "RUB", label: "Russian Ruble (₽)" },
+  { code: "THB", label: "Thai Baht (฿)" },
+  { code: "IDR", label: "Indonesian Rupiah (Rp)" },
+  { code: "MYR", label: "Malaysian Ringgit (RM)" },
+  { code: "PHP", label: "Philippine Peso (₱)" },
+  { code: "AED", label: "UAE Dirham (د.إ)" },
+  { code: "SAR", label: "Saudi Riyal (﷼)" }
+];

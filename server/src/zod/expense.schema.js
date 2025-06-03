@@ -16,7 +16,7 @@ const participantSchema = z.object({
 
 export const createExpenseSchema = z.object({
   title: stringValidation(1, 50, "title"),
-  totalAmount: z.coerce
+  totalAmount: z.coerce 
     .number()
     .positive("Total amount must be a positive number")
     .min(1, "Minimum amount is 1")

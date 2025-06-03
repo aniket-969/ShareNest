@@ -25,15 +25,23 @@ export const createExpenseSchema = z.object({
     .positive("Total amount must be a positive number")
     .min(1, "Minimum amount is 1")
     .max(1000000, "Maximum amount allowed is ten lakh"),
-  imageUrl: optionalStringValidation(5, 300, "imageUrl"),
+  imageUrl: z.union([
+    z.string().url("Must be a valid URL"),
+    z.literal(""), 
+  ]).optional(),
   participants: z
     .array(participantSchema)
     .min(1, { message: "Minimum one participants is required" }),
   dueDate: z.coerce.date().optional(),
+   currency: z
+    .string()
+    .regex(/^[A-Z]{3}$/, "Currency must be a 3-letter code")
+    .optional()
+    .default("INR")
 });
-
+ 
 export const updatePaymentSchema = z.object({
-  paymentMode: stringValidation(1, 20, "Payment mode").optional(),
+  paymentMode: optionalStringValidation(1, 20, "Payment mode"),
 });
 
 export const updateExpenseSchema = z.object({
