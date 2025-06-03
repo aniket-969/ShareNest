@@ -21,6 +21,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import MarkAsPaid from "./MarkAsPaid";
 
 const ExpenseCard = ({ expense, userId }) => {
   const createdDate = format(new Date(expense.createdAt), "dd MMM yyyy");
@@ -34,7 +35,7 @@ const ExpenseCard = ({ expense, userId }) => {
   const youStatus = youPaid ? "Paid" : "Pending";
 
   return (
-    <Card className="w-full max-w-md rounded-xl shadow-md">
+    <Card className="w-full max-w-md rounded-sm shadow-md ">
       <CardHeader className="px-6 py-4">
         {/* Title + Total Amount */}
         <div className="flex items-center justify-between">
@@ -47,34 +48,35 @@ const ExpenseCard = ({ expense, userId }) => {
         </div>
 
         {/* Paid By + Date Row */}
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Avatar className="w-8 h-8">
+        <div className="mt-3 flex items-center justify-between gap-5 ">
+          <div className="flex items-center gap-2 ">
+            {/* Avatar + Fullname */}
+            
+                  <Avatar className="w-8 h-8">
               <AvatarImage
                 src={expense.paidBy.avatar}
                 alt={expense.paidBy.fullName}
               />
               <AvatarFallback>{expense.paidBy.fullName.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium text-foreground-light">
-              Paid by {expense.paidBy.fullName}
+            <span className="text-sm font-medium ">
+              {expense.paidBy.fullName}
             </span>
-          </div>
+            </div>
+          
           <span className="text-sm text-muted-foreground">{createdDate}</span>
         </div>
       </CardHeader>
 
-      <Separator />
-
       <CardContent className="px-6 py-4">
         {/* You Owe Section */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-10 ">
           <span className="text-base font-medium text-foreground-light">
             You owe: ₹{youOwe}
           </span>
           <Badge
             variant={youPaid ? "secondary" : "destructive"}
-            className="uppercase px-2 py-1 text-xs"
+            className="uppercase text-secondary-foreground px-2 py-1 text-xs"
           >
             {youStatus}
           </Badge>
@@ -138,7 +140,7 @@ const ExpenseCard = ({ expense, userId }) => {
       </CardContent>
 
       <CardFooter className="px-6 py-4 flex justify-end">
-        {/* for later */}
+        <MarkAsPaid/>
       </CardFooter>
     </Card>
   );

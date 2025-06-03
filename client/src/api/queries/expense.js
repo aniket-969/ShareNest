@@ -32,6 +32,8 @@ export const getUserExpense = async () => {
   return response?.data?.data
 };
 
-export const updatePayment = async (data) => {
-  return axiosClient.patch(`/${baseExpense}`, data);
+export const updatePayment = async (expenseId, updatedData) => {
+  console.log(data)
+  return
+  return axiosClient.patch(`/${baseExpense}/${expenseId}/payment`, data);
 };

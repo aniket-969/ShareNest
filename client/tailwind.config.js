@@ -12,10 +12,20 @@ export default {
   		colors: {
   			background: '#040404',
   			foreground: '#ffffff',
-  			card: {
-  				DEFAULT: '#de8c9d',
-  				foreground: '#fe2858'
-  			},
+
+ card: {
+  DEFAULT: '#232029',
+  foreground: '#f0e3f3'
+}
+
+
+
+,
+
+  			// card: {
+  			// 	DEFAULT: '#de8c9d',
+  			// 	foreground: '#fe2858'
+  			// },
   			popover: {
   				DEFAULT: '#040404',
   				foreground: '#de8c9d'

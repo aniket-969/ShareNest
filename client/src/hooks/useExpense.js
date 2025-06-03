@@ -60,11 +60,7 @@ export const useExpense = (roomId) => {
 
   const updatePaymentMutation = useMutation({
     mutationFn: ({ expenseId, updatedData }) =>
-      updatePayment(expenseId, updatedData),
-    onSuccess: (data, { expenseId }) => {
-      queryClient.invalidateQueries(["expense", expenseId]);
-      queryClient.invalidateQueries(["expense", "pending"]);
-    },
+      updatePayment(expenseId, updatedData)
   });
 
   const deleteExpenseMutation = useMutation({
