@@ -1,5 +1,5 @@
 // components/Expense/ExpenseCard.jsx
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogTrigger,
@@ -24,112 +24,136 @@ import {
 import MarkAsPaid from "./MarkAsPaid";
 
 const ExpenseCard = ({ expense, userId }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const createdDate = format(new Date(expense.createdAt), "dd MMM yyyy");
 
-  // Find the current user's participant record
-  const userParticipant = expense.participants.find( 
-    (p) => p.user._id === userId
+  // Calculate total expense amount by summing totalAmountOwed of all participants
+  const totalExpense = expense.participants.reduce(
+    (sum, p) => sum + p.totalAmountOwed,
+    0
   );
-  const youOwe = userParticipant?.totalAmountOwed ?? 0;
-  const youPaid = userParticipant?.hasPaid ?? false;
+
+  // Find current user's participant record
+  const userPart = expense.participants.find((p) =>
+    p.user._id === userId
+  );
+  const youOwe = userPart?.totalAmountOwed ?? 0;
+  const youPaid = userPart?.hasPaid ?? false;
   const youStatus = youPaid ? "Paid" : "Pending";
 
   return (
-     <Card className=" rounded-xl shadow-md bg-gray-800">
+    <Card className="rounded-xl shadow-md bg-gray-800">
+      {/* ───── Card Header ───── */}
       <CardHeader className="px-6 py-4">
-        {/* Title + Total Amount */}
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">
+          <CardTitle className="text-lg font-semibold text-gray-100">
             {expense.title}
           </CardTitle>
           <span className="text-lg font-bold text-accent-light">
-            ₹{expense.totalAmount}
+            ₹{totalExpense}
           </span>
         </div>
-
-        {/* Paid By + Date Row */}
-        <div className="mt-3 flex items-center justify-between gap-5 ">
-          <div className="flex items-center gap-2 ">
-            {/* Avatar + Fullname */}
-            
-                  <Avatar className="w-8 h-8">
+        <div className="mt-3 flex items-center justify-between gap-5">
+          <div className="flex items-center gap-2">
+            <Avatar className="w-8 h-8 ring-1 ring-gray-700">
               <AvatarImage
                 src={expense.paidBy.avatar}
                 alt={expense.paidBy.fullName}
               />
-              <AvatarFallback>{expense.paidBy.fullName.charAt(0)}</AvatarFallback>
+              <AvatarFallback>
+                {expense.paidBy.fullName.charAt(0)}
+              </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium ">
+            <span className="text-sm font-medium text-gray-100">
               {expense.paidBy.fullName}
             </span>
-            </div>
-          
-          <span className="text-sm text-muted-foreground">{createdDate}</span>
+          </div>
+          <span className="text-sm text-gray-400">{createdDate}</span>
         </div>
       </CardHeader>
 
+      {/* ───── Card Content ───── */}
       <CardContent className="px-6 py-4">
-        {/* You Owe Section */}
-        <div className="flex items-center justify-between mb-4 gap-10 ">
-          <span className="text-base font-medium text-foreground-light">
+        <div className="flex items-center justify-between mb-4 gap-10">
+          <span className="text-base font-medium text-gray-100">
             You owe: ₹{youOwe}
           </span>
           <Badge
             variant={youPaid ? "secondary" : "destructive"}
-            className="uppercase text-secondary-foreground px-2 py-1 text-xs"
+            className="uppercase px-2 py-1 text-xs"
           >
             {youStatus}
           </Badge>
         </div>
 
-        {/* Modal Trigger for Participants */}
-        <Dialog>
+        {/* Participants Modal Trigger */}
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" className="w-full" size="sm">
               Show Participants
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md bg-gray-900 text-gray-100">
             <DialogHeader>
               <DialogTitle>Participants</DialogTitle>
               <DialogDescription>
-                See who has paid and who still owes.
+                Breakdown of who owes what.
               </DialogDescription>
             </DialogHeader>
-            <div className="mt-4 space-y-3">
-              {expense.participants.map((p) => {
-                const paidStatus = p.hasPaid ? "Paid" : "Pending";
-                return (
-                  <div
-                    key={p._id}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Avatar className="w-7 h-7">
-                        <AvatarImage src={p.user.avatar} alt={p.user.fullName} />
-                        <AvatarFallback>
-                          {p.user.fullName.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm text-foreground-light">
-                        {p.user.fullName}
-                      </span>
+
+            <ScrollArea className="mt-4 max-h-72 px-5">
+              <div className="space-y-4">
+                {expense.participants.map((p) => {
+                  const status = p.hasPaid ? "Paid" : "Pending";
+                  return (
+                    <div key={p._id} className="flex flex-col space-y-1">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Avatar className="w-7 h-7 ring-1 ring-gray-700">
+                            <AvatarImage
+                              src={p.user.avatar}
+                              alt={p.user.fullName}
+                            />
+                            <AvatarFallback>
+                              {p.user.fullName.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm">{p.user.fullName}</span>
+                        </div>
+                        <span className="text-sm font-medium">
+                          ₹{p.totalAmountOwed}
+                        </span>
+                      </div>
+                      <div className="ml-10 text-sm text-gray-300">
+                        Base: ₹{p.baseAmount}
+                      </div>
+                      {p.additionalCharges.length > 0 && (
+                        <div className="ml-10 mt-1 space-y-1">
+                          <span className="text-sm text-gray-300">Extras:</span>
+                          {p.additionalCharges.map((c) => (
+                            <div
+                              key={c._id}
+                              className="text-sm text-gray-200"
+                            >
+                              • ₹{c.amount} – {c.reason}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="ml-10 mt-2">
+                        <Badge
+                          variant={p.hasPaid ? "secondary" : "destructive"}
+                          className="text-xs uppercase px-2 py-1"
+                        >
+                          {status}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-foreground-light">
-                        ₹{p.amountOwed}
-                      </span>
-                      <Badge
-                        variant={p.hasPaid ? "secondary" : "destructive"}
-                        className="uppercase px-2 py-1 text-xs"
-                      >
-                        {paidStatus}
-                      </Badge>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+
             <div className="mt-6 flex justify-end">
               <DialogClose asChild>
                 <Button variant="ghost">Close</Button>
@@ -139,8 +163,9 @@ const ExpenseCard = ({ expense, userId }) => {
         </Dialog>
       </CardContent>
 
+      {/* ───── Card Footer ───── */}
       <CardFooter className="px-6 flex justify-end">
-        <MarkAsPaid expenseId={expense?._id} roomId={expense?.roomId}/>
+        <MarkAsPaid expenseId={expense._id} roomId={expense.roomId} />
       </CardFooter>
     </Card>
   );
