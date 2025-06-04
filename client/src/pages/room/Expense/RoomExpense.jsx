@@ -37,7 +37,7 @@ const userId = JSON.parse(userData)?._id
           <FormWrapper onClose={() => setIsFormOpen(false)}>
             <ExpenseForm
               participants={participants}
-              onSubmit={() => setIsFormOpen(false)} // Close on submit
+              onSubmit={() => setIsFormOpen(false)} 
             />
           </FormWrapper>
         </Suspense>

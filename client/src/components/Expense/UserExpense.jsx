@@ -26,8 +26,8 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
     <div className="m-2">
       <h3>To Pay</h3>
 
-      <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
-        <CarouselContent  className={`-ml-4 ${
+      <Carousel className="bb lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
+        <CarouselContent  className={`-ml-4  ${
     expenses.length < 3 ? "sm:flex sm:justify-center sm:items-center" : ""
   }`}>
           {expenses.map((expense) => (

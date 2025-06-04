@@ -1,20 +1,27 @@
 // components/Expense/MarkAsPaid.jsx
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updatePaymentSchema } from "@/schema/expenseSchema"; 
+import { updatePaymentSchema } from "@/schema/expenseSchema";
 import { useExpense } from "@/hooks/useExpense";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogOverlay,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import FormWrapper from "@/components/ui/formWrapper";
 import { toast } from "react-toastify";
 
 const MarkAsPaid = ({ expenseId, roomId }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const { updatePaymentMutation } = useExpense(roomId);
-
   const {
     register,
     handleSubmit,
@@ -22,20 +29,9 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
     reset,
   } = useForm({
     resolver: zodResolver(updatePaymentSchema),
-    defaultValues: {
-      paymentMode: "",
-    },
+    defaultValues: { paymentMode: "" },
     mode: "onTouched",
   });
-
-  const openModal = () => {
-    reset();
-    setIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsOpen(false);
-  };
 
   const onSubmit = (values) => {
     updatePaymentMutation.mutate(
@@ -43,10 +39,9 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
       {
         onSuccess: () => {
           toast.success("Payment updated successfully");
-          closeModal();
+          reset();
         },
         onError: (err) => {
-          console.log(err)
           toast.error(err?.response?.data?.message || "Failed to update payment");
         },
       }
@@ -54,29 +49,40 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
   };
 
   return (
-    <>
-      <Button size="sm" onClick={openModal}>
-        Mark as Paid
-      </Button>
+    <Dialog >
+    
+      <DialogTrigger asChild>
+        <Button size="sm">Mark as Paid</Button>
+      </DialogTrigger>
 
-      {isOpen && (
-        <FormWrapper onClose={closeModal}>
+      <DialogOverlay className="fixed inset-0 z-50 bg-[#121212]/60 " /> 
+      <DialogContent className="fixed z-50 flex items-center justify-center ">
+       
+        <div className="w-full max-w-[30rem] p-10  bg-black mx-3 bmain rounded-[2.5rem]">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-6 max-w-md mx-auto p-6 rounded-2xl bg-background text-foreground shadow-md"
+            className="flex flex-col gap-6"
           >
-            <h3 className="text-lg font-semibold">Confirm Payment</h3>
-
-            <div>
-              <Label htmlFor="paymentMode" className="text-sm">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold text-white">
+                Confirm Payment
+              </DialogTitle>
+              <DialogDescription className="text-sm text-gray-400">
                 Payment Mode (optional)
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Payment Mode Field */}
+            <div>
+              <Label htmlFor="paymentMode" className="text-sm text-white">
+                Payment Mode
               </Label>
               <Input
                 id="paymentMode"
                 type="text"
                 {...register("paymentMode")}
                 placeholder="e.g., UPI, Cash"
-                className="mt-1"
+                className="mt-1 bg-gray-800 text-white"
               />
               {errors.paymentMode && (
                 <p className="mt-1 text-sm text-destructive">
@@ -85,17 +91,22 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
               )}
             </div>
 
+            {/* Buttons */}
             <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={closeModal}
-                disabled={isSubmitting || updatePaymentMutation.isLoading}
-              >
-                Cancel
-              </Button>
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  disabled={isSubmitting || updatePaymentMutation.isLoading}
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
               <Button
                 type="submit"
-                disabled={ isSubmitting || updatePaymentMutation.isLoading}
+                disabled={
+                  isSubmitting ||
+                  updatePaymentMutation.isLoading
+                }
               >
                 {isSubmitting || updatePaymentMutation.isLoading ? (
                   <Spinner size="sm" />
@@ -105,9 +116,9 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
               </Button>
             </div>
           </form>
-        </FormWrapper>
-      )}
-    </>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
