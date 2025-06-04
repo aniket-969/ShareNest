@@ -1,4 +1,4 @@
-// components/Expense/ExpenseCard.jsx
+
 import React, { useState } from "react";
 import { format } from "date-fns";
 import {
@@ -22,18 +22,22 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import MarkAsPaid from "./MarkAsPaid";
+import { currencyOptions } from "@/utils/helper"; 
 
 const ExpenseCard = ({ expense, userId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const createdDate = format(new Date(expense.createdAt), "dd MMM yyyy");
 
-  // Calculate total expense amount by summing totalAmountOwed of all participants
+  //  currency symbol 
+  const currencyObj = currencyOptions.find((c) => c.code === expense.currency);
+  const symbol = currencyObj?.label.match(/\((.*)\)/)?.[1] || expense.currency;
+
+  //  total expense 
   const totalExpense = expense.participants.reduce(
     (sum, p) => sum + p.totalAmountOwed,
     0
   );
 
-  // Find current user's participant record
   const userPart = expense.participants.find((p) =>
     p.user._id === userId
   );
@@ -50,7 +54,8 @@ const ExpenseCard = ({ expense, userId }) => {
             {expense.title}
           </CardTitle>
           <span className="text-lg font-bold text-accent-light">
-            ₹{totalExpense}
+            {symbol}
+            {totalExpense}
           </span>
         </div>
         <div className="mt-3 flex items-center justify-between gap-5">
@@ -76,7 +81,8 @@ const ExpenseCard = ({ expense, userId }) => {
       <CardContent className="px-6 py-4">
         <div className="flex items-center justify-between mb-4 gap-10">
           <span className="text-base font-medium text-gray-100">
-            You owe: ₹{youOwe}
+            You owe: {symbol}
+            {youOwe}
           </span>
           <Badge
             variant={youPaid ? "secondary" : "destructive"}
@@ -101,7 +107,7 @@ const ExpenseCard = ({ expense, userId }) => {
               </DialogDescription>
             </DialogHeader>
 
-            <ScrollArea className="mt-4 max-h-72 px-5">
+            <ScrollArea className="mt-4 max-h-72 overflow-auto">
               <div className="space-y-4">
                 {expense.participants.map((p) => {
                   const status = p.hasPaid ? "Paid" : "Pending";
@@ -121,11 +127,13 @@ const ExpenseCard = ({ expense, userId }) => {
                           <span className="text-sm">{p.user.fullName}</span>
                         </div>
                         <span className="text-sm font-medium">
-                          ₹{p.totalAmountOwed}
+                          {symbol}
+                          {p.totalAmountOwed}
                         </span>
                       </div>
                       <div className="ml-10 text-sm text-gray-300">
-                        Base: ₹{p.baseAmount}
+                        Base: {symbol}
+                        {p.baseAmount}
                       </div>
                       {p.additionalCharges.length > 0 && (
                         <div className="ml-10 mt-1 space-y-1">
@@ -135,7 +143,8 @@ const ExpenseCard = ({ expense, userId }) => {
                               key={c._id}
                               className="text-sm text-gray-200"
                             >
-                              • ₹{c.amount} – {c.reason}
+                              • {symbol}
+                              {c.amount} – {c.reason}
                             </div>
                           ))}
                         </div>

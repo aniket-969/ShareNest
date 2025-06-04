@@ -148,14 +148,7 @@ function isPatternMatch(task, targetDate, pattern, weekOfMonth) {
       return false;
   }
 }
-/**
- * Determine which participant should be assigned based on rotation or fixed assignment
- */
-/**
- * Given a matching pattern, chooses the right user:
- * - "single" mode → task.currentAssignee
- * - "rotation" mode → rotate through task.rotationOrder
- */
+
 function determineAssignee(task, targetDate, pattern) {
   //  Single 
   if (task.assignmentMode === "single" || pattern.frequency === "one-time") {
