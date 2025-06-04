@@ -27,7 +27,7 @@ const ExpenseCard = ({ expense, userId }) => {
   const createdDate = format(new Date(expense.createdAt), "dd MMM yyyy");
 
   // Find the current user's participant record
-  const userParticipant = expense.participants.find(
+  const userParticipant = expense.participants.find( 
     (p) => p.user._id === userId
   );
   const youOwe = userParticipant?.totalAmountOwed ?? 0;

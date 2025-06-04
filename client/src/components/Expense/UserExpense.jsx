@@ -26,9 +26,9 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
     <div className="m-2">
       <h3>To Pay</h3>
 
-      <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[20rem] my-4">
-        <CarouselContent  className={`-ml-4 flex touch-pan-x snap-x snap-mandatory ${
-    expenses.length < 3 ? "justify-center items-center" : ""
+      <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
+        <CarouselContent  className={`-ml-4 ${
+    expenses.length < 3 ? "sm:flex sm:justify-center sm:items-center" : ""
   }`}>
           {expenses.map((expense) => (
             <CarouselItem
@@ -46,8 +46,8 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="sm:ml-0 ml-4"/>
+        <CarouselNext className="sm:mr-0 mr-4"/>
       </Carousel>
     </div>
   );
