@@ -58,8 +58,6 @@ const getPendingPayments = asyncHandler(async (req, res) => {
     const additionalTotal = charges.reduce((sum, c) => sum + c.amount, 0);
     return {
       user: userId,
-      hasPaid: false,
-      paidDate: null,
       baseAmount,
       additionalCharges: charges,
       totalAmountOwed: baseAmount + additionalTotal,
@@ -88,6 +86,7 @@ const getPendingPayments = asyncHandler(async (req, res) => {
     expense
   );
 
+  // FCM notification
   try {
     const recipientIds = formattedParticipants.map((p) => p.user);
     const users = await User.find(
