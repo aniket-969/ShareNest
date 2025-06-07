@@ -9,15 +9,15 @@ import { fcm } from './../firebase/config.js';
 
 
 const getUserExpenses = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
+  const userId = req.user._id;
 
-  const expenses = await Expense.find({ "participants.user": userId }).select("-paymentHistory")
+  const expenses = await Expense.find({
+    "participants.user": userId,
+    paidBy: { $ne: userId }
+  })
     .populate("paidBy", "fullName avatar")
-    .populate("participants.user", "fullName avatar");
-
-  if (!expenses.length) {
-    return res.json(new ApiResponse(200, [], "No expenses found for the user"));
-  }
+    .populate("participants.user", "fullName avatar")
+    .lean();
 
   return res.json(
     new ApiResponse(200, expenses, "user expenses fetched successfully")
