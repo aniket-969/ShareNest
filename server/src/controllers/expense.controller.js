@@ -115,7 +115,7 @@ const getPendingPayments = asyncHandler(async (req, res) => {
 });
  
 const updatePayment = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
+  const userId = req.user._id;
   const { expenseId, roomId } = req.params;
   const { paymentMode } = req.body;
 
@@ -127,25 +127,25 @@ const updatePayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Expense not found or you’re not a participant");
   }
 
-  const participant = expense.participants.find((p) =>
-    p.user.equals(userId)
+  const alreadyPaid = expense.paymentHistory.some(ph =>
+    ph.user.equals(userId)
   );
-  if (participant.hasPaid) {
+  if (alreadyPaid) {
     throw new ApiError(400, "You have already paid for this expense");
   }
 
+  const participant = expense.participants.find(p =>
+    p.user.equals(userId)
+  );
   const paymentAmount = participant.totalAmountOwed;
 
   const updatedExpense = await Expense.findOneAndUpdate(
     {
       _id: expenseId,
       "participants.user": userId,
+      "paymentHistory.user": { $ne: userId }   
     },
     {
-      $set: {
-        "participants.$.hasPaid": true,
-        "participants.$.paidDate": new Date(),
-      },
       $push: {
         paymentHistory: {
           user: userId,
@@ -154,9 +154,7 @@ const updatePayment = asyncHandler(async (req, res) => {
           description: paymentMode || "",
         },
       },
-      $inc: {
-        totalAmountPaid: paymentAmount,
-      },
+      $inc: { totalAmountPaid: paymentAmount },
     },
     {
       new: true,
@@ -165,10 +163,10 @@ const updatePayment = asyncHandler(async (req, res) => {
   );
 
   if (!updatedExpense) {
-    throw new ApiError(500, "Failed to update payment");
+    
+    throw new ApiError(400, "You have already paid for this expense");
   }
 
- 
   emitSocketEvent(
     req,
     roomId,
@@ -177,9 +175,11 @@ const updatePayment = asyncHandler(async (req, res) => {
   );
 
   return res.json(
-    new ApiResponse(200, updatedExpense, "Payment updated successfully")
+    new ApiResponse(200, updatedExpense, "Payment recorded successfully")
   );
 });
+
+
 const deleteExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
 
