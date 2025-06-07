@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import { currencyOptions } from "@/utils/helper"; import { useState } from "react";
 import { format } from "date-fns";
 import {
   Card,
@@ -8,43 +7,43 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
-import MarkAsPaid from "./MarkAsPaid";
-import { currencyOptions } from "@/utils/helper"; 
 import ParticipantsModal from "./ParticipantsModal";
+import MarkAsPaid from "./MarkAsPaid";
 
 const ExpenseCard = ({ expense, userId }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Format the creation date
   const createdDate = format(new Date(expense.createdAt), "dd MMM yyyy");
 
-  //  currency symbol 
+  // Figure out currency symbol
   const currencyObj = currencyOptions.find((c) => c.code === expense.currency);
   const symbol = currencyObj?.label.match(/\((.*)\)/)?.[1] || expense.currency;
 
-  //  total expense 
+  // Total of all participants' owed amounts
   const totalExpense = expense.participants.reduce(
     (sum, p) => sum + p.totalAmountOwed,
     0
   );
 
-  const userPart = expense.participants.find((p) =>
-    p.user._id === userId
+  // user's share
+  const userPart = expense.participants.find((p) => 
+    p.user._id.toString() === userId.toString()
   );
   const youOwe = userPart?.totalAmountOwed ?? 0;
-  const youPaid = userPart?.hasPaid ?? false;
+
+  // check if user has paid 
+  const paymentRecord = expense.paymentHistory.find((ph) =>
+   ph.user.toString() === userId.toString()
+      
+  );
+  const youPaid = Boolean(paymentRecord);
   const youStatus = youPaid ? "Paid" : "Pending";
+  const paidDate = paymentRecord
+    ? format(new Date(paymentRecord.paymentDate), "dd MMM yyyy")
+    : null;
 
   return (
     <Card className="rounded-xl shadow-md bg-gray-800">
@@ -81,10 +80,15 @@ const ExpenseCard = ({ expense, userId }) => {
       {/* ───── Card Content ───── */}
       <CardContent className="px-6 py-4">
         <div className="flex items-center justify-between mb-4 gap-10">
-          <span className="text-base font-medium text-gray-100">
-            You owe: {symbol}
-            {youOwe}
-          </span>
+          <div>
+            <span className="text-base font-medium text-gray-100">
+              You owe: {symbol}
+              {youOwe}
+            </span>
+            {youPaid && paidDate && (
+              <div className="text-xs text-gray-400">Paid on {paidDate}</div>
+            )}
+          </div>
           <Badge
             variant={youPaid ? "secondary" : "destructive"}
             className="uppercase px-2 py-1 text-xs"
@@ -94,12 +98,23 @@ const ExpenseCard = ({ expense, userId }) => {
         </div>
 
         {/* Participants Modal Trigger */}
-        <ParticipantsModal expense={expense} symbol={symbol} status={status}/>
+        <ParticipantsModal
+          expense={expense}
+          symbol={symbol}
+          status={youStatus}
+          onOpen={() => setIsOpen(true)}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
       </CardContent>
 
       {/* ───── Card Footer ───── */}
       <CardFooter className="px-6 flex justify-end">
-        <MarkAsPaid expenseId={expense._id} roomId={expense.roomId} />
+        <MarkAsPaid
+          expenseId={expense._id}
+          roomId={expense.roomId}
+          disabled={youPaid}
+        />
       </CardFooter>
     </Card>
   );

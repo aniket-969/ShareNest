@@ -1,17 +1,17 @@
 import { useExpense } from "@/hooks/useExpense";
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Spinner } from "./../ui/spinner";
+import { Spinner } from "../../ui/spinner";
 import ExpenseCard from "./ExpenseCard";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea } from "../../ui/scroll-area";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "../ui/carousel";
-import { Card, CardContent } from "../ui/card";
+} from "../../ui/carousel";
+import { Card, CardContent } from "../../ui/card";
 
 const UserExpense = ({ userExpenseQuery, userId }) => {
   const { data: expenses, isLoading, isError, error } = userExpenseQuery;
@@ -23,10 +23,10 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
   }
   console.log("Userx", expenses[0]);
   return (
-    <div className="m-2">
-      <h3>To Pay</h3>
+    <div className=" mx-2 my-5">
+      <h3 className="font-semibold text-lg ml-2">To Pay -</h3>
 
-      <Carousel className="bb lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
+      <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
         <CarouselContent  className={`-ml-4  ${
     expenses.length < 3 ? "sm:flex sm:justify-center sm:items-center" : ""
   }`}>

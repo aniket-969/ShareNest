@@ -4,8 +4,8 @@ import { useExpense } from "@/hooks/useExpense";
 import { useRoom } from "@/hooks/useRoom";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import UserExpense from "@/components/Expense/UserExpense";
-import PendingExpense from "@/components/Expense/PendingExpense";
+import UserExpense from "@/components/Expense/userExpense/UserExpense";
+import PendingExpense from "@/components/Expense/pending/PendingExpense";
 
 const ExpenseForm = lazy(() => import("@/components/form/ExpenseForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -28,10 +28,16 @@ const userId = JSON.parse(userData)?._id
 
   return (
     <div className="flex flex-col gap-6 w-full items-center">
-      <h2 className="font-bold text-xl">Expense</h2>
 
-      <Button onClick={() => setIsFormOpen(true)}>Create Expense</Button>
+      {/* Heading and form button */}
+      <div className="flex items-center justify-center gap-40 w-full mx-5">
+        <h2 className="font-bold text-2xl">Expense</h2>
 
+      <Button onClick={() => setIsFormOpen(true)}>Create new Expense</Button>
+
+      </div>
+      
+      {/* Form Modal */}
       {isFormOpen && (
         <Suspense fallback={<Spinner />}>
           <FormWrapper onClose={() => setIsFormOpen(false)}>
@@ -42,9 +48,11 @@ const userId = JSON.parse(userData)?._id
           </FormWrapper>
         </Suspense>
       )}
+
+      {/* Expense and Pending cards */}
       <div>
         <UserExpense userExpenseQuery={userExpenseQuery} userId = {userId}/>
-        <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery} userId={userId}/>
+        {/* <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery} userId={userId}/> */}
       </div>
     </div>
   );

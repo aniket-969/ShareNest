@@ -6,10 +6,10 @@ import PendingExpenseCard from './PendingExpenseCard';
 const PendingExpense = ({userPendingExpenseQuery}) => {
     
     const {data,isLoading,isError} = userPendingExpenseQuery
-    // console.log("Pending",data.data)
+    console.log("Pending",data)
   return (
     <div>
-        <h3>Paid by you</h3>
+        <h3 className='font-semibold text-lg '>Personal expense</h3>
         <PendingExpenseCard/>
     </div>
   )

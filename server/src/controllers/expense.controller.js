@@ -18,7 +18,7 @@ const getUserExpenses = asyncHandler(async (req, res) => {
     .populate("paidBy", "fullName avatar")
     .populate("participants.user", "fullName avatar")
     .lean();
-
+console.log("This is expense",expenses)
   return res.json(
     new ApiResponse(200, expenses, "user expenses fetched successfully")
   );
