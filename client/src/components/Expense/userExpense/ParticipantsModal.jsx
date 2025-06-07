@@ -22,6 +22,11 @@ const ParticipantsModal = ({ expense, symbol }) => {
     return acc;
   }, {});
 
+  const payerId = expense.paidBy._id.toString();
+  if (!paidMap[payerId]) {
+    paidMap[payerId] = expense.createdAt;
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -95,7 +100,7 @@ const ParticipantsModal = ({ expense, symbol }) => {
                     >
                       {status}
                     </Badge>
-                    {hasPaid && (
+                    {hasPaid && paidDate && (
                       <span className="text-xs text-gray-400">
                         on {format(new Date(paidDate), "dd MMM yyyy")}
                       </span>
