@@ -23,8 +23,6 @@ const expenseSchema = new Schema(
     participants: [
       {
         user: { type: Schema.Types.ObjectId, ref: "User" },
-        hasPaid: { type: Boolean, default: false },
-        paidDate: { type: Date, default: null },
         baseAmount: { type: Number, required: true },
         additionalCharges: {
           type: [

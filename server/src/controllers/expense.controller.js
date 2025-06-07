@@ -7,6 +7,42 @@ import { emitSocketEvent } from "../socket/index.js";
 import { fcm } from './../firebase/config.js';
  import { User } from "../models/user.model.js";
 
+
+const getUserExpenses = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  const expenses = await Expense.find({ "participants.user": userId }).select("-paymentHistory")
+    .populate("paidBy", "fullName avatar")
+    .populate("participants.user", "fullName avatar");
+
+  if (!expenses.length) {
+    return res.json(new ApiResponse(200, [], "No expenses found for the user"));
+  }
+
+  return res.json(
+    new ApiResponse(200, expenses, "user expenses fetched successfully")
+  );
+});
+
+const getPendingPayments = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  const pendingExpense = await Expense.find({ paidBy: userId })
+    .populate("paidBy", "fullName avatar")
+    .populate("participants.user", "fullName avatar");
+
+  if (!pendingExpense.length) {
+    return res.json(new ApiResponse(200, [], "No user payment found"));
+  }
+
+  return res.json(
+    new ApiResponse(
+      200,
+      pendingExpense,
+      " Pending payments owed to user fetched successfully"
+    )
+  );
+});
+
  const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { title, totalAmount, imageUrl, dueDate, participants, currency } = req.body;
@@ -145,43 +181,6 @@ const updatePayment = asyncHandler(async (req, res) => {
     new ApiResponse(200, updatedExpense, "Payment updated successfully")
   );
 });
-
-
-const getUserExpenses = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
-
-  const expenses = await Expense.find({ "participants.user": userId }).select("-paymentHistory")
-    .populate("paidBy", "fullName avatar")
-    .populate("participants.user", "fullName avatar");
-
-  if (!expenses.length) {
-    return res.json(new ApiResponse(200, [], "No expenses found for the user"));
-  }
-
-  return res.json(
-    new ApiResponse(200, expenses, "user expenses fetched successfully")
-  );
-});
-
-const getPendingPayments = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
-  const pendingExpense = await Expense.find({ paidBy: userId })
-    .populate("paidBy", "fullName avatar")
-    .populate("participants.user", "fullName avatar");
-
-  if (!pendingExpense.length) {
-    return res.json(new ApiResponse(200, [], "No user payment found"));
-  }
-
-  return res.json(
-    new ApiResponse(
-      200,
-      pendingExpense,
-      " Pending payments owed to user fetched successfully"
-    )
-  );
-});
-
 const deleteExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
 
