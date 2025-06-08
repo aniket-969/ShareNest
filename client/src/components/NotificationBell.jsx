@@ -46,7 +46,7 @@ const NotificationBell = () => {
   };
 
   return (
-    <div className="notification rounded-3xl flex justify-center items-center hover:bg-muted/30 transition-colors bg-[#2f2b2b8d]">
+    <div className="notification rounded-3xl flex justify-center items-center hover:bg-muted/30 transition-colors bg-[#121212] border border-[#2a2a2a]">
       <div className="relative">
         <button onClick={toggle} className="p-2 ">
           <Bell className=" text-primary p-[0.15rem]" />
