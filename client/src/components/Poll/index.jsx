@@ -9,7 +9,7 @@ const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
 // console.log(initialPolls)
   return (
-    <div className="w-[25rem] h-[300px] rounded-lg shadow-md p-4 flex flex-col bmain">
+    <div className="w-[25rem] h-[300px] rounded-lg shadow-md p-4 flex flex-col  bg-[#121212] border border-[#2a2a2a] ">
       <div className="flex justify-between items-center mb-3">
         <h2 className="font-semibold text-lg">Polls</h2>
         <Button size="sm" onClick={() => setShowPoll(true)}>

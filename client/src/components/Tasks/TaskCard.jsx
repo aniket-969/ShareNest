@@ -3,11 +3,11 @@ import { Bell } from "lucide-react";
 import NotificationBell from "../NotificationBell";
 
 const TaskCard = ({ scheduledTasks }) => {
-  
+   
   return (
     <div className="relative ">
       <NotificationBell />
-      <div className="bmai max-w-md border rounded-lg p-3 clip bg-[#2f2b2b8d] ">
+      <div className=" max-w-md rounded-lg p-3 clip bg-[#121212] border border-[#2a2a2a] ">
         <h3 className="font-semibold text-base mx-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>

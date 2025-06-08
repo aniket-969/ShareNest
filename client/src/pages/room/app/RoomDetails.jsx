@@ -40,7 +40,7 @@ const RoomDetails = () => {
     <div className=" flex  w-full items-center justify-center gap-20  my-5">
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}
-        <div className=" rounded-2xl border p-4 shadow-md h-[320px] max-w-md bmain ">
+        <div className=" rounded-lg p-4 shadow-md h-[320px] max-w-md bg-[#121212] border border-[#2a2a2a]">
           <Calendar
             classNames={{
               months:

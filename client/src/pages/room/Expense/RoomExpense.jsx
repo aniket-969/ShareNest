@@ -30,7 +30,7 @@ const userId = JSON.parse(userData)?._id
     <div className="flex flex-col gap-6 w-full items-center">
 
       {/* Heading and form button */}
-      <div className="flex items-center justify-center gap-40 w-full mx-5">
+      <div className="flex items-start justify-center gap-40 w-full mx-5 my-5">
         <h2 className="font-bold text-2xl">Expense</h2>
 
       <Button onClick={() => setIsFormOpen(true)}>Create new Expense</Button>

@@ -52,7 +52,7 @@ const Tasks = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full items-center">
+    <div className="flex flex-col gap-6 w-full items-center ">
       <h2 className="font-bold text-xl">Tasks</h2>
 
       <Button onClick={() => setIsFormOpen(true)}>Create Task</Button>
