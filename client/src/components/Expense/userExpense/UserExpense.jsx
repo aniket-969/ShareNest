@@ -28,14 +28,14 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
 
       <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
         <CarouselContent  className={`-ml-4  ${
-    expenses.length < 3 ? "sm:flex sm:justify-center sm:items-center" : ""
+    expenses.length < 3 ? "sm:flex md:justify-center sm:items-center" : ""
   }`}>
           {expenses.map((expense) => (
             <CarouselItem
               key={expense._id}
               className="pl-4 md:basis-1/2 lg:basis-1/3"
             >
-                <div className="p-1 ">
+                <div className="p-1">
                     <ExpenseCard
                 key={expense._id}
                 userId={userId}
@@ -46,8 +46,8 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="sm:ml-0 ml-4"/>
-        <CarouselNext className="sm:mr-0 mr-4"/>
+        <CarouselPrevious className={`${expenses.length==1 ?"invisible":""} sm:ml-0 ml-4`}/>
+        <CarouselNext className={`${expenses.length==1 ?"invisible":""} sm:mr-0 mr-4`}/>
       </Carousel>
     </div>
   );

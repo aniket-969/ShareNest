@@ -52,7 +52,7 @@ const userId = JSON.parse(userData)?._id
       {/* Expense and Pending cards */}
       <div>
         <UserExpense userExpenseQuery={userExpenseQuery} userId = {userId}/>
-        {/* <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery} userId={userId}/> */}
+        <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery} userId={userId}/>
       </div>
     </div>
   );

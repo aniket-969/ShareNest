@@ -1,5 +1,5 @@
 
-const PendingExpenseCard = () => {
+const PendingExpenseCard = ({expense}) => {
   return (
     <div>PendingExpenseCard</div>
   )
