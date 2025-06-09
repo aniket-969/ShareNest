@@ -58,7 +58,7 @@ export const QRCarousel = ({ paymentMethod }) => {
                         <p className="font-semibold text-xl">
                           {payment.appName}
                         </p>
-                        <p className="text-gray-900 mb-2">{payment.type}</p>
+                        <p className="text-gray-600 mb-2">{payment.type}</p>
                         {qrImages[payment._id] ? (
                           <img
                             src={qrImages[payment._id]}
