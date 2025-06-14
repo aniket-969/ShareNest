@@ -17,11 +17,11 @@ const TaskCard = ({ scheduledTasks }) => {
               No tasks for this date.
             </p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-3 ">
               {scheduledTasks.map((task) => (
                 <li
                   key={task._id}
-                  className="p-3 rounded-xl bg-[#121212] transition"
+                  className="p-3 rounded-xl bg-card-muted transition "
                 >
                   <p className="font-semibold text-primary text-sm">
                     {task.title}

@@ -30,32 +30,34 @@ const PollVoteForm = ({ poll }) => {
   };
 
   return (
-    <div className="rounded-lg p-4 shadow">
+    <div className="rounded-lg p-4 shadow ">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
           <FormField
             control={form.control}
             name="optionId"
             render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel className="text-lg font-semibold text-foreground">
+              <FormItem className="">
+                {/* title */}
+                <FormLabel className="text-lg font-semibold text-foreground ">
                   {poll.title}
                 </FormLabel>
-                <FormControl>
+                <FormControl className="">
                   <RadioGroup
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    className="flex flex-col gap-2"
+                    className="flex flex-col gap-2 "
                   >
                     {poll.options.map((option) => (
                       <FormItem
                         key={option._id}
-                        className="flex items-center space-x-3"
+                        className="flex items-center bg-card-muted px-5 rounded-lg gap-3"
                       >
-                        <FormControl>
+                        {/* radio icon */}
+                        <FormControl className="">
                           <RadioGroupItem value={option._id} />
                         </FormControl>
-                        <FormLabel className="text-base font-normal">
+                        <FormLabel className="text-sm font-normal pb-3">
                           {option.optionText}
                         </FormLabel>
                       </FormItem>

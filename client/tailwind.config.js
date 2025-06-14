@@ -18,6 +18,8 @@ export default {
         card: {
           DEFAULT: "#121212",
           foreground: "#f0e3f3",
+           muted: "#1c1c1c",            
+    border: "#2a2a2a",   
         },
 
         // card: {

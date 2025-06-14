@@ -36,7 +36,7 @@ export const QRCarousel = ({ paymentMethod }) => {
   const totalPaymentMethods = paymentMethod.length;
   const items = [...paymentMethod];
 
-  // If less than 3 items, add AddPayment "fake" entries
+  // If less than 3 items, add AddPayment  entries
   if (totalPaymentMethods < 3) {
     const numAddButtons = 3 - totalPaymentMethods;
     for (let i = 0; i < numAddButtons; i++) {

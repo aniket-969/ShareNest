@@ -67,7 +67,7 @@ const Poll = ({ initialPolls }) => {
     );
   }
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 ">
       {/* unvoted/active polls first */}
       {voteForms.map((poll) => (
         <PollVoteForm poll={poll} key={poll._id} />
@@ -75,7 +75,7 @@ const Poll = ({ initialPolls }) => {
 
       {/*  voted results/end polls */}
       {resultCards.length > 0 && (
-        <div className="  border-t border-border">
+        <div className="">
           {resultCards.map((poll) => (
             <PollResults poll={poll} key={poll._id} />
           ))}
