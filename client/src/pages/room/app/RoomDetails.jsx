@@ -38,6 +38,8 @@ const RoomDetails = () => {
 
   return (
     <div className=" flex  w-full items-center justify-center xl:gap-20 gap-10  my-5 ">
+
+      {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}
         <div className=" rounded-lg p-4 shadow-md h-[320px] max-w-md bg-[#121212] border border-[#2a2a2a]">
@@ -60,6 +62,8 @@ const RoomDetails = () => {
         {/* Polls */}
         <PollCard initialPolls={data.polls} />
       </div>
+
+      {/* Tasks and chat container */}
       <div className="flex flex-col gap-5 ">
         {/* Scheduled Tasks */}
         <TaskCard scheduledTasks={scheduledTasks} />
