@@ -3,7 +3,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
-  Route,
+  Route, 
   Outlet,
 } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,7 +11,6 @@ import { useQueryClient } from "@tanstack/react-query";
 // Layouts
 import Layout from "@/layouts/Layout.jsx";
 import AuthLayout from "@/layouts/AuthLayout.jsx";
-// import RoomLayout from "@/layouts/RoomLayout.jsx";
 
 // Providers and utilities
 import { SocketProvider } from "@/socket.jsx";
