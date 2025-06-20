@@ -2,9 +2,10 @@ import { useParams } from "react-router-dom";
 import { useState, Suspense, lazy } from "react";
 import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; 
 import AwardCard from "@/components/ui/awardCard";
 import AwardsSkeleton from "@/components/skeleton/Award/award";
+import { useAward } from "@/hooks/useAwards";
 
 const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -14,6 +15,7 @@ const Awards = () => {
   const { roomQuery } = useRoom(roomId);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [manageMode, setManageMode] = useState(false);
+const {deleteAwardMutation} = useAward()
 
   if (roomQuery.isLoading) return <AwardsSkeleton />;
   if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
@@ -30,6 +32,7 @@ const Awards = () => {
 
   const handleDelete = (awardId) => {
     console.log('Delete this award with id:', awardId);
+    deleteAwardMutation.mutate({roomId,awardId})
   };
 
   return (
