@@ -42,7 +42,7 @@ const RoomDetails = () => {
       {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}
-        <div className=" rounded-lg p-4 shadow-md h-[320px] max-w-md bg-[#121212] borde border-[#2a2a2a]">
+        <div className=" rounded-lg p-4 shadow-md h-[320px] max-w-md bg-[#1c1f26] borde border-[#2a2a2a]">
           <Calendar
             classNames={{
               months:
