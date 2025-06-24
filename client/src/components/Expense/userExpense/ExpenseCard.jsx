@@ -73,7 +73,7 @@ const ExpenseCard = ({ expense, userId }) => {
               {expense.paidBy.fullName}
             </span>
           </div>
-          <span className="text-sm text-gray-400">{createdDate}</span>
+          <span className="text-sm text-gray-400 ">{createdDate}</span>
         </div>
       </CardHeader>
 

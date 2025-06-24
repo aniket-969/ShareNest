@@ -30,13 +30,13 @@ const PendingExpenseCard = ({ expense, userId }) => {
   ).length;
 
   return (
-    <Card className="rounded-lg bg-card  ">
+    <Card className="rounded-lg bg-card">
       <CardHeader className="px-6 py-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold text-card-foreground">
             {expense.title}
           </CardTitle>
-          <span className="text-lg font-bold text-accent">
+          <span className="text-lg font-bold ">
             {symbol}{totalExpense}
           </span>
         </div>
@@ -50,7 +50,7 @@ const PendingExpenseCard = ({ expense, userId }) => {
               {expense.paidBy.fullName}
             </span>
           </div>
-          <span className="text-sm text-muted">{createdDate}</span>
+          <span className="text-sm text-gray-400">{createdDate}</span>
         </div>
       </CardHeader>
 
