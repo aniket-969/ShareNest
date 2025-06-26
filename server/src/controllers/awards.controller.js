@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { emitSocketEvent } from "../socket/index.js";
-    
+     
 const customRoomAward = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { title, description, image, criteria, assignedTo } = req.body;
@@ -59,7 +59,7 @@ const deleteRoomAward = asyncHandler(async (req, res) => {
   );
   return res.json(new ApiResponse(200, {}, "Awards deleted successfully"));
 });
-
+ 
 const updateRoomAward = asyncHandler(async (req, res) => {
   const { roomId, awardId } = req.params;
   const { title, description, image, criteria, assignedTo } = req.body;

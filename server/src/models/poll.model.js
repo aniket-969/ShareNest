@@ -10,7 +10,7 @@ const pollSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
+    }, 
     voteEndTime: {
       type: Date,
       required: true,
