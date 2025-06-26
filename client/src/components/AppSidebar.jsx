@@ -74,10 +74,10 @@ const AppSidebar = ({roomData})=> {
   // console.log("sidebar rendered");
   
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar >
+      <SidebarContent className="">
         {/* Room Info */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b ">
           <h2 className="text-lg font-bold line-clamp-1">
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>

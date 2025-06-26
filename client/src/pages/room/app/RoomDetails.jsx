@@ -20,7 +20,7 @@ const RoomDetails = () => {
   // console.log(data);
   const [date, setDate] = useState(new Date());
   const [scheduledTasks, setScheduledTasks] = useState([]);
-// console.log(scheduledTasks)
+console.log(data?.tasks)
 
   useEffect(() => {
     if (data?.tasks) {

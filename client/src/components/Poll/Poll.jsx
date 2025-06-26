@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 
 const Poll = ({ initialPolls }) => {
   const [polls, setPolls] = useState(initialPolls);
-  console.log(polls)
+  // console.log(polls)
   const { sessionQuery } = useAuth();
   const { data: user, isLoading, isError } = sessionQuery;
   const { roomId } = useParams();
@@ -60,7 +60,7 @@ const Poll = ({ initialPolls }) => {
       voteForms.push(poll);
     }
   }
-  console.log(voteForms,resultCards)
+  // console.log(voteForms,resultCards)
   if (voteForms.length == 0 && resultCards.length == 0) {
     return (
       <p className="text-muted-foreground text-sm">Room has no polls.</p>
