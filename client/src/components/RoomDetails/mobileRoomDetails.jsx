@@ -1,0 +1,106 @@
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+
+import { useRoom } from "@/hooks/useRoom"
+import { getTasksForDate } from "@/utils/helper"
+
+import RoomDetailsLoader from "@/components/skeleton/RoomDetails"
+import TaskCard from "@/components/Tasks/TaskCard"
+import PollCard from "@/components/Poll"
+import Chat from "@/pages/room/Chat/Chat"
+
+import { Calendar } from "@/components/ui/calendar"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { MessageCircle as ChatIcon } from "lucide-react"
+
+const MobileRoomDetails = () => {
+  const { roomId } = useParams()
+  const { roomQuery } = useRoom(roomId)
+  const { data, isLoading, isError } = roomQuery
+
+  const [date, setDate] = useState(new Date())
+  const [scheduledTasks, setScheduledTasks] = useState([])
+
+  const [isPollOpen, setIsPollOpen] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(false)
+
+  useEffect(() => {
+    if (data?.tasks) {
+      setScheduledTasks(getTasksForDate(data.tasks, date))
+    }
+  }, [data, date])
+
+  if (isLoading) return <RoomDetailsLoader />
+  if (isError)   return <>Something went wrong. Please refresh.</>
+
+  return (
+    <div className="flex flex-col items-center px-5 ">
+      {/* Poll & Chat buttons */}
+     
+      <div className="flex w-full max-w-[25rem] justify-end gap-2">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+             poll
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md w-full">
+           
+            <PollCard initialPolls={data.polls} />
+           
+          </DialogContent>
+        </Dialog>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <ChatIcon />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md w-full">
+            
+            <Chat />
+          
+          </DialogContent>
+        </Dialog>
+      </div>
+ <div  className="flex flex-col items-center gap-8 w-full ">
+          <div className="w-full max-w-[25rem] bg-card rounded-lg shadow-md p-4 border border-card-border">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          className="h-[300px] w-full rounded-xl"
+          classNames={{
+            months:
+              "flex w-full flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 flex-1",
+            month: "space-y-4 w-full flex flex-col",
+            table: "w-full h-full border-collapse space-y-1",
+            head_row: "",
+            row: "w-full mt-2",
+          }}
+        />
+      </div>
+
+      {/* Tasks */}
+      <div className="w-full max-w-[25rem]">
+        <TaskCard scheduledTasks={scheduledTasks} />
+      </div>
+      </div>
+      {/* Calendar */}
+    
+    </div>
+  )
+}
+
+export default MobileRoomDetails

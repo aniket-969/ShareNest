@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider,SidebarTrigger } from "../ui/sidebar";
-import { AppSidebar } from "../AppSidebar";
+import { AppSidebar } from "../RoomDetails/AppSidebar";
 import LogOut from "../LogOut";
 
 export const RoomHeader = () => {

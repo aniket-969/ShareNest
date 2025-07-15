@@ -4,6 +4,14 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens: {
+       
+        bs: { max: "929px" },
+          sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -18,8 +26,8 @@ export default {
         card: {
           DEFAULT: "#121212",
           foreground: "#f0e3f3",
-           muted: "#1c1c1c",            
-    border: "#2a2a2a",   
+          muted: "#1c1c1c",
+          border: "#2a2a2a",
         },
 
         // card: {

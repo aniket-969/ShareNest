@@ -2,7 +2,7 @@ import { getSocket } from "@/socket";
 import { Suspense, useEffect } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar } from "@/components/RoomDetails/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 import { Spinner } from "@/components/ui/spinner";
 import { useRoom } from "@/hooks/useRoom";
