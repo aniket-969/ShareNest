@@ -1,3 +1,4 @@
+import ChatSkeleton from "@/components/skeleton/Chat/chatSkeleton";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,7 +24,7 @@ const Chat = () => {
     isError: isUserError,
   } = sessionQuery;
 
-  if (isMessageLoading || isUserLoading) return <Spinner />;
+  if (isMessageLoading || isUserLoading) return <ChatSkeleton />;
   if (isMessageError || isUserError)
     return <>Something went wrong. Please refresh.</>;
   // Flatten the messages array from all pages

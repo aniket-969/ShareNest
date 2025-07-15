@@ -11,6 +11,8 @@ import PollCard from "@/components/Poll";
 import { getTasksForDate } from "@/utils/helper";
 import TaskCard from "@/components/Tasks/TaskCard";
 import { Calendar } from "@/components/ui/calendar";
+import RoomLoader from "@/components/skeleton/Room";
+import RoomDetailsLoader from "@/components/skeleton/RoomDetails";
 
 const RoomDetails = () => {
   const { roomId } = useParams();
@@ -29,7 +31,7 @@ console.log(data?.tasks)
   }, [data, date]);
 
   if (isLoading) {
-    return <Spinner />;
+    return <RoomDetailsLoader />;
   }
 
   if (isError) {

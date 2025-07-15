@@ -1,6 +1,6 @@
-import ProfileSkeleton from "../skeleton/Room/profile";
-import QrCodeSkeleton from "../skeleton/Room/qrCode";
-import RoomListSkeleton from "../skeleton/Room/roomList";
+import ProfileSkeleton from "./profile";
+import QrCodeSkeleton from "./qrCode";
+import RoomListSkeleton from "./roomList";
 
 const RoomLoader = () => {
   return (
