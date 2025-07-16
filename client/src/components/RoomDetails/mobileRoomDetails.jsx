@@ -44,7 +44,7 @@ const MobileRoomDetails = () => {
   if (isError)   return <>Something went wrong. Please refresh.</>
 
   return (
-    <div className="flex flex-col items-center px-5 gap-2">
+    <div className="flex flex-col items-center px-5 py-2 gap-2">
       {/* Poll & Chat buttons */}
      
       <div className="flex w-full max-w-[25rem] justify-end gap-2 mx-2 ">
@@ -54,7 +54,7 @@ const MobileRoomDetails = () => {
              poll
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-lg p-4 shadow-md h-[320px] max-w-md bg-card border-[#2a2a2a] w-full">
+          <DialogContent className="rounded-lg p-4 shadow-md max-h-[420px] h-full max-w-md bg-card border-[#2a2a2a] w-full ">
            
             <PollCard initialPolls={data.polls} />
            

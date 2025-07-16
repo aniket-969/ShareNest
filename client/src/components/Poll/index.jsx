@@ -10,7 +10,7 @@ const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
 // console.log(initialPolls)
   return (
-    <div className="bs:w-[25rem] h-[305px] rounded-lg shadow-md p-5 flex flex-col bg-card border-[#2a2a2a] ">
+    <div className="bs:w-[25rem] bs:h-[305px] h-[400px] rounded-lg shadow-md p-5 flex flex-col bg-card border-[#2a2a2a] ">
     
       {/* Title and create poll button */}
       <div className="flex justify-between items-center pb-1 mb-3 ">
@@ -26,7 +26,7 @@ const PollCard = ({ initialPolls }) => {
         </FormWrapper>
       )}
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 ">
         <Poll initialPolls={initialPolls} />
       </ScrollArea>
     </div>
