@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
 import { useRoom } from "@/hooks/useRoom"
@@ -6,8 +6,8 @@ import { getTasksForDate } from "@/utils/helper"
 
 import RoomDetailsLoader from "@/components/skeleton/RoomDetails"
 import TaskCard from "@/components/Tasks/TaskCard"
-import PollCard from "@/components/Poll"
-import Chat from "@/pages/room/Chat/Chat"
+// import PollCard from "@/components/Poll"
+// import Chat from "@/pages/room/Chat/Chat"
 
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,9 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { MessageCircle as ChatIcon } from "lucide-react"
+
+const PollCard = React.lazy(()=>import("@/components/Poll"))
+const Chat = React.lazy(()=>import("@/pages/room/Chat/Chat"))
 
 const MobileRoomDetails = () => {
   const { roomId } = useParams()
