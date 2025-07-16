@@ -22,6 +22,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { MessageCircle as ChatIcon } from "lucide-react"
+import MobileRoomDetailsLoader from "../skeleton/RoomDetails/mobileLoader"
 
 const PollCard = React.lazy(()=>import("@/components/Poll"))
 const Chat = React.lazy(()=>import("@/pages/room/Chat/Chat"))
@@ -43,7 +44,7 @@ const MobileRoomDetails = () => {
     }
   }, [data, date])
 
-  if (isLoading) return <RoomDetailsLoader />
+  if (isLoading) return <MobileRoomDetailsLoader />
   if (isError)   return <>Something went wrong. Please refresh.</>
 
   return (
