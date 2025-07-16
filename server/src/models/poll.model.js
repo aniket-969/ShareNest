@@ -5,12 +5,12 @@ const pollSchema = new Schema(
     title: {
       type: String,
       required: true,
-    },
+    }, 
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    }, 
+    },  
     voteEndTime: {
       type: Date,
       required: true,

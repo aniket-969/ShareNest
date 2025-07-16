@@ -10,7 +10,7 @@ export const RoomEventEnum = Object.freeze({
 });
 
 export const AvailableRoomEvents = Object.values(RoomEventEnum);
-
+ 
 export const ChatEventEnum = Object.freeze({
   JOIN_CHAT_EVENT: "joinChat",
   // ? when participant gets removed from group, chat gets deleted or leaves a group

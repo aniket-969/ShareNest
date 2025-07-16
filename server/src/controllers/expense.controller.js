@@ -63,7 +63,10 @@ const getPendingPayments = asyncHandler(async (req, res) => {
       totalAmountOwed: baseAmount + additionalTotal,
     };
   });
-
+const payerPart = formattedParticipants.find(
+    (p) => p.user.toString() === paidBy.toString()
+  );
+  const payerAmount = payerPart?.totalAmountOwed ?? 0;
   const expense = await Expense.create({
     title,
     paidBy,
@@ -72,6 +75,14 @@ const getPendingPayments = asyncHandler(async (req, res) => {
     dueDate,
     participants: formattedParticipants,
     totalAmountPaid: 0,
+      paymentHistory: [
+      {
+        user: paidBy,
+        amount: payerAmount,
+        paymentDate: new Date(),
+        description: "Self-paid share",
+      },
+    ],
     currency: currency || "INR",
   });
 
@@ -178,7 +189,6 @@ const updatePayment = asyncHandler(async (req, res) => {
     new ApiResponse(200, updatedExpense, "Payment recorded successfully")
   );
 });
-
 
 const deleteExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
