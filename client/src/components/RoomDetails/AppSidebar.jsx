@@ -19,7 +19,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link,useLocation } from "react-router-dom";
 
 const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
 const PendingRequests = lazy(
@@ -30,7 +30,7 @@ const AppSidebar = ({roomData})=> {
   const { roomId } = useParams();
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
-
+ const location = useLocation();
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
@@ -106,9 +106,13 @@ const AppSidebar = ({roomData})=> {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {items.map((item) => 
+              {
+                 const isActive = location.pathname === item.url;
+
+                return(
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title} data-active={isActive}>
                     <Link
                       to={item.url}
                       className="flex items-center space-x-3 px-3 py-2 hover:bg-accent rounded-lg"
@@ -118,7 +122,7 @@ const AppSidebar = ({roomData})=> {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              )})}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
