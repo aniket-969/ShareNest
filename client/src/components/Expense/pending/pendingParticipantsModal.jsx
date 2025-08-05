@@ -66,7 +66,7 @@ export const PendingParticipantsModal = ({ expense, symbol }) => {
                           Paid on {format(new Date(paidDate), "dd MMM yyyy")}
                         </div>
                       ) : (
-                        <Badge variant="destructive" className="text-xs uppercase px-2 py-1">
+                        <Badge variant="" className="text-[0.7rem] uppercase px-2 py-1 ml-2">
                           Pending
                         </Badge>
                       )}
