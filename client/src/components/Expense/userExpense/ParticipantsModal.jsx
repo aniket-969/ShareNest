@@ -95,8 +95,8 @@ const ParticipantsModal = ({ expense, symbol }) => {
                   {/* Paid / Pending badge (and date if paid) */}
                   <div className="ml-10 mt-2 flex items-center space-x-2">
                     <Badge
-                      variant={hasPaid ? "secondary" : "destructive"}
-                      className="text-xs uppercase px-2 py-1"
+                      variant={hasPaid ? "secondary" : ""}
+                      className="text-[0.7rem] uppercase px-2 py-1"
                     >
                       {status}
                     </Badge>
