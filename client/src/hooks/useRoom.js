@@ -37,7 +37,6 @@ export const useRoom = (roomId) => {
   },
 });
 
-
   const deleteRoomMutation = useMutation({
     queryFn: deleteRoom,
     onSuccess: () => {

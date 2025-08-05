@@ -3,7 +3,7 @@ import TaskSkeleton from '../Task/taskSkeleton'
 
 const MobileRoomDetailsLoader = () => {
   return (
-      <div className="flex flex-col items-center px-5 py-2 gap-2">
+      <div className="flex flex-col items-center px-5 py-2 gap-2 mt-12">
      
      
  <div  className="flex flex-col items-center gap-8 w-full ">

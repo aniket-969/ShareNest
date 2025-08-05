@@ -27,7 +27,7 @@ const userId = JSON.parse(userData)?._id
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full items-center">
+    <div className="flex flex-col gap-1 w-full items-center ">
 
       {/* Heading and form button */}
       <div className="flex items-start justify-center gap-40 w-full mx-5 mt-5 mb-1">

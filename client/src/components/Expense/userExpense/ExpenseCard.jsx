@@ -46,7 +46,7 @@ const ExpenseCard = ({ expense, userId }) => {
     : null;
 
   return (
-    <Card className="rounded-lg bg-card border border-[#2a2a2a]">
+    <Card className="rounded-lg bg-card border">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 py-4">
         <div className="flex items-center justify-between">
@@ -86,12 +86,12 @@ const ExpenseCard = ({ expense, userId }) => {
               {youOwe}
             </span>
             {youPaid && paidDate ? (
-              <div className="text-xs text-gray-400">Paid on {paidDate}</div>
+              <div className="text-xs text-gray-400 ">Paid on {paidDate}</div>
             ):(  <div className="text-xs text-card">Paid on</div>)}
           </div>
           <Badge
-            variant={youPaid ? "secondary" : "destructive"}
-            className="uppercase px-2 py-1 text-xs"
+            variant={youPaid ? "secondary" : ""}
+            className="uppercase px-2 py-1 text-[0.72rem]"
           >
             {youStatus}
           </Badge>

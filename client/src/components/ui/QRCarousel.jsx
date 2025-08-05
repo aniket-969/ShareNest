@@ -46,13 +46,13 @@ export const QRCarousel = ({ paymentMethod }) => {
 
   return (
     <div className="flex flex-col items-center">
-      <Carousel className="w-full max-w-[14rem] md:max-w-[20rem] sm:max-w-[15rem]">
+      <Carousel className="w-full max-w-[14rem] md:max-w-[20rem] sm:max-w-[15rem] ">
         <CarouselContent>
           {items.map((payment, index) => (
             <CarouselItem key={payment._id}>
-              <div className="h-full">
-                <Card className="h-full">
-                  <CardContent className="flex flex-col items-center justify-center h-full font-semibold text-sm md:text-xl sm:text-base sm:gap-2 pt-2">
+              <div className="h-full ">
+                <Card className="h-full bg-card">
+                  <CardContent className="flex flex-col items-center justify-center h-full font-semibold text-sm md:text-xl sm:text-base sm:gap-2 pt-2 ">
                     {payment.appName ? (
                       <>
                         <p className="font-semibold text-xl">

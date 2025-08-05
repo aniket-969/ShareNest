@@ -58,7 +58,7 @@ const MobileRoomDetails = () => {
              poll
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-lg p-4 shadow-md max-h-[420px] h-full max-w-md bg-card border-[#2a2a2a] w-full ">
+          <DialogContent className="rounded-lg p-4 shadow-md max-h-[420px] h-full max-w-md bg-card w-full ">
            
             <PollCard initialPolls={data.polls} />
            
@@ -78,8 +78,10 @@ const MobileRoomDetails = () => {
           </DialogContent>
         </Dialog>
       </div>
+      
  <div  className="flex flex-col items-center gap-8 w-full ">
-          <div className="w-full max-w-[25rem] bg-card rounded-lg shadow-md p-4 border border-card-border">
+   {/* Calendar */}
+          <div className="w-full max-w-[25rem] bg-card rounded-lg shadow-md p-4 border ">
         <Calendar
           mode="single"
           selected={date}
@@ -101,7 +103,7 @@ const MobileRoomDetails = () => {
         <TaskCard scheduledTasks={scheduledTasks} />
       </div>
       </div>
-      {/* Calendar */}
+     
     
     </div>
   )
