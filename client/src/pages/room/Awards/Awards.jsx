@@ -7,7 +7,7 @@ import AwardCard from "@/components/ui/awardCard";
 import AwardsSkeleton from "@/components/skeleton/Award/award";
 import { useAward } from "@/hooks/useAwards";
 
-const AwardsForm = lazy(() => import("@/components/form/AwardsForm"));
+const AwardsForm = lazy(() => import("@/components/form/awards/AwardsForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
 
 const Awards = () => {

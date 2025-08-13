@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import PollVoteForm from "../form/PollVoteForm";
+import PollVoteForm from "../form/poll/PollVoteForm";
 import { PollResults } from "./PollResults";
 import { useEffect, useState } from "react";
 import { getSocket } from "@/socket";

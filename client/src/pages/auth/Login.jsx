@@ -1,4 +1,4 @@
-import { SignIn } from '@/components/form/LoginForm'
+import { SignIn } from '@/components/form/auth/LoginForm'
 import React from 'react'
 import { Link } from 'react-router-dom'
  

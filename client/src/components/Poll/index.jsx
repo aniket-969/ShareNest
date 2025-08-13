@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { PollForm } from "../form/PollForm";
-import { Button } from "../ui/button";
-import FormWrapper from "../ui/formWrapper";
+import { PollForm } from "@/components/form/poll/PollForm";
+import { Button } from "@/components/ui/button";
+import FormWrapper from "@/components/ui/formWrapper";
 import Poll from "./Poll";
-import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);

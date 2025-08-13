@@ -1,8 +1,6 @@
 import { Spinner } from "@/components/ui/spinner";
 import { useRoom, useRoomMutation } from "@/hooks/useRoom";
 import { useParams } from "react-router-dom";
-import { PollForm } from "@/components/form/PollForm";
-import PollVote from "@/components/Poll/Poll";
 import { getSocket } from "@/socket";
 import { useEffect, useState } from "react";
 import RoomCalendar from "@/pages/room/Calendar/RoomCalendar";
