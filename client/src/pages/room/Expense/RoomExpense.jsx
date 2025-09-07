@@ -27,10 +27,10 @@ const userId = JSON.parse(userData)?._id
   ];
 
   return (
-    <div className="flex flex-col gap-1 items-center">
+    <div className="flex flex-col gap-2 items-center">
 
       {/* Heading and form button */}
-      <div className="flex items-center justify-around mt-5 mb-1 w-full">
+      <div className="flex items-center justify-around  w-full">
         <h2 className="font-bold text-2xl">Expense</h2>
 
       <Button onClick={() => setIsFormOpen(true)}>Create new Expense</Button>
@@ -50,7 +50,7 @@ const userId = JSON.parse(userData)?._id
       )}
 
       {/* Expense and Pending cards */}
-      <div>
+      <div className="">
         <UserExpense userExpenseQuery={userExpenseQuery} userId = {userId}/>
         <PendingExpense userPendingExpenseQuery={userPendingExpenseQuery} userId={userId}/>
       </div>

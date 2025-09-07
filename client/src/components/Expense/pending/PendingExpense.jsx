@@ -19,7 +19,7 @@ console.log(expenses)
 
   return (
     <div className="mx-2 my-5">
-      <h3 className="font-semibold text-lg ml-2">Pending Expenses –</h3>
+      <h3 className="font-semibold text-lg ml-2">Your Payments –</h3>
 
       <Carousel className="lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
         <CarouselContent

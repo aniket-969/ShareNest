@@ -37,6 +37,11 @@ const AppSidebar = ({roomData})=> {
   };
 
   const toggleRequests = () => {
+    console.log(roomData?.pendingRequests)
+    if(roomData?.pendingRequests?.length == 0){
+      setShowMembers(false)
+      return
+    }
     setShowRequests(!showRequests);
     if (!showRequests) setShowMembers(false);
   };
