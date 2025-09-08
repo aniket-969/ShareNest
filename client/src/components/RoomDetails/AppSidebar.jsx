@@ -27,6 +27,7 @@ const PendingRequests = lazy(
 );
  
 const AppSidebar = ({roomData})=> {
+  console.log(roomData)
   const { roomId } = useParams();
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
@@ -96,6 +97,7 @@ const AppSidebar = ({roomData})=> {
           toggleMembers={toggleMembers}
           showMembers={showMembers}
           tenants={roomData?.tenants}
+          admin = {roomData?.admin}
         />
 
         {/* Pending Requests */}

@@ -1,7 +1,9 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Users } from "lucide-react";
+import { Badge } from "../ui/badge";
 
-const RoomMembers = ({ tenants, showMembers, toggleMembers }) => {
+const RoomMembers = ({ tenants, showMembers, toggleMembers, admin }) => {
+  console.log(tenants, admin);
   return (
     <div className="p-4 border-b">
       <div
@@ -28,8 +30,13 @@ const RoomMembers = ({ tenants, showMembers, toggleMembers }) => {
                     alt={member.fullName}
                     className="w-8 h-8 rounded-full mr-3 border"
                   />
-                  <span className="text-sm font-medium ">
+                  <span className="text-sm font-medium flex items-center gap-8">
                     {member.fullName}
+                    {member._id === admin._id && (
+                      <Badge className="text-[0.65rem] bg-secondary/20 px-1.5 rounded-sm hover:bg-secondary/20">
+                        Admin
+                      </Badge>
+                    )}
                   </span>
                 </div>
               ))}
