@@ -17,7 +17,7 @@ const ProfileCard = () => {
   return (
     <div className="flex flex-col items-center gap-3 ">
       <div className="w-[5rem] ">
-        <img className=" rounded-[2.4rem] w-[80px] h-[80px]" src={data.avatar} alt={data.username} />
+        <img className=" rounded-[2.4rem] w-[80px] h-[80px]" src={data.avatar} alt="/altAvatar.jpg" />
       </div>
       <div className="flex gap-5">
         <h2 >{data.fullName}</h2>

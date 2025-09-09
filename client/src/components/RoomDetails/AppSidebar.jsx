@@ -88,7 +88,7 @@ const AppSidebar = ({roomData})=> {
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
-            {roomData?.description || ""}
+            {roomData?.description|| ""}
           </p>
         </div>
 

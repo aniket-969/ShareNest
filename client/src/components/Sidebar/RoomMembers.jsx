@@ -27,7 +27,7 @@ const RoomMembers = ({ tenants, showMembers, toggleMembers, admin }) => {
                 >
                   <img
                     src={member.avatar}
-                    alt={member.fullName}
+                    alt="/altAvatar.jpg"
                     className="w-8 h-8 rounded-full mr-3 border"
                   />
                   <span className="text-sm font-medium flex items-center gap-8">
