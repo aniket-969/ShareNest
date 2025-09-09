@@ -24,7 +24,7 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
   console.log("Userx", expenses[0]);
   return (
     <div className=" mx-2 my-5">
-      <h3 className="font-semibold text-lg ml-2">Due -</h3>
+      <h3 className="font-semibold text-lg ml-2">Owed by you -</h3>
 
       <Carousel className=" lg:w-[56rem] md:w-[38rem] w-[18rem] my-4">
         <CarouselContent  className={`-ml-4  ${
