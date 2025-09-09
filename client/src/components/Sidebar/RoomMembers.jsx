@@ -34,9 +34,9 @@ const RoomMembers = ({ tenants, showMembers, toggleMembers, admin }) => {
                       {/* You can use initials or an alt image here */}
                       {(
                         <img
-                          src="/altAvatar.jpg"
+                          src="/altAvatar1.jpg"
                           alt="fallback avatar"
-                          className="w-full h-full object-cover"
+                          
                         />
                       ) || member.fullName?.charAt(0)}
                     </AvatarFallback>
