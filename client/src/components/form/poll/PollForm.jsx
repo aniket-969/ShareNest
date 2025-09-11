@@ -85,8 +85,8 @@ export const PollForm = ({ onClose }) => {
             <FormItem>
               <FormLabel>Vote End Time</FormLabel>
               <FormControl>
-                <DatePicker
-                  name="voteEndTime"
+                
+                <DatePicker name="voteEndTime"
                   field={field}
                   disableBefore={new Date()} // disable past dates
                   disableAfter={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // disable after today+7 days

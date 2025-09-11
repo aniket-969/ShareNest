@@ -53,11 +53,13 @@ const MobileRoomDetails = () => {
      
       <div className="flex w-full max-w-[25rem] justify-end gap-2 mx-2 ">
         <Dialog >
+
           <DialogTrigger asChild>
             <Button variant="ghost"  className="h-[30px] p-2">
              poll
             </Button>
           </DialogTrigger>
+          
           <DialogContent className="rounded-lg p-4 shadow-md max-h-[420px] h-full max-w-md bg-card w-full ">
            
             <PollCard initialPolls={data.polls} />
