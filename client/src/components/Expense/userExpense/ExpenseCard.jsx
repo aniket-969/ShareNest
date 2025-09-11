@@ -46,7 +46,7 @@ const ExpenseCard = ({ expense, userId }) => {
     : null;
 
   return (
-    <Card className="rounded-lg bg-card border">
+    <Card className="rounded-lg bg-card border ">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 py-4">
         <div className="flex items-center justify-between">

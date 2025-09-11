@@ -68,12 +68,12 @@ const Poll = ({ initialPolls }) => {
   }
   return (
     <div className="flex flex-col gap-3  ">
-      {/* unvoted/active polls first */}
+      {/* active polls first */}
       {voteForms.map((poll) => (
         <PollVoteForm poll={poll} key={poll._id} />
       ))}
 
-      {/*  voted results/end polls */}
+      {/*  voted results */}
       {resultCards.length > 0 && (
         <div className="">
           {resultCards.map((poll) => (

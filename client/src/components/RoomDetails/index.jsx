@@ -42,7 +42,7 @@ console.log(data?.tasks)
       {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}
-        <div className=" rounded-lg p-4 shadow-md h-[320px] max-w-md bg-card border-[#2a2a2a]">
+        <div className=" rounded-lg p-4 h-[320px] max-w-md bg-card ">
           <Calendar
             classNames={{
               months:

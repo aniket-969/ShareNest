@@ -41,7 +41,7 @@ const userId = JSON.parse(userData)?._id
       {isFormOpen && (
         <Suspense fallback={<Spinner />}>
           <FormWrapper onClose={() => setIsFormOpen(false)}>
-            <ExpenseForm
+            <ExpenseForm onClose={() => setIsFormOpen(false)}
               participants={participants}
               onSubmit={() => setIsFormOpen(false)} 
             />

@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 import { pollSchema } from "@/schema/PollSchema";
 import {
   Form,
@@ -17,7 +17,7 @@ import { useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import DatePicker from "@/components/ui/datePicker";
 
-export const PollForm = () => {
+export const PollForm = ({ onClose }) => {
   const { roomId } = useParams();
   const { createPollMutation } = usePoll();
 
@@ -30,13 +30,13 @@ export const PollForm = () => {
     },
   });
 
-  const { watch, setValue, handleSubmit } = form;
+  const { watch, setValue, handleSubmit, reset } = form;
   const options = watch("options");
 
   const onSubmit = async (values) => {
     const data = {
       ...values,
-      options: values.options.filter((opt) => opt.trim() !== ""), // Remove empty options
+      options: values.options.filter((opt) => opt.trim() !== ""),
     };
 
     try {
@@ -45,6 +45,8 @@ export const PollForm = () => {
         roomId,
       });
       console.log(response);
+      reset();
+      onClose();
     } catch (error) {
       console.error("Error during registration:", error);
     }
@@ -77,23 +79,23 @@ export const PollForm = () => {
 
         {/* Vote End Time Field */}
         <FormField
-  control={form.control}
-  name="voteEndTime"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Vote End Time</FormLabel>
-      <FormControl>
-        <DatePicker
+          control={form.control}
           name="voteEndTime"
-          field={field}
-          disableBefore={new Date()} // disable past dates
-          disableAfter={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // disable after today+7 days
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Vote End Time</FormLabel>
+              <FormControl>
+                <DatePicker
+                  name="voteEndTime"
+                  field={field}
+                  disableBefore={new Date()} // disable past dates
+                  disableAfter={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // disable after today+7 days
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
 
         {/* Options Field */}
         <FormItem>

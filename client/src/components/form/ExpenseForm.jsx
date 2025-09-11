@@ -20,8 +20,8 @@ import { Spinner } from "@/components/ui/spinner";
 import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
 import { currencyOptions } from "@/utils/helper";
-
-const ExpenseForm = ({ participants }) => {
+ 
+const ExpenseForm = ({ participants,onClose }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
 
@@ -32,6 +32,9 @@ const ExpenseForm = ({ participants }) => {
       const response = await createExpenseMutation.mutateAsync(values);
       console.log(response);
       toast("Splitted Expense ");
+      form.reset()
+      onClose()
+
     } catch (error) {
       console.error("Error during registration:", error);
     }

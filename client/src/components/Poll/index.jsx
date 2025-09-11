@@ -10,7 +10,7 @@ const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
   // console.log(initialPolls)
   return (
-    <div className="bs:w-[25rem] bs:h-[305px] h-[400px] rounded-lg shadow-md p-5 flex flex-col bg-card border-[#2a2a2a] ">
+    <div className="bs:w-[25rem] bs:h-[305px] h-[400px] rounded-lg p-5 flex flex-col bg-card ">
 
       {/* Title and create poll button */}
       
@@ -25,7 +25,7 @@ const PollCard = ({ initialPolls }) => {
 
       {showPoll && (
         <FormWrapper onClose={() => setShowPoll(false)}>
-          <PollForm />
+          <PollForm onClose={() => setShowPoll(false)}/>
         </FormWrapper>
       )}
 
