@@ -5,10 +5,12 @@ import FormWrapper from "@/components/ui/formWrapper";
 import Poll from "./Poll";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "../ui/spinner";
 
 const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
   // console.log(initialPolls)
+ 
   return (
     <div className="bs:w-[25rem] bs:h-[305px] h-[400px] rounded-lg p-5 flex flex-col bg-card ">
 
