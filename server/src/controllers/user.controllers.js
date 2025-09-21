@@ -82,6 +82,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const googleLogin = asyncHandler(async(req,res)=>{
+   const {email,username,fullName,avatar} = req.body
 
 })
 
