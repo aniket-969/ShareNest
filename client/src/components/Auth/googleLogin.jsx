@@ -10,6 +10,7 @@ const GoogleLogin = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
+      console.log(credential)
       const token = credential.accessToken;
       const user = result.user;
       console.log("Google login success:", user, token);
