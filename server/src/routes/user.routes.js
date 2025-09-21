@@ -11,6 +11,7 @@ import {
   addPaymentMethod,
   changePassword,
   fetchSession,
+  googleLogin,
   loginUser,
   logoutUser,
   refreshTokens,
@@ -27,6 +28,7 @@ const router = Router();
 
 router.route("/register").post(loginLimiter,validate(registerSchema), registerUser);
 router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
+router.route("/google").post(loginLimiter, googleLogin);
 router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
  
 // secured routes

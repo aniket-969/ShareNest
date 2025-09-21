@@ -81,6 +81,10 @@ const loginUser = asyncHandler(async (req, res) => {
   .json(new ApiResponse(200, loggedInUser, "User logged in successfully"));
 });
 
+const googleLogin = asyncHandler(async(req,res)=>{
+
+})
+
 const logoutUser = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   if (!userId) {
@@ -285,6 +289,7 @@ const addPaymentMethod = asyncHandler(async (req, res) => {
 export {
   registerUser,
   loginUser,
+  googleLogin,
   logoutUser,
   refreshTokens,
   changePassword,
