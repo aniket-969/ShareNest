@@ -11,7 +11,7 @@ router.route("/:roomId").get(getAllMessages).post(validate(sendMessageSchema),se
 router
   .route("/:roomId/:messageId") 
   .delete(
-    deleteMessage
+    deleteMessage 
   ); 
  
 export default router;

@@ -1,3 +1,4 @@
+import GoogleLogin from "@/components/Auth/googleLogin";
 import React from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
@@ -8,7 +9,9 @@ const AuthLayout = () => {
     <Navigate to="/room" />
   ) : (
     <div className="flex items-center flex-col gap-6 max-h-screen mt-10">
+      
       <Outlet />
+      <GoogleLogin/>
     </div>
   );
 };

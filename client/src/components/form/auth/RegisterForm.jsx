@@ -11,11 +11,11 @@ import {
   FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../ui/button";
-import { AvatarSelector } from "../AvatarSelector";
+import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AvatarSelector } from './../../AvatarSelector';
 
 
 export const SignUp = () => {
