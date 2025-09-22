@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-import { fcm } from "../firebase/config.js";
+import admin, { fcm } from "../firebase/config.js";
 
 const generateTokens = async (userId) => {
   const user = await User.findById(userId);
@@ -81,10 +81,81 @@ const loginUser = asyncHandler(async (req, res) => {
   .json(new ApiResponse(200, loggedInUser, "User logged in successfully"));
 });
 
-const googleLogin = asyncHandler(async(req,res)=>{
-   const {email,username,fullName,avatar} = req.body
+const googleLogin = asyncHandler(async (req, res) => {
+  const authHeader = req.headers.authorization || "";
+  const idToken = authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
 
-})
+  if (!idToken) {
+    throw new ApiError(400, "Missing Firebase ID token");
+  }
+
+  // verify Firebase ID token
+  const decoded = await admin.auth().verifyIdToken(idToken);
+
+  const firebaseUid = decoded.uid;
+  const email = decoded.email;
+  const fullName = decoded.name || decoded.displayName || "Google User";
+  const avatar = decoded.picture || "";
+
+  // filter + update for upsert
+  const filter = { firebaseUid };
+
+  const update = {
+    $setOnInsert: {
+      firebaseUid,
+      email,
+      fullName,
+      avatar,
+      provider: "google",
+      createdAt: Date.now(),
+    },
+  };
+
+  const options = {
+    upsert: true,
+    new: true,
+    rawResult: true,
+    setDefaultsOnInsert: true,
+  };
+
+  // upsert
+  const raw = await User.findOneAndUpdate(filter, update, options);
+  const wasExisting =
+    Boolean(raw.lastErrorObject && raw.lastErrorObject.updatedExisting);
+  const userDoc = raw.value;
+
+  if (!userDoc) {
+    throw new ApiError(500, "Failed to create or fetch user");
+  }
+
+  const { accessToken, refreshToken } = await generateTokens(userDoc._id);
+
+  await User.updateOne({ _id: userDoc._id }, { $set: { refreshToken } });
+
+  const safeUser = {
+    _id: userDoc._id,
+    email: userDoc.email,
+    username: userDoc.username,
+    fullName: userDoc.fullName,
+    avatar: userDoc.avatar,
+  };
+
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true
+  };
+
+  return res
+    .cookie("accessToken", accessToken, { ...cookieOptions, path: "/" })
+    .cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      path: "/api/v1/users/refreshTokens",
+    })
+    .json(new ApiResponse(200, safeUser, "User logged in via Google"));
+});
+
 
 const logoutUser = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
