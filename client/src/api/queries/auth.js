@@ -16,6 +16,10 @@ export const loginUser = (data) => {
   return axiosClient.post(`/${base}/login`, data);
 };
 
+export const loginWithGoogle = (data)=>{
+  return axiosClient.post(`/${base}/google`,data)
+}
+
 export const logOut = () => {
   return axiosClient.post(`/${base}/me/logout`);
 };

@@ -4,6 +4,7 @@ import {
   changePassword,
   fetchSession,
   loginUser,
+  loginWithGoogle,
   logOut,
   refreshTokens,
   registerUser,
@@ -56,6 +57,22 @@ export const useAuth = () => {
       );
     },
   });
+
+  const loginWithGoogleMutation = useMutation({
+    mutationFn:loginWithGoogle,
+    onSuccess:(data)=>{
+      localStorage.setItem("session", JSON.stringify(data.data.data));
+      queryClient.invalidateQueries(["auth", "session"]);
+      navigate("/room");
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+      toast(
+        error.response.data.message ||
+          "Invalid User Credentials , Please login again"
+      );
+    },
+  })
 
   // Logout Mutation
   const logoutMutation = useMutation({
