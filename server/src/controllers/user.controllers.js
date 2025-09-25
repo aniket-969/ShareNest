@@ -87,11 +87,8 @@ const googleLogin = asyncHandler(async (req, res) => {
     ? authHeader.split(" ")[1]
     : null;
 
-  if (!idToken) {
-    throw new ApiError(400, "Missing Firebase ID token");
-  }
+  if (!idToken) throw new ApiError(400, "Missing Firebase ID token");
 
-  // verify Firebase ID token
   const decoded = await admin.auth().verifyIdToken(idToken);
 
   const firebaseUid = decoded.uid;
@@ -99,9 +96,8 @@ const googleLogin = asyncHandler(async (req, res) => {
   const fullName = decoded.name || decoded.displayName || "Google User";
   const avatar = decoded.picture || "";
 
-  // filter + update for upsert
+  // upsert 
   const filter = { firebaseUid };
-
   const update = {
     $setOnInsert: {
       firebaseUid,
@@ -112,7 +108,6 @@ const googleLogin = asyncHandler(async (req, res) => {
       createdAt: Date.now(),
     },
   };
-
   const options = {
     upsert: true,
     new: true,
@@ -120,22 +115,20 @@ const googleLogin = asyncHandler(async (req, res) => {
     setDefaultsOnInsert: true,
   };
 
-  // upsert
   const raw = await User.findOneAndUpdate(filter, update, options);
-  const wasExisting =
-    Boolean(raw.lastErrorObject && raw.lastErrorObject.updatedExisting);
-  const userDoc = raw.value;
+
+  const userDoc = raw && raw.value ? raw.value : raw;
+console.log("raw data",raw)
 
   if (!userDoc) {
     throw new ApiError(500, "Failed to create or fetch user");
   }
 
   const { accessToken, refreshToken } = await generateTokens(userDoc._id);
-
-  await User.updateOne({ _id: userDoc._id }, { $set: { refreshToken } });
+  await User.updateOne({ _id: userDoc._1d ?? userDoc._id }, { $set: { refreshToken } });
 
   const safeUser = {
-    _id: userDoc._id,
+    _id: userDoc._id, 
     email: userDoc.email,
     username: userDoc.username,
     fullName: userDoc.fullName,
@@ -144,7 +137,8 @@ const googleLogin = asyncHandler(async (req, res) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: true
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
   };
 
   return res
@@ -155,6 +149,7 @@ const googleLogin = asyncHandler(async (req, res) => {
     })
     .json(new ApiResponse(200, safeUser, "User logged in via Google"));
 });
+
 
 
 const logoutUser = asyncHandler(async (req, res) => {

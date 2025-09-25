@@ -17,6 +17,7 @@ export const loginUser = (data) => {
 };
 
 export const loginWithGoogle = (idToken) => {
+  console.log(idToken)
   return axiosClient.post(
     `/${base}/google`,
     {}, 

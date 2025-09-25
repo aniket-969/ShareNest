@@ -151,6 +151,7 @@ export const useAuth = () => {
     sessionQuery,
     registerMutation,
     loginMutation,
+    loginWithGoogleMutation,
     changePasswordMutation,
     refreshTokensMutation,
     logoutMutation,

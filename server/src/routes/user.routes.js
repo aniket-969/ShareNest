@@ -25,7 +25,7 @@ import { validateQRCodeData } from "../middleware/qrcode.middleware.js";
 import { loginLimiter, sessionLimiter } from "../middleware/rateLimiters.js";
 
 const router = Router();
-
+ 
 router.route("/register").post(loginLimiter,validate(registerSchema), registerUser);
 router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
 router.route("/google").post(loginLimiter, googleLogin);
