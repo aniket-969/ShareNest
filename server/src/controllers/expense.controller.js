@@ -4,21 +4,20 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ExpenseEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
-import { fcm } from './../firebase/config.js';
- import { User } from "../models/user.model.js";
-
+import { fcm } from "./../firebase/config.js";
+import { User } from "../models/user.model.js";
 
 const getUserExpenses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const expenses = await Expense.find({
     "participants.user": userId,
-    paidBy: { $ne: userId }
+    paidBy: { $ne: userId },
   })
     .populate("paidBy", "fullName avatar")
     .populate("participants.user", "fullName avatar")
     .lean();
-console.log("This is expense",expenses)
+  console.log("This is expense", expenses);
   return res.json(
     new ApiResponse(200, expenses, "user expenses fetched successfully")
   );
@@ -43,9 +42,206 @@ const getPendingPayments = asyncHandler(async (req, res) => {
   );
 });
 
- const createExpense = asyncHandler(async (req, res) => {
+export const getRoomBalances = asyncHandler(async (req, res) => {
+  const roomIdParam = req.params.roomId;
+  if (!roomIdParam) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "roomId is required in params"));
+  }
+
+  const roomId = mongoose.Types.ObjectId(roomIdParam);
+  const userId = mongoose.Types.ObjectId(req.user._id);
+
+  const pipeline = [
+    { $match: { roomId } },
+    { $unwind: "$participants" },
+
+    // sum payments in paymentHistory made by this participant for this expense
+    {
+      $addFields: {
+        paidSumForParticipant: {
+          $reduce: {
+            input: { $ifNull: ["$paymentHistory", []] },
+            initialValue: 0,
+            in: {
+              $cond: [
+                { $eq: ["$$this.user", "$participants.user"] },
+                { $add: ["$$value", "$$this.amount"] },
+                "$$value",
+              ],
+            },
+          },
+        },
+      },
+    },
+
+    // unpaid amount for the participant (clamped to >= 0)
+    {
+      $addFields: {
+        unpaidForParticipant: {
+          $max: [
+            {
+              $subtract: [
+                "$participants.totalAmountOwed",
+                "$paidSumForParticipant",
+              ],
+            },
+            0,
+          ],
+        },
+      },
+    },
+
+    {
+      $project: {
+        paidBy: 1,
+        participantUser: "$participants.user",
+        unpaidForParticipant: 1,
+        expenseId: "$_id",
+        expenseTitle: "$title",
+        expenseCreatedAt: "$createdAt",
+      },
+    },
+
+    {
+      $facet: {
+        owedByYou: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$participantUser", userId] },
+                  { $ne: ["$paidBy", userId] },
+                  { $gt: ["$unpaidForParticipant", 0] },
+                ],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: "$paidBy",
+              totalOwedByYou: { $sum: "$unpaidForParticipant" },
+              unpaidCount: { $sum: 1 },
+            },
+          },
+        ],
+        owedToYou: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$paidBy", userId] },
+                  { $ne: ["$participantUser", userId] },
+                  { $gt: ["$unpaidForParticipant", 0] },
+                ],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: "$participantUser",
+              totalOwedToYou: { $sum: "$unpaidForParticipant" },
+              unpaidCount: { $sum: 1 },
+            },
+          },
+        ],
+      },
+    },
+  ];
+
+  const agg = await Expense.aggregate(pipeline).allowDiskUse(true);
+  const facet = (agg && agg[0]) || { owedByYou: [], owedToYou: [] };
+  const owedByYou = facet.owedByYou || [];
+  const owedToYou = facet.owedToYou || [];
+
+  // gather peer ids
+  const peerIdsSet = new Set();
+  owedByYou.forEach((r) => peerIdsSet.add(String(r._id)));
+  owedToYou.forEach((r) => peerIdsSet.add(String(r._id)));
+  const peerIds = Array.from(peerIdsSet).map((id) =>
+    mongoose.Types.ObjectId(id)
+  );
+
+  // fetch peer profiles
+  let usersMap = {};
+  if (peerIds.length) {
+    const users = await User.find({ _id: { $in: peerIds } })
+      .select("fullName avatar email")
+      .lean();
+    usersMap = users.reduce((acc, u) => {
+      acc[String(u._id)] = u;
+      return acc;
+    }, {});
+  }
+
+  // merge owedByYou and owedToYou into peers map
+  const peersMap = new Map();
+  owedByYou.forEach((r) => {
+    const idStr = String(r._id);
+    peersMap.set(idStr, {
+      userId: idStr,
+      owedByYou: r.totalOwedByYou || 0,
+      owedToYou: 0,
+      unpaidCount: r.unpaidCount || 0,
+    });
+  });
+
+  owedToYou.forEach((r) => {
+    const idStr = String(r._id);
+    const existing = peersMap.get(idStr);
+    if (existing) {
+      existing.owedToYou = r.totalOwedToYou || 0;
+      existing.unpaidCount = (existing.unpaidCount || 0) + (r.unpaidCount || 0);
+      peersMap.set(idStr, existing);
+    } else {
+      peersMap.set(idStr, {
+        userId: idStr,
+        owedByYou: 0,
+        owedToYou: r.totalOwedToYou || 0,
+        unpaidCount: r.unpaidCount || 0,
+      });
+    }
+  });
+
+  // compute totals and format peers list
+  let totalOwedByYou = 0;
+  let totalOwedToYou = 0;
+  const peers = [];
+
+  for (const [, v] of peersMap) {
+    totalOwedByYou += v.owedByYou;
+    totalOwedToYou += v.owedToYou;
+
+    const profile = usersMap[v.userId] || null;
+
+    peers.push({
+      userId: v.userId,
+      name: profile ? profile.fullName : null,
+      avatar: profile ? profile.avatar : null,
+      owedByYou: v.owedByYou,
+      owedToYou: v.owedToYou,
+      net: v.owedToYou - v.owedByYou,
+      unpaidCount: v.unpaidCount,
+    });
+  }
+
+  const response = {
+    totalOwedByYou,
+    totalOwedToYou,
+    net: totalOwedToYou - totalOwedByYou,
+    peers,
+  };
+
+  return res.json(
+    new ApiResponse(200, response, "room balances fetched successfully")
+  );
+});
+
+const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, imageUrl, dueDate, participants, currency } = req.body;
+  const { title, totalAmount, imageUrl, dueDate, participants, currency } =
+    req.body;
   const paidBy = req.user._id;
 
   if (!participants?.length) {
@@ -53,17 +249,22 @@ const getPendingPayments = asyncHandler(async (req, res) => {
   }
 
   const baseAmount = Math.round(totalAmount / participants.length);
-  const formattedParticipants = participants.map(({ userId, additionalCharges }) => {
-    const charges = (additionalCharges || []).map(({ amount, reason }) => ({ amount, reason }));
-    const additionalTotal = charges.reduce((sum, c) => sum + c.amount, 0);
-    return {
-      user: userId,
-      baseAmount,
-      additionalCharges: charges,
-      totalAmountOwed: baseAmount + additionalTotal,
-    };
-  });
-const payerPart = formattedParticipants.find(
+  const formattedParticipants = participants.map(
+    ({ userId, additionalCharges }) => {
+      const charges = (additionalCharges || []).map(({ amount, reason }) => ({
+        amount,
+        reason,
+      }));
+      const additionalTotal = charges.reduce((sum, c) => sum + c.amount, 0);
+      return {
+        user: userId,
+        baseAmount,
+        additionalCharges: charges,
+        totalAmountOwed: baseAmount + additionalTotal,
+      };
+    }
+  );
+  const payerPart = formattedParticipants.find(
     (p) => p.user.toString() === paidBy.toString()
   );
   const payerAmount = payerPart?.totalAmountOwed ?? 0;
@@ -75,7 +276,7 @@ const payerPart = formattedParticipants.find(
     dueDate,
     participants: formattedParticipants,
     totalAmountPaid: 0,
-      paymentHistory: [
+    paymentHistory: [
       {
         user: paidBy,
         amount: payerAmount,
@@ -90,12 +291,7 @@ const payerPart = formattedParticipants.find(
     throw new ApiError(500, "Expense creation failed");
   }
 
-  emitSocketEvent(
-    req,
-    roomId,
-    ExpenseEventEnum.EXPENSE_CREATED_EVENT,
-    expense
-  );
+  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
 
   // FCM notification
   try {
@@ -124,7 +320,7 @@ const payerPart = formattedParticipants.find(
     .status(201)
     .json(new ApiResponse(201, expense, "Expense created successfully"));
 });
- 
+
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { expenseId, roomId } = req.params;
@@ -138,23 +334,21 @@ const updatePayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Expense not found or you’re not a participant");
   }
 
-  const alreadyPaid = expense.paymentHistory.some(ph =>
+  const alreadyPaid = expense.paymentHistory.some((ph) =>
     ph.user.equals(userId)
   );
   if (alreadyPaid) {
     throw new ApiError(400, "You have already paid for this expense");
   }
 
-  const participant = expense.participants.find(p =>
-    p.user.equals(userId)
-  );
+  const participant = expense.participants.find((p) => p.user.equals(userId));
   const paymentAmount = participant.totalAmountOwed;
 
   const updatedExpense = await Expense.findOneAndUpdate(
     {
       _id: expenseId,
       "participants.user": userId,
-      "paymentHistory.user": { $ne: userId }   
+      "paymentHistory.user": { $ne: userId },
     },
     {
       $push: {
@@ -174,7 +368,6 @@ const updatePayment = asyncHandler(async (req, res) => {
   );
 
   if (!updatedExpense) {
-    
     throw new ApiError(400, "You have already paid for this expense");
   }
 

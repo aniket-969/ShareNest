@@ -5,6 +5,7 @@ import {
   deleteExpense,
   getExpenseDetails,
   getPendingPayments,
+  getRoomBalances,
   getUserExpenses,
   updateExpense,
   updatePayment,
@@ -21,15 +22,16 @@ const router = Router();
 router
   .route("/:roomId")
   .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense);
-router  
+router
   .route("/:expenseId/payment")
   .patch(verifyJWT, validate(updatePaymentSchema), updatePayment);
 router.route("/").get(verifyJWT, getUserExpenses);
+router.route("/balance").get(verifyJWT, checkMember, getRoomBalances);
 router.route("/pending").get(verifyJWT, getPendingPayments);
-router.route("/:expenseId").get(verifyJWT, getExpenseDetails); 
+router.route("/:expenseId").get(verifyJWT, getExpenseDetails);
 router
   .route("/:expenseId")
-  .patch(verifyJWT, validate(updateExpenseSchema),updateExpense);
+  .patch(verifyJWT, validate(updateExpenseSchema), updateExpense);
 router.route("/:expenseId").delete(verifyJWT, deleteExpense);
 
 export default router;

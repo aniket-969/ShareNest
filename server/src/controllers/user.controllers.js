@@ -150,8 +150,6 @@ console.log("raw data",raw)
     .json(new ApiResponse(200, safeUser, "User logged in via Google"));
 });
 
-
-
 const logoutUser = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   if (!userId) {
