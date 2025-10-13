@@ -33,6 +33,14 @@ export const useExpense = (roomId) => {
   });
 
   // Fetch pending payments
+  // const balanceQuery = useQuery({
+  //   queryKey: ["expense", "balance"],
+  //   queryFn: getBalances,
+  //   refetchOnWindowFocus: false,
+  //   staleTime: 30 * 60 * 1000,
+  //   cacheTime: 60 * 60 * 1000,
+  // });
+ 
   const userPendingExpenseQuery = useQuery({
     queryKey: ["expense", "pending"],
     queryFn: getPendingPayments,

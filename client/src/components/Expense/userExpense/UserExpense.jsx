@@ -21,7 +21,8 @@ const UserExpense = ({ userExpenseQuery, userId }) => {
   if (isError) {
     return <>Please refresh ,something went wrong</>;
   }
-  console.log("Userx", expenses[0]);
+  // console.log(expenses)
+  // console.log("Userx", expenses[0]);
   return (
     <div className=" mx-2 my-5">
       <h3 className="font-semibold text-lg ml-2">Owed by you -</h3>

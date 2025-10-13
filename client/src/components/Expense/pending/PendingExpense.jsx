@@ -12,7 +12,7 @@ import PendingExpenseCard from "./PendingExpenseCard";
 
 const PendingExpense = ({ userPendingExpenseQuery, userId }) => {
   const { data: expenses, isLoading, isError } = userPendingExpenseQuery;
-console.log(expenses)
+// console.log(expenses)
   if (isLoading) return <Spinner />;
   if (isError || !expenses.length)
     return <div className="mx-2 my-5">No pending expenses</div>;

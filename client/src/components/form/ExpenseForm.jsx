@@ -110,7 +110,7 @@ const ExpenseForm = ({ participants,onClose }) => {
           )}
         />
         {/* image or bill link */}
-        <FormField
+        {/* <FormField
           control={form.control}
           name="imageUrl"
           render={({ field }) => (
@@ -126,7 +126,7 @@ const ExpenseForm = ({ participants,onClose }) => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         {/* Due date */}
         <FormField
           control={form.control}

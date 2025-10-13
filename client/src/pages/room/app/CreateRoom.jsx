@@ -1,4 +1,4 @@
-import { CreateRoomForm } from "@/components/form/CreateRoomForm";
+import { CreateRoomForm } from "@/components/form/room/CreateRoomForm";
 import { JoinRoomForm } from "@/components/form/room/JoinRoomForm";
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
