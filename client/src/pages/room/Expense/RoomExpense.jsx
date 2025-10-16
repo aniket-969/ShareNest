@@ -39,7 +39,7 @@ const RoomExpense = () => {
   if (isLoading) return <Spinner />;
   if (isError) return <>Something went wrong. Please refresh</>;
 
-console.log(balancesByCurrency)
+// console.log(balancesByCurrency)
 
   const participants = [
     ...(data.tenants || []),
@@ -59,13 +59,7 @@ console.log(balancesByCurrency)
           >
             <CirclePlus />
           </Button>
-          <Button
-            size="icon"
-            variant="primary"
-            onClick={() => setIsFormOpen(true)}
-          >
-            <ScrollText />
-          </Button>
+         <BalanceSheet/>
         </div>
       </div>
 
@@ -81,7 +75,7 @@ console.log(balancesByCurrency)
           </FormWrapper>
         </Suspense>
       )}
-         <BalanceSheet balances={balancesByCurrency} />
+        
       {/* Expense and Pending cards */}
       <div className="">
         <UserExpense userExpenseQuery={userExpenseQuery} userId={userId} />

@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
 
-const MarkAsPaid = ({ expenseId, roomId }) => {
+const MarkAsPaid = ({ expenseId, roomId, disabled }) => {
   const { updatePaymentMutation } = useExpense(roomId);
   const {
     register,
@@ -42,22 +42,28 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
           reset();
         },
         onError: (err) => {
-          toast.error(err?.response?.data?.message || "Failed to update payment");
+          toast.error(
+            err?.response?.data?.message || "Failed to update payment"
+          );
         },
       }
     );
   };
 
   return (
-    <Dialog >
-    
-      <DialogTrigger asChild>
-        <Button size="sm">Mark as Paid</Button>
-      </DialogTrigger>
+    <Dialog>
+      {!disabled ? (
+        <DialogTrigger asChild>
+          <Button size="sm">Mark as Paid</Button>
+        </DialogTrigger>
+      ) : (
+        <Button size="sm" className="invisible">
+          Mark as Paid
+        </Button>
+      )}
 
-      <DialogOverlay className="fixed inset-0 z-50 bg-[#121212]/60 " /> 
+      <DialogOverlay className="fixed inset-0 z-50 bg-[#121212]/60 " />
       <DialogContent className="fixed z-50 flex items-center justify-center ">
-       
         <div className="w-full max-w-[30rem] p-10  bg-black mx-3 bmain rounded-[2.5rem]">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -103,10 +109,7 @@ const MarkAsPaid = ({ expenseId, roomId }) => {
               </DialogClose>
               <Button
                 type="submit"
-                disabled={
-                  isSubmitting ||
-                  updatePaymentMutation.isLoading
-                }
+                disabled={isSubmitting || updatePaymentMutation.isLoading}
               >
                 {isSubmitting || updatePaymentMutation.isLoading ? (
                   <Spinner size="sm" />
