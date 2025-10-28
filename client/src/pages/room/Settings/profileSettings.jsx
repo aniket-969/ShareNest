@@ -10,7 +10,7 @@ const ProfileSettings = ({user,refetch}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isPwModalOpen, setIsPwModalOpen] = useState(false);
 
-  return (
+  return ( 
     <div className="">
       {/* User Details */}
       <ProfileSettingsView onEdit={() => setIsEditing(true)} />

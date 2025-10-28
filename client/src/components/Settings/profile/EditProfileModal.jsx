@@ -4,7 +4,7 @@ import FormWrapper from "@/components/ui/formWrapper";
 
 const EditProfileModal = ({ open, onClose, user, onSave }) => {
   if (!open) return null;
-
+ 
   return (
     <FormWrapper onClose={onClose}>
       <ProfileSettingsForm
