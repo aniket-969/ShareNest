@@ -3,7 +3,7 @@ export default {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {
+    extend: { 
       screens: {
        
         bs: { min: "929px" },
@@ -25,6 +25,7 @@ export default {
 
         card: {
           DEFAULT: "#121212",
+          // DEFAULT: "#18181B",
           foreground: "#f0e3f3",
           muted: "#1c1c1c",
           border: "#2a2a2a",
@@ -69,7 +70,8 @@ export default {
           5: "#040404",
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
+          // DEFAULT: "hsl(var(--sidebar-background))",
+          DEFAULT: "#121212",
           foreground: "hsl(var(--sidebar-foreground))",
           primary: "hsl(var(--sidebar-primary))",
           "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
