@@ -5,7 +5,6 @@ import {
   deleteExpense,
   getExpenseDetails,
   getPendingPayments,
-  getRoomBalances,
   getUserExpenses,
   updateExpense,
   updatePayment,
@@ -19,19 +18,28 @@ import {
 } from "../zod/expense.schema.js";
 
 const router = Router();
+// 1) Collection / user-scoped routes (static)
+router.route("/").get(verifyJWT, getUserExpenses);
+router.route("/pending").get(verifyJWT, getPendingPayments);
+
+// 2) Room-scoped routes (keep :roomId where controller/middleware expect it)
 router
   .route("/:roomId")
   .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense);
+
+// router
+  // .route("/:roomId/balance")
+  // .get(verifyJWT, checkMember, getRoomBalances);
+
+// 3) Expense-specific routes (put these after room-scoped & static routes)
 router
   .route("/:expenseId/payment")
   .patch(verifyJWT, validate(updatePaymentSchema), updatePayment);
-router.route("/").get(verifyJWT, getUserExpenses);
-router.route("/balance").get(verifyJWT, checkMember, getRoomBalances);
-router.route("/pending").get(verifyJWT, getPendingPayments);
-router.route("/:expenseId").get(verifyJWT, getExpenseDetails);
+
 router
   .route("/:expenseId")
-  .patch(verifyJWT, validate(updateExpenseSchema), updateExpense);
-router.route("/:expenseId").delete(verifyJWT, deleteExpense);
+  .get(verifyJWT, getExpenseDetails)
+  .patch(verifyJWT, validate(updateExpenseSchema), updateExpense)
+  .delete(verifyJWT, deleteExpense);
 
 export default router;
