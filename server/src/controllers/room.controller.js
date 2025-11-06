@@ -39,11 +39,10 @@ const getRoomData = asyncHandler(async (req, res) => {
   console.log("getting room Data");
 
   let roomQuery = Room.findById(roomId).select("-groupCode");
-
   const isAdmin = await Room.exists({ _id: roomId, admin: userId });
 
   if (!isAdmin) {
-    roomQuery = roomQuery.select("-pendingRequests"); 
+    roomQuery = roomQuery.select("-pendingRequests");
   }
 
   const populateArr = [
@@ -58,26 +57,36 @@ const getRoomData = asyncHandler(async (req, res) => {
   ];
 
   const room = await roomQuery.populate(populateArr);
+  if (!room) throw new ApiError(404, "Room not found");
 
-
-  let chatMessages = [];
-
-  const latest = await ChatMessage.find({ chat: roomId })
+  // Fetch latest messages
+  const LIMIT = 50;
+  const latestPlusOne = await ChatMessage.find({ chat: roomId })
     .sort({ createdAt: -1 })
-    .limit(50)
+    .limit(LIMIT + 1)
     .populate("sender", "fullName avatar username _id")
     .lean();
 
-  chatMessages = latest.reverse();
+  const hasMore = latestPlusOne.length > LIMIT;
+  const chatMessages = latestPlusOne.slice(0, LIMIT).reverse();
+  const nextBeforeId = hasMore ? latestPlusOne[LIMIT]._id.toString() : null;
+
+  const chatMessagesMeta = {
+    hasMore,
+    nextBeforeId,
+    limit: LIMIT,
+    returnedCount: chatMessages.length,
+  };
 
   return res.json(
     new ApiResponse(
       200,
-      { room, chatMessages },
-      "Room data + recent messages fetched"
+      { room, chatMessages, chatMessagesMeta },
+      "Room data + recent messages fetched successfully"
     )
   );
 });
+
 
 const createRoom = asyncHandler(async (req, res) => {
   const admin = req.user?._id;
