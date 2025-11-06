@@ -34,7 +34,7 @@ console.log(data?.tasks)
   if (isError) {
     return <>Something went wrong . Please refresh</>;
   }
-
+console.log(data)
   return (
     <div className=" flex  w-full items-center justify-center xl:gap-20 gap-10 my-5 ">
 
@@ -59,7 +59,7 @@ console.log(data?.tasks)
         </div>
 
         {/* Polls */}
-        <PollCard initialPolls={data.polls} />
+        <PollCard initialPolls={data?.polls} />
       </div>
 
       {/* Tasks and chat container */}
@@ -68,7 +68,7 @@ console.log(data?.tasks)
         <TaskCard scheduledTasks={scheduledTasks} />
 
         {/* Chat */}
-        <Chat />
+        <Chat messages={data?.chatMessages}/>
       </div>
     </div>
   );

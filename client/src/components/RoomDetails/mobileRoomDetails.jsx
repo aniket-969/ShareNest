@@ -75,7 +75,7 @@ const MobileRoomDetails = () => {
           </DialogTrigger>
           <DialogContent className="max-w-md w-full">
             
-            <Chat />
+            <Chat messages={data?.chatMessages}/>
           
           </DialogContent>
         </Dialog>

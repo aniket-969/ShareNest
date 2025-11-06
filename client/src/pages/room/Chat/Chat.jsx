@@ -5,43 +5,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { useChat } from "@/hooks/useChat";
 import ChatLayout from "@/layouts/ChatLayout";
 import { useParams } from "react-router-dom";
-const Chat = () => {
+
+const Chat = ({ messages }) => {
   const { roomId } = useParams();
-  const { messageQuery } = useChat();
+ 
   const { sessionQuery } = useAuth();
 
   const {
-    data: messageData,
-    isLoading: isMessageLoading,
-    isError: isMessageError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = messageQuery(roomId);
-  const {
     data: userData,
-    isLoading: isUserLoading,
-    isError: isUserError,
   } = sessionQuery;
+console.log(messages)
 
-  if (isMessageLoading || isUserLoading) return <ChatSkeleton />;
-  if (isMessageError || isUserError)
-    return <>Something went wrong. Please refresh.</>;
-  // Flatten the messages array from all pages
-
-  const allMessages = messageData.pages
-    .flatMap((page) => page.messages)
-    .reverse();
-  // console.log(allMessages);
-  
   return (
     <div className="flex flex-col items-center h-[480px] bs:h-[370px] w-full max-w-[25rem] rounded-lg shadow-md  bg-[#1c1f26 bg-card borde border-[#2a2a2a] pt-4 bs:px-2 ">
-      <ChatLayout
-        messages={allMessages}
+     <ChatLayout 
+        messages={messages}
         currentUser={userData._id}
-        fetchNextPage={fetchNextPage}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
       />
     </div>
   );

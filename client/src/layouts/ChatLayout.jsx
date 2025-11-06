@@ -7,23 +7,26 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getDateLabel } from "@/utils/helper";
 import { useDebouncedCallback } from "@/hooks/use-debounce";
+import { useChat } from "@/hooks/useChat";
 
 const ChatLayout = ({
   messages,
-  currentUser,
-  fetchNextPage,
-  hasNextPage,
-  isFetchingNextPage,
+  currentUser
 }) => {
+
   const viewportRef = useRef(null);
   const socket = getSocket();
   const [prevMessagesLength, setPrevMessagesLength] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const queryClient = useQueryClient();
   const { roomId } = useParams();
+console.log(messages)
+   const { messageQuery } = useChat();
   // Socket to update messages
   useEffect(() => {
     if (!roomId) return;
+
+
 
     const handleNewMessage = (newMessage) => {
       queryClient.setQueryData(["chat", roomId], (oldData) => {
@@ -47,7 +50,7 @@ const ChatLayout = ({
       socket.off("messageReceived", handleNewMessage);
     };
   }, [roomId, queryClient, socket]);
-
+ 
   /** Scroll to bottom function */
   const scrollToBottom = useCallback(() => {
     if (viewportRef.current) {
@@ -132,13 +135,14 @@ const ChatLayout = ({
   const debouncedHandleScroll = useDebouncedCallback(handleScroll, 200);
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-[25rem] h-full">
       <ScrollArea
         ref={viewportRef}
-        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
+        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto "
         onScroll={debouncedHandleScroll}
       >
-        {messages.map((msg, index) => {
+        {messages.length>0?
+       (messages.map((msg, index) => {
           const prevMsg = index > 0 ? messages[index - 1] : null;
           const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
@@ -164,7 +168,8 @@ const ChatLayout = ({
               />
             </div>
           );
-        })}
+        })) :<p className="text-center ">No messages to show</p>}
+        
       </ScrollArea>
 
       {/* Chat Input */}
