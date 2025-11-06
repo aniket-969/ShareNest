@@ -8,7 +8,8 @@ import { Poll } from "../models/poll.model.js";
 import { Expense } from "../models/expense.model.js";
 import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
-import { mongoose } from 'mongoose';
+import { mongoose } from "mongoose";
+import { ChatMessage } from './../models/chatMessage.model.js';
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -30,6 +31,53 @@ async function generateUniqueGroupCode() {
 
   return groupCode;
 }
+
+const getRoomData = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const userId = req.user?._id;
+
+  console.log("getting room Data");
+
+  let roomQuery = Room.findById(roomId).select("-groupCode");
+
+  const isAdmin = await Room.exists({ _id: roomId, admin: userId });
+
+  if (!isAdmin) {
+    roomQuery = roomQuery.select("-pendingRequests"); 
+  }
+
+  const populateArr = [
+    { path: "admin", select: "username fullName avatar _id" },
+    { path: "tenants", select: "username fullName avatar _id" },
+    { path: "awards" },
+    { path: "tasks.currentAssignee", select: "username fullName" },
+    { path: "tasks.participants", select: "username fullName avatar _id" },
+    { path: "tasks.rotationOrder", select: "username fullName avatar _id" },
+    { path: "polls" },
+    ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []),
+  ];
+
+  const room = await roomQuery.populate(populateArr);
+
+
+  let chatMessages = [];
+
+  const latest = await ChatMessage.find({ chat: roomId })
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .populate("sender", "fullName avatar username _id")
+    .lean();
+
+  chatMessages = latest.reverse();
+
+  return res.json(
+    new ApiResponse(
+      200,
+      { room, chatMessages },
+      "Room data + recent messages fetched"
+    )
+  );
+});
 
 const createRoom = asyncHandler(async (req, res) => {
   const admin = req.user?._id;
@@ -241,49 +289,6 @@ const deleteRoom = asyncHandler(async (req, res) => {
       new ApiResponse(200, {}, "Room and related data deleted successfully")
     );
 });
- 
-const getRoomData = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
-  const userId = req.user?._id;
-
-  console.log("getting room Data");
-
-  // Fetch room with/without pendingRequests based on admin status
-  let roomQuery = Room.findById(roomId).select("-groupCode");
-
-  // Check if user is admin (without making an extra DB call)
-  const isAdmin = await Room.exists({ _id: roomId, admin: userId });
-
-  if (!isAdmin) {
-    roomQuery = roomQuery.select("-pendingRequests"); // Exclude pendingRequests for non-admins
-  }
-
-  const room = await roomQuery.populate([
-    { path: "admin", select: "username fullName avatar _id" },
-    { path: "tenants", select: "username fullName avatar _id" },
-    { path: "landlord", select: "username fullName avatar _id" },
-    { path: "awards" },
-    { path: "tasks.currentAssignee", select: "username fullName" },
-    ,
-    {
-      path: "tasks.participants",
-      select: "username fullName avatar _id",
-    },
-    {
-      path: "tasks.rotationOrder",
-      select: "username fullName avatar _id",
-    },
-    { path: "polls" },
-    ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []), // Only populate pendingRequests if admin
-  ]);
-
-  if (!room) {
-    throw new ApiError(404, "Room not found");
-  }
-
-  return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
-});
-
 
 const leaveRoom = asyncHandler(async (req, res) => {
   const userId = req.user._id.toString();
@@ -294,7 +299,6 @@ const leaveRoom = asyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
-    
     const room = await Room.findById(roomId).session(session);
     if (!room) {
       throw new ApiError(404, "Room not found");
@@ -309,7 +313,7 @@ const leaveRoom = asyncHandler(async (req, res) => {
     );
     await room.save({ session });
 
-    const user = req.user
+    const user = req.user;
 
     //  Remove room from user rooms array
     user.rooms = user.rooms.filter(
@@ -329,17 +333,15 @@ const leaveRoom = asyncHandler(async (req, res) => {
 
     return res.json(new ApiResponse(200, {}, "User has left the room"));
   } catch (err) {
-    
     await session.abortTransaction();
     session.endSession();
     throw err;
   }
 });
 
-
 const transferAdminControl = asyncHandler(async (req, res) => {
   const { newAdminId } = req.params;
-  const room = req.room; 
+  const room = req.room;
 
   // Check for newAdminId is a member
   if (!room.tenants.includes(newAdminId)) {
@@ -360,7 +362,7 @@ const transferAdminControl = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, room, "Admin rights transferred successfully"));
 });
- 
+
 export const kickUser = asyncHandler(async (req, res) => {
   const adminId = req.user._id.toString();
   const { roomId, targetUserId } = req.params;
@@ -369,7 +371,6 @@ export const kickUser = asyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
- 
     const room = await Room.findById(roomId).session(session);
     if (!room) throw new ApiError(404, "Room not found");
 
@@ -413,13 +414,11 @@ export const kickUser = asyncHandler(async (req, res) => {
       new ApiResponse(200, {}, "User has been kicked from the room")
     );
   } catch (err) {
-   
     await session.abortTransaction();
     session.endSession();
     throw err;
   }
 });
-
 
 export {
   createRoom,
