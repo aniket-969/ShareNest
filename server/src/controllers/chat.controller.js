@@ -8,72 +8,52 @@ import { AvailableChatEvents, ChatEventEnum } from "../constants.js";
 import mongoose from "mongoose";
 
 const sendMessage = asyncHandler(async (req, res) => {
-  console.log(req.params);
   const { roomId } = req.params;
-  console.log("roomId", roomId);
-  const { content } = req.body;
+  const { content = "" } = req.body;
 
-  const selectedRoom = await Room.findById(roomId);
-
+  const selectedRoom = await Room.findById(roomId).select("_id tenants");
   if (!selectedRoom) {
-    throw new ApiError(404, "Chat does not exist");
+    throw new ApiError(404, "Room does not exist");
   }
 
-  const messageFiles = [];
+  const senderSnapshot = {
+    _id: req.user._id,
+    username: req.user.username,
+    fullName: req.user.fullName,
+    avatar: req.user.avatar,
+  };
 
-  if (req.files && req.files.attachments?.length > 0) {
-    req.files.attachments?.map((attachment) => {
-      messageFiles.push({
-        url: attachment.url,
-      });
-    });
-  }
-
-  const message = await ChatMessage.create({
-    sender: new mongoose.Types.ObjectId(req.user._id),
-    content: content || "",
-    chat: new mongoose.Types.ObjectId(roomId),
-    attachments: messageFiles,
+  const messageDoc = await ChatMessage.create({
+    sender: senderSnapshot,
+    content: typeof content === "string" ? content.trim() : "",
+    room: new mongoose.Types.ObjectId(roomId),
   });
 
-  const chat = await Room.findByIdAndUpdate(
-    roomId,
-    {
-      $set: {
-        lastMessage: message._id,
-      },
-    },
-    { new: true }
-  );
-
-  const receivedMessage = await ChatMessage.findById(message._id)
-    .populate("sender", "username avatar email")
-    .populate("chat", "room participants");
-
-  if (!receivedMessage) {
-    throw new ApiError(500, "Internal server error");
+  if (!messageDoc) {
+    throw new ApiError(500, "Failed to create message");
   }
 
-  const recipients = [...selectedRoom.tenants];
-  if (selectedRoom.landlord) {
-    recipients.push(selectedRoom.landlord);
-  }
+  const messageObj = messageDoc.toObject({ getters: true });
 
-  recipients.forEach((participantId) => {
-    if (participantId.toString() === req.user._id.toString()) return;
+ 
+  const tenants = Array.isArray(selectedRoom.tenants) ? selectedRoom.tenants : [];
+  const recipients = new Set(tenants.map((id) => id.toString()));
 
+  for (const participantId of recipients) {
+    if (participantId === req.user._id.toString()) continue;
     emitSocketEvent(
       req,
-      participantId.toString(),
+      participantId,
       ChatEventEnum.MESSAGE_RECEIVED_EVENT,
-      receivedMessage
+      messageObj
     );
-  });
+  }
 
   return res
     .status(201)
-    .json(new ApiResponse(201, receivedMessage, "Message saved successfully"));
+    .json(new ApiResponse(201, messageObj, "Message saved successfully"));
 });
+
 
 const deleteMessage = asyncHandler(async (req, res) => {
   const { roomId, messageId } = req.params;

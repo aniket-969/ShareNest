@@ -23,5 +23,4 @@ const chatMessageSchema = new Schema(
 
 chatMessageSchema.index({ room: 1, createdAt: -1 });
 
-
 export const ChatMessage = mongoose.model("ChatMessage", chatMessageSchema);
