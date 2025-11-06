@@ -3,29 +3,16 @@ import mongoose, { Schema } from "mongoose";
 const chatMessageSchema = new Schema(
   {
     sender: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      _id: { type: Schema.Types.ObjectId, required: true },
+      username: { type: String, required: true },
+      fullName: { type: String, required: true },
+      avatar: { type: String },
     },
     content: {
       type: String,
       required: true,
     },
-    attachments: {
-      type: [
-        {
-          url: String,
-          localPath: String,
-          type: {
-            type: String,
-            enum: ["image", "pdf", "other"],
-            default: "other",
-          },
-        },
-      ],
-      default: [],
-    },
-    chat: { 
+    room: {
       type: Schema.Types.ObjectId,
       ref: "Room",
       required: true,
@@ -34,9 +21,7 @@ const chatMessageSchema = new Schema(
   { timestamps: true }
 );
 
-chatMessageSchema.index({ chat: 1 });
-chatMessageSchema.index({ content: "text" });
-chatMessageSchema.index({ chat: 1, createdAt: -1 });
+chatMessageSchema.index({ room: 1, createdAt: -1 });
 
 
 export const ChatMessage = mongoose.model("ChatMessage", chatMessageSchema);
