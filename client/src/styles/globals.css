@@ -123,49 +123,28 @@ select:-webkit-autofill:focus {
 
  }
 
- .notification {
+ /* .notification {
   position: absolute;
-  /* border: 2px solid gainsboro; */
+  border: 2px solid gainsboro;
   width: 38px;
   height: 30px;
   transform: translate(10%, -35%);
-  /* width: 32px; */
-  /* height: 32px; */
-  /* transform: translate(-10%, -35%); */
   right: 0.75rem;
   top: 0.75rem;
   z-index: 20;
-}
+} */
 
- /*
-.notification{
+ .notification {
   position: absolute;
-  border: 2px solid gainsboro;
   width: 35px;
-  height: 30px;
-  top:5.3%;
-  left:93%;
-  z-index: 20000;
-} */
-/* .notification{
-  position: absolute;
-  border: 2px solid gainsboro;
-  width: 35px;
-  height: 30px;
-  top:38px;
-  left:852px;
-  z-index: 20000;
-} */
-/* 
-.notification{
-  position: absolute;
-  border: 2px solid gainsboro;
-  width: 32px;
-  height: 32px;
-  top:36px;
-  left:852px;
-  z-index: 20000;
-} */
+  height: 28px;
+  transform: translate(10%, -35%);
+  right: 0.75rem;
+  top: 0.75rem;
+  z-index: 20;
+} 
+
+
 
 .bb {
   border: 2px solid blue;

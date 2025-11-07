@@ -22,7 +22,7 @@ const ChatLayout = ({
   const { roomId } = useParams();
 console.log(messages)
    const { messageQuery } = useChat();
-  // Socket to update messages
+  
   useEffect(() => {
     if (!roomId) return;
 
@@ -51,7 +51,6 @@ console.log(messages)
     };
   }, [roomId, queryClient, socket]);
  
-  /** Scroll to bottom function */
   const scrollToBottom = useCallback(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTo({
@@ -61,7 +60,7 @@ console.log(messages)
     }
   }, []);
 
-  /** Handle initial load and new messages */
+  
   useEffect(() => {
     if (isInitialLoad && messages.length > 0) {
       scrollToBottom();
@@ -80,49 +79,46 @@ console.log(messages)
     }
   }, [messages, scrollToBottom, isInitialLoad, prevMessagesLength]);
 
-  /** Handle infinite scroll (Load older messages) */
+  
   const handleScroll = async (event) => {
     const { scrollTop, scrollHeight } = event.target;
 
     if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
-      // Store the current first visible message for reference
+      
       const firstVisibleMessage =
         viewportRef.current.querySelector("[data-message-id]");
       const firstVisibleMessageId =
         firstVisibleMessage?.getAttribute("data-message-id");
 
-      // Save current height to calculate difference later
       const prevScrollHeight = scrollHeight;
 
-      // Fetch next page
       await fetchNextPage();
 
-      // After the DOM updates with new messages
       requestAnimationFrame(() => {
         if (viewportRef.current) {
-          // Calculate new content height
+         
           const newScrollHeight = viewportRef.current.scrollHeight;
-          // Calculate height difference (height of newly loaded messages)
+         
           const heightDifference = newScrollHeight - prevScrollHeight;
 
           if (firstVisibleMessageId) {
-            // Find the same message element after DOM update
+            
             const sameMessageElement = viewportRef.current.querySelector(
               `[data-message-id="${firstVisibleMessageId}"]`
             );
 
             if (sameMessageElement) {
-              // Scroll to the same message, maintaining user's position
+             
               sameMessageElement.scrollIntoView({
                 block: "start",
                 behavior: "auto",
               });
             } else {
-              // Fallback: set scroll position by calculation
+             
               viewportRef.current.scrollTop = heightDifference;
             }
           } else {
-            // Fallback: set scroll position by calculation
+         
             viewportRef.current.scrollTop = heightDifference;
           }
 
