@@ -60,3 +60,9 @@ export const changePassword = async(data) => {
 export const addPayment = (data) => {
   return axiosClient.patch(`/${base}/me/payments`, data);
 };
+
+export const deletePayment = (paymentId) => {
+  console.log(paymentId)
+
+  return axiosClient.delete(`/${base}/me/payments/${paymentId}`);
+};

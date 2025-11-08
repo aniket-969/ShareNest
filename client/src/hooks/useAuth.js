@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   addPayment,
   changePassword,
+  deletePayment,
   fetchSession,
   loginUser,
   loginWithGoogle,
@@ -43,7 +44,7 @@ export const useAuth = () => {
   // Login User Mutation
   const loginMutation = useMutation({
     mutationFn: loginUser,
-    onSuccess: (data) => { 
+    onSuccess: (data) => {
       // console.log(data.data.data);
       localStorage.setItem("session", JSON.stringify(data.data.data));
       queryClient.invalidateQueries(["auth", "session"]);
@@ -59,8 +60,8 @@ export const useAuth = () => {
   });
 
   const loginWithGoogleMutation = useMutation({
-    mutationFn:loginWithGoogle,
-    onSuccess:(data)=>{
+    mutationFn: loginWithGoogle,
+    onSuccess: (data) => {
       localStorage.setItem("session", JSON.stringify(data.data.data));
       queryClient.invalidateQueries(["auth", "session"]);
       navigate("/room");
@@ -72,7 +73,7 @@ export const useAuth = () => {
           "Invalid User Credentials , Please login again"
       );
     },
-  })
+  });
 
   // Logout Mutation
   const logoutMutation = useMutation({
@@ -109,7 +110,6 @@ export const useAuth = () => {
     },
     onError: (error) => {
       console.error("update user error", error);
-      
     },
   });
 
@@ -134,18 +134,24 @@ export const useAuth = () => {
     },
   });
 
+  const deletePaymentMutation = useMutation({
+    mutationFn: ({ paymentId }) => deletePayment(paymentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["auth", "profile"]);
+    },
+    onError: (error) => {
+      console.error("delete payment error", error);
+    },
+  });
+
   // Change Password Mutation
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
-    onSuccess: () => {
-      
-    },
+    onSuccess: () => {},
     onError: (error) => {
       console.error("change password error:", error);
     },
   });
-
-
 
   return {
     sessionQuery,
@@ -157,6 +163,7 @@ export const useAuth = () => {
     logoutMutation,
     updateUserMutation,
     addPaymentMutation,
-    updateNotificationTokenMutation
+    deletePaymentMutation,
+    updateNotificationTokenMutation,
   };
 };

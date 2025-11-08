@@ -13,8 +13,12 @@ import FormWrapper from "./formWrapper";
 import { PaymentMethodForm } from "../form/PaymentMethodForm";
 import { Spinner } from "./spinner";
 import { Trash2 } from "lucide-react"; // ✅ import the trash icon
+import { useAuth } from "@/hooks/useAuth";
 
 export const QRCarousel = ({ paymentMethod }) => {
+  const { deletePaymentMutation } = useAuth();
+  // console.log(deletePaymentMutation);
+
   const [qrImages, setQrImages] = useState({});
   const [showForm, setShowForm] = useState(false);
 
@@ -34,9 +38,9 @@ export const QRCarousel = ({ paymentMethod }) => {
   }, [paymentMethod]);
 
   // Delete handler
-  const handleDelete = (paymentId) => {
+  const handleDelete = async (paymentId) => {
     console.log("Deleting...", paymentId);
-    // later: call API or update state to remove this payment
+    await deletePaymentMutation.mutateAsync({ paymentId });
   };
 
   // Preparing items for carousel
@@ -56,7 +60,7 @@ export const QRCarousel = ({ paymentMethod }) => {
         <CarouselContent>
           {items.map((payment, index) => (
             <CarouselItem key={payment._id}>
-              <Card className="h-full bg-card relative group"> 
+              <Card className="h-full bg-card relative group">
                 {payment.appName && (
                   <button
                     onClick={() => handleDelete(payment._id)}
@@ -70,9 +74,7 @@ export const QRCarousel = ({ paymentMethod }) => {
                 <CardContent className="flex flex-col items-center justify-center h-full font-semibold text-sm md:text-xl sm:text-base sm:gap-2 pt-2 ">
                   {payment.appName ? (
                     <>
-                      <p className="font-semibold text-xl">
-                        {payment.appName}
-                      </p>
+                      <p className="font-semibold text-xl">{payment.appName}</p>
                       <p className="text-gray-600 mb-2">{payment.type}</p>
                       {qrImages[payment._id] ? (
                         <img
