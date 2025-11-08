@@ -61,7 +61,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   // Fetch latest messages
   const LIMIT = 50;
-  const latestPlusOne = await ChatMessage.find({ chat: roomId })
+  const latestPlusOne = await ChatMessage.find({ room: roomId })
     .sort({ createdAt: -1 })
     .limit(LIMIT + 1)
     .populate("sender", "fullName avatar username _id")
