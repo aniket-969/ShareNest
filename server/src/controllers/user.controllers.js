@@ -272,7 +272,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
-
 const updateFcmToken = asyncHandler(async(req,res)=>{
   console.log("Updating fcm")
   const {token} = req.body
@@ -350,6 +349,30 @@ const addPaymentMethod = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, "Payment methods added successfully"));
 });
+
+const deletePaymentMethod = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const { paymentId } = req.params; 
+
+  if (!paymentId) {
+    throw new ApiError(400, "paymentId is required");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $pull: { paymentMethod: { _id: paymentId } } }, 
+    { new: true, select: "-password -refreshToken" }
+  ).lean();
+
+  if (!updatedUser) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res.json(
+    new ApiResponse(200, { paymentMethod: updatedUser.paymentMethod }, "Payment method deleted successfully")
+  );
+});
+
  
 export {
   registerUser,
@@ -361,5 +384,6 @@ export {
   updateAccountDetails,
   fetchSession,
   addPaymentMethod,
+  deletePaymentMethod,
   updateFcmToken
 };

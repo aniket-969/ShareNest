@@ -10,6 +10,7 @@ import { validate } from "../middleware/validator.middleware.js";
 import {
   addPaymentMethod,
   changePassword,
+  deletePaymentMethod,
   fetchSession,
   googleLogin,
   loginUser,
@@ -53,6 +54,10 @@ router
 router
   .route("/me/payments")
   .patch(validate(paymentMethodSchema), verifyJWT, validateQRCodeData,addPaymentMethod);
+  router
+  .route("/me/payments/:paymentId")
+  .delete(verifyJWT, deletePaymentMethod);
+
 
 export default router;
  

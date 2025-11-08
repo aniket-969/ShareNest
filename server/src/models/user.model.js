@@ -75,9 +75,7 @@ const userSchema = new Schema(
           type: String, 
         },
       }
-    ]
-    ,
-
+    ],
     notificationToken:{
       type:String,
     },
