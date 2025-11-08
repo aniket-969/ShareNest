@@ -3,7 +3,7 @@ import { Bell } from "lucide-react";
 import NotificationBell from "../NotificationBell";
 
 const TaskCard = ({ scheduledTasks }) => {
-   console.log(scheduledTasks)
+  //  console.log(scheduledTasks)
   return (
     <div className="relative ">
       <NotificationBell />

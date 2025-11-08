@@ -19,7 +19,7 @@ const RoomDetailsIndex = () => {
   // console.log(data);
   const [date, setDate] = useState(new Date());
   const [scheduledTasks, setScheduledTasks] = useState([]);
-console.log(data?.tasks)
+// console.log(data?.tasks)
 
   useEffect(() => {
     if (data?.tasks) {
@@ -34,7 +34,7 @@ console.log(data?.tasks)
   if (isError) {
     return <>Something went wrong . Please refresh</>;
   }
-console.log(data)
+// console.log(data)
   return (
     <div className=" flex  w-full items-center justify-center xl:gap-20 gap-10 my-5 ">
 

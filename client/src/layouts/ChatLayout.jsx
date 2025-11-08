@@ -9,27 +9,27 @@ import { getDateLabel } from "@/utils/helper";
 import { useDebouncedCallback } from "@/hooks/use-debounce";
 import { useChat } from "@/hooks/useChat";
 
-const ChatLayout = ({
-  messages,
-  currentUser
-}) => {
-
+const ChatLayout = ({ Imessages, currentUser }) => {
+  
   const viewportRef = useRef(null);
   const socket = getSocket();
   const [prevMessagesLength, setPrevMessagesLength] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const queryClient = useQueryClient();
   const { roomId } = useParams();
-console.log(messages)
-   const { messageQuery } = useChat();
-  
+  const [messages,setMessages] = useState(Imessages)
+
+  // console.log(messages);
+
+  const { messageQuery } = useChat();
+
   useEffect(() => {
     if (!roomId) return;
 
-
-
     const handleNewMessage = (newMessage) => {
+      console.log(newMessage);
       queryClient.setQueryData(["chat", roomId], (oldData) => {
+        console.log("old data", oldData);
         if (!oldData) return;
 
         const updatedPages = [...oldData.pages];
@@ -43,14 +43,14 @@ console.log(messages)
         return { ...oldData, pages: updatedPages };
       });
     };
-
+    console.log("About to receive message");
     socket.on("messageReceived", handleNewMessage);
 
     return () => {
       socket.off("messageReceived", handleNewMessage);
     };
   }, [roomId, queryClient, socket]);
- 
+
   const scrollToBottom = useCallback(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTo({
@@ -60,7 +60,6 @@ console.log(messages)
     }
   }, []);
 
-  
   useEffect(() => {
     if (isInitialLoad && messages.length > 0) {
       scrollToBottom();
@@ -79,12 +78,10 @@ console.log(messages)
     }
   }, [messages, scrollToBottom, isInitialLoad, prevMessagesLength]);
 
-  
   const handleScroll = async (event) => {
     const { scrollTop, scrollHeight } = event.target;
 
     if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
-      
       const firstVisibleMessage =
         viewportRef.current.querySelector("[data-message-id]");
       const firstVisibleMessageId =
@@ -96,29 +93,24 @@ console.log(messages)
 
       requestAnimationFrame(() => {
         if (viewportRef.current) {
-         
           const newScrollHeight = viewportRef.current.scrollHeight;
-         
+
           const heightDifference = newScrollHeight - prevScrollHeight;
 
           if (firstVisibleMessageId) {
-            
             const sameMessageElement = viewportRef.current.querySelector(
               `[data-message-id="${firstVisibleMessageId}"]`
             );
 
             if (sameMessageElement) {
-             
               sameMessageElement.scrollIntoView({
                 block: "start",
                 behavior: "auto",
               });
             } else {
-             
               viewportRef.current.scrollTop = heightDifference;
             }
           } else {
-         
             viewportRef.current.scrollTop = heightDifference;
           }
 
@@ -137,35 +129,38 @@ console.log(messages)
         className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto "
         onScroll={debouncedHandleScroll}
       >
-        {messages.length>0?
-       (messages.map((msg, index) => {
-          const prevMsg = index > 0 ? messages[index - 1] : null;
-          const showAvatar = !prevMsg || prevMsg.sender._id !== msg.sender._id;
+        {messages.length > 0 ? (
+          messages.map((msg, index) => {
+            const prevMsg = index > 0 ? messages[index - 1] : null;
+            const showAvatar =
+              !prevMsg || prevMsg.sender._id !== msg.sender._id;
 
-          const currentDateLabel = getDateLabel(msg.createdAt);
-          const prevDateLabel = prevMsg
-            ? getDateLabel(prevMsg.createdAt)
-            : null;
+            const currentDateLabel = getDateLabel(msg.createdAt);
+            const prevDateLabel = prevMsg
+              ? getDateLabel(prevMsg.createdAt)
+              : null;
 
-          const showDateSeparator = currentDateLabel !== prevDateLabel;
+            const showDateSeparator = currentDateLabel !== prevDateLabel;
 
-          return (
-            <div key={msg._id}>
-              {showDateSeparator && (
-                <div className="text-center my-4 text-muted-foreground text-sm font-medium">
-                  {currentDateLabel}
-                </div>
-              )}
-              <ChatMessage
-                message={msg}
-                isCurrentUser={msg.sender._id === currentUser}
-                showAvatar={showAvatar}
-                data-message-id={msg._id}
-              />
-            </div>
-          );
-        })) :<p className="text-center ">No messages to show</p>}
-        
+            return (
+              <div key={msg._id}>
+                {showDateSeparator && (
+                  <div className="text-center my-4 text-muted-foreground text-sm font-medium">
+                    {currentDateLabel}
+                  </div>
+                )}
+                <ChatMessage
+                  message={msg}
+                  isCurrentUser={msg.sender._id === currentUser}
+                  showAvatar={showAvatar}
+                  data-message-id={msg._id}
+                />
+              </div>
+            );
+          })
+        ) : (
+          <p className="text-center ">No messages to show</p>
+        )}
       </ScrollArea>
 
       {/* Chat Input */}
