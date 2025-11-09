@@ -5,38 +5,42 @@ import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
- 
-const ChatInput = ({setMessages}) => {
+import { dedupeMessages } from "@/utils/helper.js";
+
+const ChatInput = ({ roomId: propRoomId }) => {
   const [content, setContent] = useState("");
   const { sendMessageMutation } = useChat();
-  const { roomId } = useParams();
+  const routeParams = useParams();
+  const roomId = propRoomId ?? routeParams.roomId;
   const queryClient = useQueryClient();
 
   const handleSendMessage = async () => {
     if (!content.trim()) return;
-
     try {
       const sentMessage = await sendMessageMutation.mutateAsync({
         roomId,
         data: { content },
       });
 
-      setMessages(prev=>[...prev,sentMessage])
-      queryClient.setQueryData(["chat", roomId], (oldData) => {
-        if (!oldData) return;
-
-        const updatedPages = [...oldData.pages];
-        updatedPages[0] = {
-          ...updatedPages[0],
-          messages: [sentMessage, ...updatedPages[0].messages],
-        };
-
-        return { ...oldData, pages: updatedPages };
+      const key = ["chat", roomId];
+      queryClient.setQueryData(key, (old) => {
+        if (!old || !old.pages || old.pages.length === 0) {
+          return {
+            pages: [{ messages: [sentMessage], meta: { hasMore: false, nextBeforeId: null, limit: 50, returnedCount: 1 } }],
+            pageParams: [null],
+          };
+        }
+        const pages = old.pages.slice();
+        const lastIdx = pages.length - 1;
+        const last = { ...pages[lastIdx] };
+        last.messages = dedupeMessages([...(last.messages ?? []), sentMessage]);
+        pages[lastIdx] = last;
+        return { ...old, pages };
       });
 
       setContent("");
-    } catch (error) {
-      console.error("Failed to send message", error);
+    } catch (err) {
+      console.error("Failed to send message", err);
     }
   };
 

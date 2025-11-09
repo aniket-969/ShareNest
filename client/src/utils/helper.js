@@ -338,3 +338,15 @@ export function computeBalances({ expenses = [], userId }) {
   }
   return result;
 }
+
+export const dedupeMessages = (arr) => {
+  const map = new Map();
+  for (const m of arr || []) {
+    if (!m) continue;
+    const id = m._id ?? m.id;
+    if (!id) continue;
+    if (!map.has(id)) map.set(id, m);
+  }
+ 
+  return Array.from(map.values());
+};

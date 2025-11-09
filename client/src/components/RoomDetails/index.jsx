@@ -68,7 +68,7 @@ const RoomDetailsIndex = () => {
         <TaskCard scheduledTasks={scheduledTasks} />
 
         {/* Chat */}
-        <Chat messages={data?.chatMessages}/>
+        <Chat messages={data?.chatMessages} chatMessagesMeta ={data?.chatMessagesMeta}/>
       </div>
     </div>
   );

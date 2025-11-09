@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/Chat/ChatMessage";
 import ChatInput from "@/components/Chat/ChatInput";
@@ -8,127 +8,152 @@ import { useParams } from "react-router-dom";
 import { getDateLabel } from "@/utils/helper";
 import { useDebouncedCallback } from "@/hooks/use-debounce";
 import { useChat } from "@/hooks/useChat";
+import { dedupeMessages } from "@/utils/helper.js";
 
-const ChatLayout = ({ Imessages, currentUser }) => {
-
+const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
   const viewportRef = useRef(null);
   const socket = getSocket();
-  const [prevMessagesLength, setPrevMessagesLength] = useState(0);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const queryClient = useQueryClient();
   const { roomId } = useParams();
-  const [messages,setMessages] = useState(Imessages)
-
-  // console.log(messages);
-
   const { messageQuery } = useChat();
 
   useEffect(() => {
     if (!roomId) return;
 
+    const key = ["chat", roomId];
+    const existing = queryClient.getQueryData(key);
+
+    if (!existing && Array.isArray(Imessages)) {
+      const seeded = {
+        pages: [
+          {
+            messages: Imessages,
+            meta: initialMeta ?? {
+              hasMore: false,
+              nextBeforeId: null,
+              limit: Imessages.length,
+              returnedCount: Imessages.length,
+            },
+          },
+        ],
+        pageParams: [initialMeta?.nextBeforeId ?? null],
+      };
+      queryClient.setQueryData(key, seeded);
+    }
+  }, [roomId, Imessages, initialMeta, queryClient]);
+
+  const {
+    data: messageData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isMessagesLoading,
+    isError: isMessagesError,
+  } = messageQuery(roomId);
+// console.log(fetchNextPage,hasNextPage)
+  const messages = (messageData?.pages ?? []).flatMap((p) => p.messages ?? []);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const key = ["chat", roomId];
+
     const handleNewMessage = (newMessage) => {
-      console.log(newMessage);
-      setMessages(prev=>[...prev,newMessage])
-      queryClient.setQueryData(["chat", roomId], (oldData) => {
-        console.log("old data", oldData);
-        if (!oldData) return;
+      queryClient.setQueryData(key, (old) => {
+        if (!old || !old.pages || old.pages.length === 0) {
+          return {
+            pages: [
+              {
+                messages: [newMessage],
+                meta: {
+                  hasMore: false,
+                  nextBeforeId: null,
+                  limit: 50,
+                  returnedCount: 1,
+                },
+              },
+            ],
+            pageParams: [null],
+          };
+        }
 
-        const updatedPages = [...oldData.pages];
-        const lastPageIndex = updatedPages.length - 1;
+        const pages = old.pages.slice();
+        const lastIndex = pages.length - 1;
+        const lastPage = { ...pages[lastIndex] };
+        lastPage.messages = dedupeMessages([
+          ...(lastPage.messages ?? []),
+          newMessage,
+        ]);
 
-        updatedPages[lastPageIndex] = {
-          ...updatedPages[lastPageIndex],
-          messages: [newMessage, ...updatedPages[lastPageIndex].messages], // 👈 prepend
-        };
-
-        return { ...oldData, pages: updatedPages };
+        pages[lastIndex] = lastPage;
+        return { ...old, pages };
       });
-      
     };
-    console.log("About to receive message");
+
     socket.on("messageReceived", handleNewMessage);
-        
-    return () => {
-      socket.off("messageReceived", handleNewMessage);
-    };
+    return () => socket.off("messageReceived", handleNewMessage);
   }, [roomId, queryClient, socket]);
 
   const scrollToBottom = useCallback(() => {
-    if (viewportRef.current) {
-      viewportRef.current.scrollTo({
-        top: viewportRef.current.scrollHeight,
-        behavior: "auto",
-      });
-    }
+    if (!viewportRef.current) return;
+    viewportRef.current.scrollTo({
+      top: viewportRef.current.scrollHeight,
+      behavior: "auto",
+    });
   }, []);
 
   useEffect(() => {
-    if (isInitialLoad && messages.length > 0) {
+    if (!messageData) return;
+    const flat = (messageData.pages ?? []).flatMap((p) => p.messages ?? []);
+    if (flat.length > 0) {
       scrollToBottom();
-      setIsInitialLoad(false);
-      setPrevMessagesLength(messages.length);
-      return;
     }
-
-    if (messages.length > prevMessagesLength) {
-      // If new messages were added at the end (real-time message)
-      if (messages.length - prevMessagesLength <= 2) {
-        // Assuming at most 1-2 new messages at a time
-        scrollToBottom();
-      }
-      setPrevMessagesLength(messages.length);
-    }
-  }, [messages, scrollToBottom, isInitialLoad, prevMessagesLength]);
+  }, [messageData, scrollToBottom]);
 
   const handleScroll = async (event) => {
     const { scrollTop, scrollHeight } = event.target;
+    console.log(scrollTop);
+    if (scrollTop !== 0) return;
+    if (!hasNextPage || isFetchingNextPage) return;
+    console.log("scroll 0");
+    const firstVisible = viewportRef.current.querySelector("[data-message-id]");
+    const firstId = firstVisible?.getAttribute("data-message-id");
+    const prevScrollHeight = scrollHeight;
 
-    if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
-      const firstVisibleMessage =
-        viewportRef.current.querySelector("[data-message-id]");
-      const firstVisibleMessageId =
-        firstVisibleMessage?.getAttribute("data-message-id");
+    await fetchNextPage();
 
-      const prevScrollHeight = scrollHeight;
-
-      await fetchNextPage();
-
-      requestAnimationFrame(() => {
-        if (viewportRef.current) {
-          const newScrollHeight = viewportRef.current.scrollHeight;
-
-          const heightDifference = newScrollHeight - prevScrollHeight;
-
-          if (firstVisibleMessageId) {
-            const sameMessageElement = viewportRef.current.querySelector(
-              `[data-message-id="${firstVisibleMessageId}"]`
-            );
-
-            if (sameMessageElement) {
-              sameMessageElement.scrollIntoView({
-                block: "start",
-                behavior: "auto",
-              });
-            } else {
-              viewportRef.current.scrollTop = heightDifference;
-            }
-          } else {
-            viewportRef.current.scrollTop = heightDifference;
-          }
-
-          setPrevMessagesLength(messages.length);
-        }
-      });
-    }
+    requestAnimationFrame(() => {
+      if (!viewportRef.current) return;
+      if (!firstId) {
+        viewportRef.current.scrollTop =
+          viewportRef.current.scrollHeight - prevScrollHeight;
+        return;
+      }
+      const sameEl = viewportRef.current.querySelector(
+        `[data-message-id="${firstId}"]`
+      );
+      if (sameEl) {
+        sameEl.scrollIntoView({ block: "start", behavior: "auto" });
+      } else {
+        viewportRef.current.scrollTop =
+          viewportRef.current.scrollHeight - prevScrollHeight;
+      }
+    });
   };
 
-  const debouncedHandleScroll = useDebouncedCallback(handleScroll, 200);
+  const debouncedHandleScroll = useDebouncedCallback(handleScroll, 150);
+
+  if (isMessagesLoading) {
+    return <div className="flex-1">Loading messages...</div>;
+  }
+  if (isMessagesError) {
+    return <div className="flex-1">Failed to load messages.</div>;
+  }
 
   return (
     <div className="flex flex-col w-[25rem] h-full">
       <ScrollArea
         ref={viewportRef}
-        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto "
+        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
         onScroll={debouncedHandleScroll}
       >
         {messages.length > 0 ? (
@@ -136,12 +161,10 @@ const ChatLayout = ({ Imessages, currentUser }) => {
             const prevMsg = index > 0 ? messages[index - 1] : null;
             const showAvatar =
               !prevMsg || prevMsg.sender._id !== msg.sender._id;
-
             const currentDateLabel = getDateLabel(msg.createdAt);
             const prevDateLabel = prevMsg
               ? getDateLabel(prevMsg.createdAt)
               : null;
-
             const showDateSeparator = currentDateLabel !== prevDateLabel;
 
             return (
@@ -161,12 +184,11 @@ const ChatLayout = ({ Imessages, currentUser }) => {
             );
           })
         ) : (
-          <p className="text-center ">No messages to show</p>
+          <p className="text-center">No messages to show</p>
         )}
       </ScrollArea>
 
-      {/* Chat Input */}
-      <ChatInput setMessages={setMessages}/>
+      <ChatInput roomId={roomId} />
     </div>
   );
 };

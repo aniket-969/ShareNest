@@ -36,7 +36,9 @@ export const getRoomData = async (roomId) => {
 
   const room = payload?.room;
   const chatMessages = payload?.chatMessages;
-  return {...room,chatMessages};
+  const chatMessagesMeta = payload?.chatMessagesMeta
+  // console.log(payload)
+  return {...room,chatMessages,chatMessagesMeta};
 }; 
 
 export const leaveRoom = async (roomId) => {
