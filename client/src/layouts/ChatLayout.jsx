@@ -17,6 +17,7 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
   const { roomId } = useParams();
   const { messageQuery } = useChat();
 
+ 
   useEffect(() => {
     if (!roomId) return;
 
@@ -25,15 +26,18 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
 
     if (!existing && Array.isArray(Imessages)) {
       const seeded = {
+       
         pages: [
           {
             messages: Imessages,
-            meta: initialMeta ?? {
-              hasMore: false,
-              nextBeforeId: null,
-              limit: Imessages.length,
-              returnedCount: Imessages.length,
-            },
+            meta:
+              initialMeta ??
+              {
+                hasMore: false,
+                nextBeforeId: null,
+                limit: Imessages.length,
+                returnedCount: Imessages.length,
+              },
           },
         ],
         pageParams: [initialMeta?.nextBeforeId ?? null],
@@ -50,8 +54,9 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
     isLoading: isMessagesLoading,
     isError: isMessagesError,
   } = messageQuery(roomId);
-// console.log(fetchNextPage,hasNextPage)
-  const messages = (messageData?.pages ?? []).flatMap((p) => p.messages ?? []);
+
+  const pages = messageData?.pages ?? [];
+  const messages = pages.slice().reverse().flatMap((p) => p.messages ?? []);
 
   useEffect(() => {
     if (!roomId) return;
@@ -59,6 +64,7 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
 
     const handleNewMessage = (newMessage) => {
       queryClient.setQueryData(key, (old) => {
+      
         if (!old || !old.pages || old.pages.length === 0) {
           return {
             pages: [
@@ -76,16 +82,14 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
           };
         }
 
-        const pages = old.pages.slice();
-        const lastIndex = pages.length - 1;
-        const lastPage = { ...pages[lastIndex] };
-        lastPage.messages = dedupeMessages([
-          ...(lastPage.messages ?? []),
-          newMessage,
-        ]);
+        // Append to FIRST page (index 0) because that stores the latest messages
+        const newPages = old.pages.slice();
+        newPages[0] = {
+          ...newPages[0],
+          messages: dedupeMessages([...(newPages[0].messages ?? []), newMessage]),
+        };
 
-        pages[lastIndex] = lastPage;
-        return { ...old, pages };
+        return { ...old, pages: newPages };
       });
     };
 
@@ -101,6 +105,7 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
     });
   }, []);
 
+  // initial auto-scroll when messages first appear
   useEffect(() => {
     if (!messageData) return;
     const flat = (messageData.pages ?? []).flatMap((p) => p.messages ?? []);
@@ -111,10 +116,9 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
 
   const handleScroll = async (event) => {
     const { scrollTop, scrollHeight } = event.target;
-    console.log(scrollTop);
     if (scrollTop !== 0) return;
     if (!hasNextPage || isFetchingNextPage) return;
-    console.log("scroll 0");
+
     const firstVisible = viewportRef.current.querySelector("[data-message-id]");
     const firstId = firstVisible?.getAttribute("data-message-id");
     const prevScrollHeight = scrollHeight;
@@ -160,11 +164,10 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
           messages.map((msg, index) => {
             const prevMsg = index > 0 ? messages[index - 1] : null;
             const showAvatar =
-              !prevMsg || prevMsg.sender._id !== msg.sender._id;
+              !prevMsg || (prevMsg.sender && prevMsg.sender._id !== msg.sender._id);
+
             const currentDateLabel = getDateLabel(msg.createdAt);
-            const prevDateLabel = prevMsg
-              ? getDateLabel(prevMsg.createdAt)
-              : null;
+            const prevDateLabel = prevMsg ? getDateLabel(prevMsg.createdAt) : null;
             const showDateSeparator = currentDateLabel !== prevDateLabel;
 
             return (
