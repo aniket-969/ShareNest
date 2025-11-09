@@ -10,7 +10,7 @@ import { useDebouncedCallback } from "@/hooks/use-debounce";
 import { useChat } from "@/hooks/useChat";
 
 const ChatLayout = ({ Imessages, currentUser }) => {
-  
+
   const viewportRef = useRef(null);
   const socket = getSocket();
   const [prevMessagesLength, setPrevMessagesLength] = useState(0);
@@ -28,6 +28,7 @@ const ChatLayout = ({ Imessages, currentUser }) => {
 
     const handleNewMessage = (newMessage) => {
       console.log(newMessage);
+      setMessages(prev=>[...prev,newMessage])
       queryClient.setQueryData(["chat", roomId], (oldData) => {
         console.log("old data", oldData);
         if (!oldData) return;
@@ -42,10 +43,11 @@ const ChatLayout = ({ Imessages, currentUser }) => {
 
         return { ...oldData, pages: updatedPages };
       });
+      
     };
     console.log("About to receive message");
     socket.on("messageReceived", handleNewMessage);
-
+        
     return () => {
       socket.off("messageReceived", handleNewMessage);
     };
@@ -164,7 +166,7 @@ const ChatLayout = ({ Imessages, currentUser }) => {
       </ScrollArea>
 
       {/* Chat Input */}
-      <ChatInput />
+      <ChatInput setMessages={setMessages}/>
     </div>
   );
 };

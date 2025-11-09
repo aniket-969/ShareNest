@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useChat } from "@/hooks/useChat";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-
-const ChatInput = () => {
+ 
+const ChatInput = ({setMessages}) => {
   const [content, setContent] = useState("");
   const { sendMessageMutation } = useChat();
   const { roomId } = useParams();
@@ -21,7 +21,7 @@ const ChatInput = () => {
         data: { content },
       });
 
-      // Update UI immediately for the sender
+      setMessages(prev=>[...prev,sentMessage])
       queryClient.setQueryData(["chat", roomId], (oldData) => {
         if (!oldData) return;
 

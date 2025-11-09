@@ -16,7 +16,7 @@ import { Card, CardContent } from "../../ui/card";
 const UserExpense = ({ userExpenseQuery, userId }) => {
   const { data: expenses, isLoading, isError, error } = userExpenseQuery;
   if (isLoading) {
-    return <>Spinner</>;
+    return <Spinner/>;
   }
   if (isError) {
     return <>Please refresh ,something went wrong</>;
