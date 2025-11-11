@@ -209,9 +209,14 @@ const roomSchema = new Schema(
         },
       },
     ],
-
     polls: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vote" }],
+   currency: {
+      type: String,
+      default: "INR",
+      match: /^[A-Z]{3}$/,
+    },
   },
+
   { timestamps: true }
 );
 

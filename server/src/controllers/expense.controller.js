@@ -45,7 +45,7 @@ const getPendingPayments = asyncHandler(async (req, res) => {
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, imageUrl, dueDate, participants, currency } =
+  const { title, totalAmount, dueDate, participants, currency } =
     req.body;
   const paidBy = req.user._id;
 
@@ -77,7 +77,6 @@ const createExpense = asyncHandler(async (req, res) => {
     title,
     paidBy,
     roomId,
-    imageUrl,
     dueDate,
     participants: formattedParticipants,
     totalAmountPaid: 0,
@@ -227,7 +226,6 @@ const updateExpense = asyncHandler(async (req, res) => {
     name,
     totalAmount,
     paidBy,
-    imageUrl,
     participants,
     dueDate,
     paymentHistory,
@@ -249,7 +247,6 @@ const updateExpense = asyncHandler(async (req, res) => {
     ...(name !== undefined && { name }),
     ...(totalAmount !== undefined && { totalAmount }),
     ...(paidBy !== undefined && { paidBy }),
-    ...(imageUrl !== undefined && { imageUrl }),
     ...(participants !== undefined && { participants }),
     ...(dueDate !== undefined && { dueDate }),
     ...(paymentHistory !== undefined && { paymentHistory }),

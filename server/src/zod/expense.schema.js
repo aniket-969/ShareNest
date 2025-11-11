@@ -12,7 +12,7 @@ const additionalChargeSchema = z.object({
 const participantSchema = z.object({
   userId: objectIdValidation,
   additionalCharges: z.array(additionalChargeSchema).optional(),
-});
+}); 
 
 export const createExpenseSchema = z.object({
   title: stringValidation(1, 50, "title"),
@@ -21,7 +21,6 @@ export const createExpenseSchema = z.object({
     .positive("Total amount must be a positive number")
     .min(1, "Minimum amount is 1")
     .max(1000000, "Maximum amount allowed is ten lakh"),
-  imageUrl: stringValidation(5, 300, "imageUrl").optional(),
   participants: z
     .array(participantSchema)
     .min(1, { message: "Minimum one participants is required" }),
@@ -36,7 +35,6 @@ export const updateExpenseSchema = z.object({
   name: z.string().optional(),
   totalAmount: z.number().positive().optional(),
   paidBy: z.string().optional(),
-  imageUrl: z.string().url().optional(),
   participants: z
     .array(
       z.object({

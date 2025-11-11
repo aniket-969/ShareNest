@@ -16,10 +16,6 @@ const expenseSchema = new Schema(
       ref: "Room",
       required: true,
     },
-    imageUrl: {
-      type: String,
-      default: null,
-    },
     participants: [
       {
         user: { type: Schema.Types.ObjectId, ref: "User" },
@@ -53,7 +49,7 @@ const expenseSchema = new Schema(
       type: Number,
       required: true,
     },
-    currency: {
+   currency: {
       type: String,
       default: "INR",
       match: /^[A-Z]{3}$/,
