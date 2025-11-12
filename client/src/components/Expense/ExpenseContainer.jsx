@@ -174,7 +174,7 @@ const ExpenseContainer = () => {
 
   return (
    
-    <ScrollArea className=" w-[50rem] max-w-[80%] h-[36rem] max-h-[90%]">
+    <ScrollArea className=" w-[50rem] max-w-[50%] h-[36rem] max-h-[90%] ">
       <div className="flex flex-col gap-5 ">
         {fakeExpenses.map((fake) => (
           <>
