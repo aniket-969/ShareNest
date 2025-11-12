@@ -32,7 +32,6 @@ export const createExpenseSchema = z.object({
   participants: z
     .array(participantSchema)
     .min(1, { message: "Minimum one participants is required" }),
-  dueDate: z.coerce.date().optional(),
    currency: z
     .string()
     .regex(/^[A-Z]{3}$/, "Currency must be a 3-letter code")
@@ -59,7 +58,6 @@ export const updateExpenseSchema = z.object({
       })
     )
     .optional(),
-  dueDate: z.date().optional(),
   paymentHistory: z
     .array(
       z.object({

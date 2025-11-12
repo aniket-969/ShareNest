@@ -19,9 +19,9 @@ import ParticipantSelector from "../ParticipantsSelector";
 import { Spinner } from "@/components/ui/spinner";
 import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
-import { currencyOptions } from "@/utils/helper";
+
  
-const ExpenseForm = ({ participants,onClose }) => {
+const ExpenseForm = ({ participants,onClose,currency }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
 
@@ -45,11 +45,9 @@ const ExpenseForm = ({ participants,onClose }) => {
     defaultValues: {
       title: "",
       totalAmount: 0,
-      imageUrl: undefined,
-      dueDate: undefined,
       paidBy: "",
       participants: [],
-      currency: "INR",
+      currency: currency,
     },
   });
 
@@ -109,64 +107,7 @@ const ExpenseForm = ({ participants,onClose }) => {
             </FormItem>
           )}
         />
-        {/* image or bill link */}
-        {/* <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bill image link</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="add link of expense"
-                  value={field.value || ""}
-                  onChange={(e) => field.onChange(e.target.value || undefined)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
-        {/* Due date */}
-        <FormField
-          control={form.control}
-          name="dueDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Due Date</FormLabel>
-              <FormControl>
-                <DatePicker
-                  name="dueDate"
-                  field={field}
-                  disableBefore={new Date(new Date().setHours(0, 0, 0, 0))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Currency</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className="w-full rounded border px-3 py-2 bg-background text-foreground"
-                >
-                  {currencyOptions.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+       
         <Button type="submit" disabled={createExpenseMutation.isLoading}>
           Submit
         </Button>

@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import ParticipantsModal from "./ParticipantsModal";
 import MarkAsPaid from "./MarkAsPaid";
+import { Button } from "@/components/ui/button";
 
 const ExpenseCard = ({ expense, userId }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,75 +47,40 @@ const ExpenseCard = ({ expense, userId }) => {
     : null;
 
   return (
-    <Card className="rounded-lg bg-card border ">
+    <Card className="rounded-xl bg-card border w-[50%]">
       {/* ───── Card Header ───── */}
-      <CardHeader className="px-6 py-4">
-        <div className="flex items-center justify-between">
+      <CardHeader className="px-6 py-4 text-center">
+        
           <CardTitle className="text-lg font-semibold text-gray-100">
-            {expense.title}
+           Requested for ' {expense.title} '
           </CardTitle>
-          <span className="text-lg font-bold text-accent-light">
-            {symbol}
-            {totalExpense}
-          </span>
-        </div>
-        <div className="mt-3 flex items-center justify-between gap-5">
-          <div className="flex items-center gap-2">
-            <Avatar className="w-8 h-8 ring-1 ring-gray-700">
-              <AvatarImage
-                src={expense.paidBy.avatar}
-                alt={expense.paidBy.fullName}
-              />
-              <AvatarFallback>
-                {expense.paidBy.fullName.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium text-gray-100">
-              {expense.paidBy.fullName}
-            </span>
-          </div>
-          <span className="text-sm text-gray-400 ">{createdDate}</span>
-        </div>
+        
+     
       </CardHeader>
 
       {/* ───── Card Content ───── */}
       <CardContent className="px-6 py-4">
         <div className="flex items-center justify-between mb-4 gap-10">
           <div>
-            <span className="text-base font-medium text-gray-100">
-              You owe: {symbol}
+            <span className="text-2xl font-medium text-gray-100">
+           {symbol}
               {youOwe}
             </span>
-            {youPaid && paidDate ? (
-              <div className="text-xs text-gray-400 ">Paid on {paidDate}</div>
-            ):(  <div className="text-xs text-card">Paid on</div>)}
+          
           </div>
-          <Badge
-            variant={youPaid ? "secondary" : ""}
-            className="uppercase px-2 py-1 text-[0.72rem]"
-          >
-            {youStatus}
-          </Badge>
+        
         </div>
-
-        {/* Participants Modal Trigger */}
-        <ParticipantsModal
-          expense={expense}
-          symbol={symbol}
-          status={youStatus}
-          onOpen={() => setIsOpen(true)}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
+       
       </CardContent>
 
       {/* ───── Card Footer ───── */}
       <CardFooter className="px-6 flex justify-end">
-        <MarkAsPaid
-          expenseId={expense._id}
-          roomId={expense.roomId}
+        {/* <MarkAsPaid
+          expenseId={expense?._id}
+          roomId={expense?.roomId}
           disabled={youPaid}
-        />
+        /> */}
+        <Button>Mark as paid</Button>
       </CardFooter>
     </Card>
   );

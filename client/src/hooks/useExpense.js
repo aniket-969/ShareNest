@@ -12,43 +12,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 export const useExpense = (roomId) => {
   const queryClient = useQueryClient();
  
-  // Fetch expense details
-  const expenseQuery = (expenseId) =>
-    useQuery({
-      queryKey: ["expense", expenseId],
-      queryFn: () => getExpenseDetails(expenseId),
-      refetchOnWindowFocus: false,
-      staleTime: 30 * 60 * 1000,
-      cacheTime: 60 * 60 * 1000,
-      enabled: !!expenseId, // Avoid fetching when expenseId is undefined
-    });
-
-  // Fetch user-specific expenses
-  const userExpenseQuery = useQuery({
-    queryKey: ["expense", "user"],
-    queryFn: getUserExpense,
-    refetchOnWindowFocus: false,
-    staleTime: 30 * 60 * 1000,
-    cacheTime: 60 * 60 * 1000,
-  });
-
-  // Fetch pending payments
-  // const balanceQuery = useQuery({
-  //   queryKey: ["expense", "balance"],
-  //   queryFn: getBalances,
-  //   refetchOnWindowFocus: false,
-  //   staleTime: 30 * 60 * 1000,
-  //   cacheTime: 60 * 60 * 1000,
-  // });
- 
-  const userPendingExpenseQuery = useQuery({
-    queryKey: ["expense", "pending"],
-    queryFn: getPendingPayments,
-    refetchOnWindowFocus: false,
-    staleTime: 30 * 60 * 1000,
-    cacheTime: 60 * 60 * 1000,
-  });
- 
   // Create an expense
   const createExpenseMutation = useMutation({
     mutationFn: (data) => createExpense(data, roomId),
@@ -83,9 +46,6 @@ export const useExpense = (roomId) => {
     createExpenseMutation,
     updateExpenseMutation,
     deleteExpenseMutation,
-    expenseQuery,
-    userExpenseQuery,
-    userPendingExpenseQuery,
     updatePaymentMutation,
   };
 };

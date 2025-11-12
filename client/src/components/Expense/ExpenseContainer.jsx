@@ -1,0 +1,186 @@
+import React from 'react'
+import { ScrollArea } from '../ui/scroll-area'
+import ExpenseCard from './userExpense/ExpenseCard';
+
+export const fakeExpenses = [
+  {
+    _id: "66c8a01f2f1b9b500df20101",
+    title: "Groceries",
+    paidBy: {
+      id: "66c89f6d2f1b9b500df20011",
+      fullName: "Atharv Agrawal",
+      avatar: "/avatars/atharv.png",
+    },
+    roomId: "66c88c9d2f1b9b500df10001",
+    totalAmount: 1200,
+    currency: "INR",
+    participants: [
+      {
+        user: { _id: "66c89f6d2f1b9b500df20011" },
+        fullName: "Atharv Agrawal",
+        avatar: "/avatars/atharv.png",
+        baseAmount: 400,
+        additionalCharges: [],
+        totalAmountOwed: 400,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c8a02e2f1b9b500df20102" },
+        fullName: "Aniket Baranwal",
+        avatar: "/avatars/aniket.png",
+        baseAmount: 400,
+        additionalCharges: [],
+        totalAmountOwed: 400,
+        isSettled: false,
+      },
+      {
+        user: { _id: "66c8a03f2f1b9b500df20103" },
+        fullName: "Rohan Mishra",
+        avatar: "/avatars/rohan.png",
+        baseAmount: 400,
+        additionalCharges: [],
+        totalAmountOwed: 400,
+        isSettled: false,
+      },
+    ],
+    paymentHistory: [
+      {
+        user: "66c89f6d2f1b9b500df20011",
+        amount: 400,
+        paymentDate: "2025-11-10T09:14:00.000Z",
+        description: "Self payment",
+      },
+    ],
+    createdAt: "2025-11-09T10:00:00.000Z",
+    updatedAt: "2025-11-10T09:14:00.000Z",
+  },
+  {
+    _id: "66c8a04a2f1b9b500df20104",
+    title: "Milk & Eggs",
+    paidBy: {
+      id: "66c8a02e2f1b9b500df20102",
+      fullName: "Aniket Baranwal",
+      avatar: "/avatars/aniket.png",
+    },
+    roomId: "66c88c9d2f1b9b500df10001",
+    totalAmount: 360,
+    currency: "INR",
+    participants: [
+      {
+        user: { _id: "66c8a02e2f1b9b500df20102" },
+        fullName: "Aniket Baranwal",
+        avatar: "/avatars/aniket.png",
+        baseAmount: 120,
+        additionalCharges: [],
+        totalAmountOwed: 120,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c89f6d2f1b9b500df20011" },
+        fullName: "Atharv Agrawal",
+        avatar: "/avatars/atharv.png",
+        baseAmount: 120,
+        additionalCharges: [],
+        totalAmountOwed: 120,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c8a03f2f1b9b500df20103" },
+        fullName: "Rohan Mishra",
+        avatar: "/avatars/rohan.png",
+        baseAmount: 120,
+        additionalCharges: [],
+        totalAmountOwed: 120,
+        isSettled: false,
+      },
+    ],
+    paymentHistory: [
+      {
+        user: "66c8a02e2f1b9b500df20102",
+        amount: 120,
+        paymentDate: "2025-11-10T08:50:00.000Z",
+        description: "Paid share",
+      },
+      {
+        user: "66c89f6d2f1b9b500df20011",
+        amount: 120,
+        paymentDate: "2025-11-10T09:00:00.000Z",
+        description: "Paid share",
+      },
+    ],
+    createdAt: "2025-11-08T18:25:00.000Z",
+    updatedAt: "2025-11-10T09:00:00.000Z",
+  },
+  {
+    _id: "66c8a06d2f1b9b500df20105",
+    title: "Pizza Night",
+    paidBy: {
+      id: "66c8a03f2f1b9b500df20103",
+      fullName: "Rohan Mishra",
+      avatar: "/avatars/rohan.png",
+    },
+    roomId: "66c88c9d2f1b9b500df10001",
+    totalAmount: 900,
+    currency: "USD",
+    participants: [
+      {
+        user: { _id: "66c8a03f2f1b9b500df20103" },
+        fullName: "Rohan Mishra",
+        avatar: "/avatars/rohan.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c8a02e2f1b9b500df20102" },
+        fullName: "Aniket Baranwal",
+        avatar: "/avatars/aniket.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+      {
+        user: { _id: "66c89f6d2f1b9b500df20011" },
+        fullName: "Atharv Agrawal",
+        avatar: "/avatars/atharv.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+    ],
+    paymentHistory: [
+      {
+        user: "66c8a03f2f1b9b500df20103",
+        amount: 300,
+        paymentDate: "2025-11-10T09:35:00.000Z",
+        description: "Self payment",
+      },
+    ],
+    createdAt: "2025-11-10T09:30:00.000Z",
+    updatedAt: "2025-11-10T09:35:00.000Z",
+  },
+];
+
+const ExpenseContainer = () => {
+
+const {_id} = JSON.parse(localStorage.getItem('session'))
+
+  return (
+    <ScrollArea className=" w-[50rem] max-w-[80%] h-[35rem] max-h-[90%]">
+        <div className='flex flex-col gap-5'>
+              {
+        fakeExpenses.map(fake=>( <ExpenseCard key={fake._id} userId={_id} expense={fake}/>))
+        
+        }
+        </div>
+      
+   
+
+    </ScrollArea>
+  )
+}
+
+export default ExpenseContainer
