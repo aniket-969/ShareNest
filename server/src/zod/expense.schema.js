@@ -24,7 +24,6 @@ export const createExpenseSchema = z.object({
   participants: z
     .array(participantSchema)
     .min(1, { message: "Minimum one participants is required" }),
-  dueDate: z.coerce.date().optional(),
 });
 
 export const updatePaymentSchema = z.object({
@@ -50,13 +49,6 @@ export const updateExpenseSchema = z.object({
         amountOwed: z.number().positive(),
       })
     )
-    .optional(),
-  dueDate: z
-    .string()
-    .transform((val) => new Date(val))
-    .refine((date) => !isNaN(date.getTime()), {
-      message: "Invalid date format",
-    })
     .optional(),
   paymentHistory: z
     .array(

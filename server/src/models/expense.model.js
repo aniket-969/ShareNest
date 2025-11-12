@@ -32,9 +32,6 @@ const expenseSchema = new Schema(
         totalAmountOwed: { type: Number, required: true },
       },
     ],
-    dueDate: {
-      type: Date,
-    },
     paymentHistory: [
       {
         user: { type: Schema.Types.ObjectId, ref: "User", required: true },
