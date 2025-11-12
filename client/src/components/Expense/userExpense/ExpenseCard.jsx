@@ -47,11 +47,11 @@ const ExpenseCard = ({ expense, userId }) => {
     : null;
 
   return (
-    <Card className="rounded-xl bg-card border w-[50%]">
+    <Card className="rounded-xl bg-card border w-[40%] ml-12">
       {/* ───── Card Header ───── */}
-      <CardHeader className="px-6 py-4 text-center">
+      <CardHeader className="px-6 text-center">
         
-          <CardTitle className="text-lg font-semibold text-gray-100">
+          <CardTitle className="text-base tracking-wide font-semibold text-gray-100">
            Requested for ' {expense.title} '
           </CardTitle>
         
@@ -59,28 +59,20 @@ const ExpenseCard = ({ expense, userId }) => {
       </CardHeader>
 
       {/* ───── Card Content ───── */}
-      <CardContent className="px-6 py-4">
-        <div className="flex items-center justify-between mb-4 gap-10">
-          <div>
-            <span className="text-2xl font-medium text-gray-100">
+      <CardContent className="">
+       
+            <span className="text-4xl font-medium text-gray-100">
            {symbol}
               {youOwe}
             </span>
-          
-          </div>
-        
-        </div>
+          <p className="text-sm">1/3 paid</p>
+          <p className="text-sm">Unpaid</p>
        
       </CardContent>
 
       {/* ───── Card Footer ───── */}
-      <CardFooter className="px-6 flex justify-end">
-        {/* <MarkAsPaid
-          expenseId={expense?._id}
-          roomId={expense?.roomId}
-          disabled={youPaid}
-        /> */}
-        <Button>Mark as paid</Button>
+      <CardFooter className="">
+        <Button className="w-full mx-auto">Mark as paid</Button>
       </CardFooter>
     </Card>
   );

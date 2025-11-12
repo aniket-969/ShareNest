@@ -1,8 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
-import React from "react";
 import { Spinner } from "./ui/spinner";
 import ProfileSkeleton from "./skeleton/Room/profile";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfileCard = () => {
   const { sessionQuery } = useAuth();

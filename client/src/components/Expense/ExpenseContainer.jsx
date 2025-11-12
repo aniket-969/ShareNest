@@ -1,6 +1,9 @@
-import React from 'react'
-import { ScrollArea } from '../ui/scroll-area'
-import ExpenseCard from './userExpense/ExpenseCard';
+import React from "react";
+import { ScrollArea } from "../ui/scroll-area";
+import ExpenseCard from "./userExpense/ExpenseCard";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Spinner } from "@/components/ui/spinner";
 
 export const fakeExpenses = [
   {
@@ -165,22 +168,39 @@ export const fakeExpenses = [
 ];
 
 const ExpenseContainer = () => {
-
-const {_id} = JSON.parse(localStorage.getItem('session'))
+  const { sessionQuery } = useAuth();
+  const { data, isLoading, isError } = sessionQuery;
+  const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-    <ScrollArea className=" w-[50rem] max-w-[80%] h-[35rem] max-h-[90%]">
-        <div className='flex flex-col gap-5'>
-              {
-        fakeExpenses.map(fake=>( <ExpenseCard key={fake._id} userId={_id} expense={fake}/>))
-        
-        }
-        </div>
-      
    
+    <ScrollArea className=" w-[50rem] max-w-[80%] h-[36rem] max-h-[90%]">
+      <div className="flex flex-col gap-5 ">
+        {fakeExpenses.map((fake) => (
+          <>
+            <p className=" text-center text-sm">7:13 pm</p>
 
+            {/* user profile */}
+            <div className="flex items-center gap-4 mx-1">
+              <Avatar className="w-[30px] h-[30px] rounded-[2.4rem]">
+                <AvatarImage src={data.avatar} alt={data.fullName} />
+                <AvatarFallback>
+                  <img src="/altAvatar1.jpg" alt="fallback avatar" />
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex gap-10 sm:gap-20 items-center justify-center">
+                <p className="max-w-[120px] truncate text-center">
+                  {data?.fullName}
+                </p>
+              </div>
+            </div>
+            <ExpenseCard key={fake._id} userId={_id} expense={fake} />
+          </>
+        ))}
+      </div>
     </ScrollArea>
-  )
-}
+  );
+};
 
-export default ExpenseContainer
+export default ExpenseContainer;

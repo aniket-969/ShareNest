@@ -10,6 +10,7 @@ import BalanceSheet from "@/components/Expense/balanceSheet";
 import { computeBalances } from "@/utils/helper.js";
 import { Search, CirclePlus, ScrollText } from 'lucide-react';
 import ExpenseContainer from "@/components/Expense/ExpenseContainer";
+import { Card } from "@/components/ui/card";
 
 const ExpenseForm = lazy(() => import("@/components/form/ExpenseForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -29,11 +30,12 @@ const RoomExpense = () => {
     ...(data.tenants || []),
     ...(data.landlord ? [data.landlord] : []),
   ];
-  
+
   return (
-    <div className="flex flex-col gap-2 items-center">
-      {/* Heading and form button */}
-      <div className="flex items-center justify-around w-full">
+    <div className="flex flex-col gap-6 items-center">
+
+      {/* Heading and icons*/}
+      <div className="flex items-center justify-around w-full ">
         <h2 className="font-bold text-2xl">Expense</h2>
         {/* icons */}
         <div className="flex gap-3">
@@ -69,7 +71,9 @@ const RoomExpense = () => {
       )}
         
       {/* Expense and Pending cards */}
-      <ExpenseContainer/>
+      
+        <ExpenseContainer/>
+      
     </div>
   );
 };
