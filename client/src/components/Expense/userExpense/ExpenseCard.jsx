@@ -47,7 +47,7 @@ const ExpenseCard = ({ expense, userId }) => {
     : null;
 
   return (
-    <Card className="rounded-xl bg-card border mr-12">
+    <Card className="rounded-xl bg-card ">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
         
@@ -74,6 +74,7 @@ const ExpenseCard = ({ expense, userId }) => {
       <CardFooter className="">
         <Button className="w-full mx-auto">Mark as paid</Button>
       </CardFooter>
+      
     </Card>
   );
 };

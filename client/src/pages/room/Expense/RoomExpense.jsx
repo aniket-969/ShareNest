@@ -72,7 +72,7 @@ const RoomExpense = () => {
         
       {/* Expense and Pending cards */}
       
-        <ExpenseContainer/>
+        <ExpenseContainer participants={participants}/>
       
     </div>
   );

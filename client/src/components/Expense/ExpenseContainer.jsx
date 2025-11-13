@@ -4,6 +4,9 @@ import ExpenseCard from "./userExpense/ExpenseCard";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Spinner } from "@/components/ui/spinner";
+import { Card } from "../ui/card";
+import FormWrapper from "../ui/formWrapper";
+import ExpenseForm from "../form/ExpenseForm";
 
 export const fakeExpenses = [
   {
@@ -167,15 +170,16 @@ export const fakeExpenses = [
   },
 ];
 
-const ExpenseContainer = () => {
+const ExpenseContainer = ({participants}) => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
   const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-   
-    <ScrollArea className=" w-[50rem] max-w-[50%] h-[36rem] max-h-[90%] ">
-      <div className="flex flex-col gap-5 items-center ">
+   <div className="flex w-full items-center justify-around">
+
+       <ScrollArea className=" h-[36rem]  ">
+      <Card className="flex flex-col gap-3 items-center bg-black p-2 max-h-[90%] w-[25rem]">
         {fakeExpenses.map((fake) => (
           <>
             <p className=" text-center text-sm">7:13 pm</p>
@@ -198,8 +202,20 @@ const ExpenseContainer = () => {
             <ExpenseCard key={fake._id} userId={_id} expense={fake} />
           </>
         ))}
-      </div>
+      </Card>
+
     </ScrollArea>
+
+     <div className="bmain w-full max-w-[25rem] p-10 rounded-[2.5rem] bg-black mx-3 ">
+          <ExpenseForm
+              onClose={() => {}}
+              participants={participants}
+              onSubmit={() => setIsFormOpen(false)}
+            />
+     </div>
+          
+   </div>
+ 
   );
 };
 
