@@ -333,8 +333,8 @@ const ExpenseContainer = ({participants}) => {
    <div className="flex w-full items-center justify-around h-[38rem] ">
 
 {/* Scrollable expense history */}
-       <ScrollArea className=" h-[32rem] ">
-      <div className="flex flex-col gap-3 items-center p-2 max-h-[90%] w-[25rem] ">
+       <ScrollArea className=" h-[32rem] rounded-xl">
+      <Card className="flex flex-col gap-3 items-center p-2 max-h-[90%] w-[25rem] ">
         {fakeExpenses.map((fake) => (
           <>
             {Number(fake._id.slice(-1)) % 2 == 0 && <p className=" text-center text-xs">7:13 pm</p>}
@@ -360,7 +360,7 @@ const ExpenseContainer = ({participants}) => {
            
           </>
         ))}
-      </div>
+      </Card>
 
     </ScrollArea>
 
