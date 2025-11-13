@@ -175,13 +175,13 @@ const ExpenseContainer = () => {
   return (
    
     <ScrollArea className=" w-[50rem] max-w-[50%] h-[36rem] max-h-[90%] ">
-      <div className="flex flex-col gap-5 ">
+      <div className="flex flex-col gap-5 items-center ">
         {fakeExpenses.map((fake) => (
           <>
             <p className=" text-center text-sm">7:13 pm</p>
 
             {/* user profile */}
-            <div className="flex items-center gap-4 mx-1">
+            <div className="flex gap-4 w-full">
               <Avatar className="w-[30px] h-[30px] rounded-[2.4rem]">
                 <AvatarImage src={data.avatar} alt={data.fullName} />
                 <AvatarFallback>

@@ -14,7 +14,7 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar, ...props }) => {
     >
       {showAvatar && <p className="text-sm text-muted-foreground mb-1 mr-1">You</p>}
       <div className="relative bg-secondary text-secondary-foreground rounded-2xl rounded-br-md px-4 py-[0.3rem] max-w-[80%] sm:max-w-[60%] ">
-        <p className="break-words text-[0.9rem]  ">{message.content}</p>
+        <p className="break-words text-[0.9rem] tracking-wide ">{message.content}</p>
         <p className="text-[0.6rem]  opacity-70 text-right">{formattedTime}</p>
       </div>
     </div>
@@ -41,7 +41,7 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar, ...props }) => {
         </div>
       )}
       <div className="relative  bg-primary text-primary-foreground rounded-2xl rounded-bl-md px-4 py-[0.3rem] max-w-[80%] sm:max-w-[60%]">
-        <p className="break-words text-[0.9rem]">{message?.content}</p>
+        <p className="break-words text-[0.9rem] tracking-wide">{message?.content}</p>
         <p className="text-[0.6rem] opacity-70 text-right ">{formattedTime}</p>
       </div>
     </div>
