@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Card } from "../ui/card";
 import FormWrapper from "../ui/formWrapper";
 import ExpenseForm from "../form/ExpenseForm";
+import { motion } from 'framer-motion';
 
 export const fakeExpenses = [
   {
@@ -168,6 +169,159 @@ export const fakeExpenses = [
     createdAt: "2025-11-10T09:30:00.000Z",
     updatedAt: "2025-11-10T09:35:00.000Z",
   },
+  {
+    _id: "66c8a06d2f1b9b500df20122",
+    title: "Pizza Night",
+    paidBy: {
+      id: "66c8a03f2f1b9b500df20103",
+      fullName: "Rohan Mishra",
+      avatar: "/avatars/rohan.png",
+    },
+    roomId: "66c88c9d2f1b9b500df10001",
+    totalAmount: 900,
+    currency: "USD",
+    participants: [
+      {
+        user: { _id: "66c8a03f2f1b9b500df20103" },
+        fullName: "Rohan Mishra",
+        avatar: "/avatars/rohan.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c8a02e2f1b9b500df20102" },
+        fullName: "Aniket Baranwal",
+        avatar: "/avatars/aniket.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+      {
+        user: { _id: "66c89f6d2f1b9b500df20011" },
+        fullName: "Atharv Agrawal",
+        avatar: "/avatars/atharv.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+    ],
+    paymentHistory: [
+      {
+        user: "66c8a03f2f1b9b500df20103",
+        amount: 300,
+        paymentDate: "2025-11-10T09:35:00.000Z",
+        description: "Self payment",
+      },
+    ],
+    createdAt: "2025-11-10T09:30:00.000Z",
+    updatedAt: "2025-11-10T09:35:00.000Z",
+  },
+  {
+    _id: "66c8a06d2f1b0b500df20103",
+    title: "Pizza Night",
+    paidBy: {
+      id: "66c8a03f2f1b9b500df20103",
+      fullName: "Rohan Mishra",
+      avatar: "/avatars/rohan.png",
+    },
+    roomId: "66c88c9d2f1b9b500df10001",
+    totalAmount: 900,
+    currency: "USD",
+    participants: [
+      {
+        user: { _id: "66c8a03f2f1b9b500df20103" },
+        fullName: "Rohan Mishra",
+        avatar: "/avatars/rohan.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c8a02e2f1b9b500df20102" },
+        fullName: "Aniket Baranwal",
+        avatar: "/avatars/aniket.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+      {
+        user: { _id: "66c89f6d2f1b9b500df20011" },
+        fullName: "Atharv Agrawal",
+        avatar: "/avatars/atharv.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+    ],
+    paymentHistory: [
+      {
+        user: "66c8a03f2f1b9b500df20103",
+        amount: 300,
+        paymentDate: "2025-11-10T09:35:00.000Z",
+        description: "Self payment",
+      },
+    ],
+    createdAt: "2025-11-10T09:30:00.000Z",
+    updatedAt: "2025-11-10T09:35:00.000Z",
+  },
+  {
+    _id: "66c8a06d2f1b9b500df20108",
+    title: "Pizza Night",
+    paidBy: {
+      id: "66c8a03f2f1b9b500df20103",
+      fullName: "Rohan Mishra",
+      avatar: "/avatars/rohan.png",
+    },
+    roomId: "66c88c9d2f1b9b500df10001",
+    totalAmount: 900,
+    currency: "USD",
+    participants: [
+      {
+        user: { _id: "66c8a03f2f1b9b500df20103" },
+        fullName: "Rohan Mishra",
+        avatar: "/avatars/rohan.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: true,
+      },
+      {
+        user: { _id: "66c8a02e2f1b9b500df20102" },
+        fullName: "Aniket Baranwal",
+        avatar: "/avatars/aniket.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+      {
+        user: { _id: "66c89f6d2f1b9b500df20011" },
+        fullName: "Atharv Agrawal",
+        avatar: "/avatars/atharv.png",
+        baseAmount: 300,
+        additionalCharges: [],
+        totalAmountOwed: 300,
+        isSettled: false,
+      },
+    ],
+    paymentHistory: [
+      {
+        user: "66c8a03f2f1b9b500df20103",
+        amount: 300,
+        paymentDate: "2025-11-10T09:35:00.000Z",
+        description: "Self payment",
+      },
+    ],
+    createdAt: "2025-11-10T09:30:00.000Z",
+    updatedAt: "2025-11-10T09:35:00.000Z",
+  },
 ];
 
 const ExpenseContainer = ({participants}) => {
@@ -176,16 +330,18 @@ const ExpenseContainer = ({participants}) => {
   const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-   <div className="flex w-full items-center justify-around">
+   <div className="flex w-full items-center justify-around h-[38rem] ">
 
-       <ScrollArea className=" h-[36rem]  ">
-      <Card className="flex flex-col gap-3 items-center bg-black p-2 max-h-[90%] w-[25rem]">
+{/* Scrollable expense history */}
+       <ScrollArea className=" h-[32rem] ">
+      <div className="flex flex-col gap-3 items-center p-2 max-h-[90%] w-[25rem] ">
         {fakeExpenses.map((fake) => (
           <>
-            <p className=" text-center text-sm">7:13 pm</p>
+            {Number(fake._id.slice(-1)) % 2 == 0 && <p className=" text-center text-xs">7:13 pm</p>}
 
             {/* user profile */}
-            <div className="flex gap-4 w-full">
+            <div className="">
+                 <div className="flex gap-4 m-2">
               <Avatar className="w-[30px] h-[30px] rounded-[2.4rem]">
                 <AvatarImage src={data.avatar} alt={data.fullName} />
                 <AvatarFallback>
@@ -200,12 +356,23 @@ const ExpenseContainer = ({participants}) => {
               </div>
             </div>
             <ExpenseCard key={fake._id} userId={_id} expense={fake} />
+            </div>
+           
           </>
         ))}
-      </Card>
+      </div>
 
     </ScrollArea>
 
+ {/* 🔹 Vertical Animated Divider */}
+<motion.div
+  initial={{ scaleY: 0, opacity: 0 }}
+  animate={{ scaleY: 1, opacity: 1 }}
+  transition={{ duration: 0.6, ease: "easeOut" }}
+  className="w-[3px] h-[70%] rounded-full bg-gradient-to-b from-pink-500 via-purple-500 to-blue-500 origin-top shadow-[0_0_10px_rgba(168,85,247,0.6)]"
+/>
+
+{/* expense form */}
      <div className="bmain w-full max-w-[25rem] p-10 rounded-[2.5rem] bg-black mx-3 ">
           <ExpenseForm
               onClose={() => {}}

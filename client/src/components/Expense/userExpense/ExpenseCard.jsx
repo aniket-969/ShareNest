@@ -65,7 +65,7 @@ const ExpenseCard = ({ expense, userId }) => {
            {symbol}
               {youOwe}
             </span>
-          <p className="text-sm">1/3 paid</p>
+          <p className="text-sm my-2">1/3 paid</p>
           <p className="text-sm">Unpaid</p>
        
       </CardContent>
@@ -74,7 +74,7 @@ const ExpenseCard = ({ expense, userId }) => {
       <CardFooter className="">
         <Button className="w-full mx-auto">Mark as paid</Button>
       </CardFooter>
-      
+
     </Card>
   );
 };
