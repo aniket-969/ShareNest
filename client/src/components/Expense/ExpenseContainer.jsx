@@ -369,7 +369,7 @@ const ExpenseContainer = ({participants}) => {
   initial={{ scaleY: 0, opacity: 0 }}
   animate={{ scaleY: 1, opacity: 1 }}
   transition={{ duration: 0.6, ease: "easeOut" }}
-  className="w-[3px] h-[70%] rounded-full bg-gradient-to-b from-pink-500 via-purple-500 to-blue-500 origin-top shadow-[0_0_10px_rgba(168,85,247,0.6)]"
+  className="w-[3px] h-[70%] rounded-full bg-gradient-to-b from-pink-500 to-red-500 origin-top shadow-[0_0_10px_rgba(168,85,247,0.6)]"
 />
 
 {/* expense form */}
