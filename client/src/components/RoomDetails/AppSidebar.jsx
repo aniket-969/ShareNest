@@ -66,11 +66,6 @@ const AppSidebar = ({roomData})=> {
       icon: ClipboardList,
     },
     {
-      title: "Maintenance",
-      url: `/room/${roomId}/maintenance`,
-      icon: Hammer,
-    },
-    {
       title: "Settings",
       url: `/room/${roomId}/settings`,
       icon: Settings,

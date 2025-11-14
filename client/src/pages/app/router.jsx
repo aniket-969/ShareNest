@@ -31,7 +31,7 @@ const Awards = React.lazy(() => import("../room/Awards/Awards.jsx"));
 const Chat = React.lazy(() => import("../room/Chat/Chat.jsx"));
 const Tasks = React.lazy(() => import("../room/Task/Tasks.jsx"));
 const RoomExpense = React.lazy(() => import("../room/Expense/RoomExpense.jsx"));
-const Maintenance = React.lazy(() => import("../room/Maintenance/Maintenance.jsx"));
+
 const RoomLayout = React.lazy(() => import("@/layouts/RoomLayout.jsx"));
 const Settings = React.lazy(() => import("./../room/Settings/index"));
 
@@ -73,7 +73,6 @@ export const AppRouter = () => {
                 <Route path="chat" element={<Chat />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="expense" element={<RoomExpense />} />
-                <Route path="maintenance" element={<Maintenance />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>
