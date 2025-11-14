@@ -330,53 +330,61 @@ const ExpenseContainer = ({ participants }) => {
   const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-    <div className="flex w-full items-center justify-center gap-16 h-[38rem] ">
+    <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-8">
+
  {/* Scrollable expense history */}
-      <div>
-        <div className=" bg-card py-2 rounded-xl"></div>
-        <ScrollArea className=" h-[32rem]">
-          <Card className="flex flex-col gap-3 items-center max-h-[90%] w-[25rem] bg-card  border-none">
+      <Card className="">
+        {/* top div */}
+        <div className=" py-2 rounded-t-xl "></div>
+
+        <ScrollArea className=" h-[32rem] ">
+          <Card className="flex flex-col gap-6  items-center max-h-[90%] w-[25rem] border-none rounded-none">
             {fakeExpenses.map((fake) => (
               <>
                 {Number(fake._id.slice(-1)) % 2 == 0 && (
                   <p className=" text-center text-xs">7:13 pm</p>
                 )}
 
-                {/* user profile */}
+              
                 <div className="">
-                  <div className="flex gap-4 m-2">
-                    <Avatar className="w-[30px] h-[30px] rounded-[2.4rem]">
+
+                      {/* user profile */}
+                  <div className="flex gap-4 m-2 items-center">
+                    <Avatar className="w-[25px] h-[25px] rounded-[2.4rem]">
                       <AvatarImage src={data.avatar} alt={data.fullName} />
                       <AvatarFallback>
                         <img src="/altAvatar1.jpg" alt="fallback avatar" />
                       </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex gap-10 sm:gap-20 items-center justify-center">
-                      <p className="max-w-[120px] truncate text-center">
+                   
+                      <p className="max-w-[120px] truncate text-center text-sm">
                         {data?.fullName}
                       </p>
-                    </div>
                   </div>
+
                   {/* expense cards */}
                   <ExpenseCard key={fake._id} userId={_id} expense={fake} />
+
                 </div>
               </>
             ))}
           </Card>
         </ScrollArea>
-        <div className=" bg-card py-2 rounded-xl"></div>
-      </div>
+
+        {/* bottom div */}
+        <div className=" bg-card py-2 rounded-b-xl"></div>
+      </Card>
      
 
       {/* expense form */}
-      <div className=" w-full max-w-[25rem] p-10 rounded-xl bg-card">
+      <Card className=" w-full max-w-[25rem] p-10 rounded-xl bg-card border-none">
         <ExpenseForm
           onClose={() => {}}
           participants={participants}
           onSubmit={() => setIsFormOpen(false)}
         />
-      </div>
+      </Card>
     </div>
   );
 };
