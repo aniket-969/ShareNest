@@ -72,7 +72,7 @@ const ExpenseCard = ({ expense, userId }) => {
 
       {/* ───── Card Footer ───── */}
       <CardFooter className="">
-        <Button className="w-full mx-auto">Mark as paid</Button>
+        <Button variant="destructive" className="w-full mx-auto">Mark as paid</Button>
       </CardFooter>
 
     </Card>

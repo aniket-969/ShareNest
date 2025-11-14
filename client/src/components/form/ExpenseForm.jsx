@@ -109,7 +109,7 @@ const ExpenseForm = ({ participants,onClose,currency }) => {
           )}
         />
        
-        <Button type="submit" disabled={createExpenseMutation.isLoading}>
+        <Button type="submit" variant="" disabled={createExpenseMutation.isLoading}>
           Split expense
         </Button>
       </form>
