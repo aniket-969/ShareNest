@@ -330,11 +330,11 @@ const ExpenseContainer = ({participants}) => {
   const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-   <div className="flex w-full items-center justify-around h-[38rem] ">
+   <div className="flex w-full items-center justify-center gap-20 h-[38rem] ">
 
 {/* Scrollable expense history */}
-       <ScrollArea className=" h-[32rem] rounded-xl">
-      <Card className="flex flex-col gap-3 items-center p-2 max-h-[90%] w-[25rem] ">
+       <ScrollArea className=" h-[34rem] rounded-xl">
+      <Card className="flex flex-col gap-3 items-center p-2 max-h-[90%] w-[25rem] bg-card">
         {fakeExpenses.map((fake) => (
           <>
             {Number(fake._id.slice(-1)) % 2 == 0 && <p className=" text-center text-xs">7:13 pm</p>}
@@ -364,16 +364,9 @@ const ExpenseContainer = ({participants}) => {
 
     </ScrollArea>
 
- {/* 🔹 Vertical Animated Divider */}
-<motion.div
-  initial={{ scaleY: 0, opacity: 0 }}
-  animate={{ scaleY: 1, opacity: 1 }}
-  transition={{ duration: 0.6, ease: "easeOut" }}
-  className="w-[3px] h-[70%] rounded-full bg-gradient-to-b from-pink-500 to-red-500 origin-top shadow-[0_0_10px_rgba(168,85,247,0.6)]"
-/>
-
 {/* expense form */}
-     <div className="bmain w-full max-w-[25rem] p-10 rounded-[2.5rem] bg-black mx-3 ">
+     <div className=" w-full max-w-[25rem] p-10 rounded-xl bg-card">
+         
           <ExpenseForm
               onClose={() => {}}
               participants={participants}

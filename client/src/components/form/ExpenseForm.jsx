@@ -53,8 +53,10 @@ const ExpenseForm = ({ participants,onClose,currency }) => {
 
   console.log(form.formState.errors);
   return (
+    <>
+     {/* <h3 className="text-center text-lg mb-2">Split expense</h3> */}
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 ">
         {/* title */}
         <FormField
           control={form.control}
@@ -109,10 +111,12 @@ const ExpenseForm = ({ participants,onClose,currency }) => {
         />
        
         <Button type="submit" disabled={createExpenseMutation.isLoading}>
-          Submit
+          Split expense
         </Button>
       </form>
     </Form>
+    </>
+    
   );
 };
 
