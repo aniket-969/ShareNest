@@ -2,24 +2,38 @@ import mongoose, { Schema } from "mongoose";
 
 const expenseSchema = new Schema(
   {
+
     title: {
       type: String,
       required: true,
+      trim: true,
     },
+
     paidBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      fullName: { type: String, required: true },
+      avatar: { type: String, default: null },
     },
+
     roomId: {
       type: Schema.Types.ObjectId,
       ref: "Room",
       required: true,
     },
+
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+
     participants: [
       {
-        user: { type: Schema.Types.ObjectId, ref: "User" },
+        id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        fullName: { type: String, required: true },
+        avatar: { type: String, default: null },
+
         baseAmount: { type: Number, required: true },
+
         additionalCharges: {
           type: [
             {
@@ -29,35 +43,42 @@ const expenseSchema = new Schema(
           ],
           default: [],
         },
-        totalAmountOwed: { type: Number, required: true },
+
+        totalAmountOwed: { type: Number, required: true }, 
+        isSettled: { type: Boolean, default: false }, 
       },
     ],
+
     paymentHistory: [
       {
-        user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        user: {
+          id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+          fullName: { type: String, required: true },
+          avatar: { type: String, default: null },
+        },
         amount: { type: Number, required: true },
         paymentDate: { type: Date, required: true },
-        description: {
-          type: String,
-        },
+        description: { type: String, default: "" },
       },
     ],
-    totalAmountPaid: {
-      type: Number,
-      required: true,
-    },
-   currency: {
+
+    currency: {
       type: String,
       default: "INR",
       match: /^[A-Z]{3}$/,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
 );
 
+
 expenseSchema.index({ room: 1 });
 expenseSchema.index({ "participants.user": 1 });
-expenseSchema.index({ dueDate: 1 });
 expenseSchema.index({ "participants.hasPaid": 1 });
 expenseSchema.index({ "paymentHistory.paymentDate": 1 });
 expenseSchema.index({ createdAt: 1 });

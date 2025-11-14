@@ -70,42 +70,6 @@ const roomSchema = new Schema(
         ],
       },
     ],
-    maintenanceRequests: [
-      {
-        _id: {
-          type: mongoose.Schema.Types.ObjectId,
-          default: () => new mongoose.Types.ObjectId(),
-        },
-        title: {
-          type: String,
-          required: true,
-        },
-        description: {
-          type: String,
-        },
-        status: {
-          type: String,
-          enum: ["pending", "in_progress", "resolved", "cancelled"],
-          default: "pending",
-        },
-        maintenanceProvider: {
-          type: String,
-        },
-        contactPhone: {
-          type: String,
-        },
-        costEstimate: {
-          type: Number,
-        },
-        dateReported: {
-          type: Date,
-          default: Date.now,
-        },
-        dateResolved: {
-          type: Date,
-        },
-      },
-    ],
     tasks: [
       {
         _id: {
@@ -249,8 +213,6 @@ roomSchema.index({ "tasks.currentAssignee": 1 });
 roomSchema.index({ "tasks.createdBy": 1 });
 roomSchema.index({ "tasks.participants": 1 });
 roomSchema.index({ "tasks.recurring": 1, "tasks.recurrencePattern": 1 });
-roomSchema.index({ "maintenanceRequests.status": 1 });
-roomSchema.index({ "maintenanceRequests.dateReported": 1 });
-roomSchema.index({ "maintenanceRequests.dateResolved": 1 });
+
 
 export const Room = mongoose.model("Room", roomSchema);
