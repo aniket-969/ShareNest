@@ -7,7 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Card } from "../ui/card";
 import FormWrapper from "../ui/formWrapper";
 import ExpenseForm from "../form/ExpenseForm";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 export const fakeExpenses = [
   {
@@ -324,58 +324,60 @@ export const fakeExpenses = [
   },
 ];
 
-const ExpenseContainer = ({participants}) => {
+const ExpenseContainer = ({ participants }) => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
   const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-   <div className="flex w-full items-center justify-center gap-20 h-[38rem] ">
+    <div className="flex w-full items-center justify-center gap-16 h-[38rem] ">
+ {/* Scrollable expense history */}
+      <div>
+        <div className=" bg-card py-2 rounded-xl"></div>
+        <ScrollArea className=" h-[32rem]">
+          <Card className="flex flex-col gap-3 items-center max-h-[90%] w-[25rem] bg-card  border-none">
+            {fakeExpenses.map((fake) => (
+              <>
+                {Number(fake._id.slice(-1)) % 2 == 0 && (
+                  <p className=" text-center text-xs">7:13 pm</p>
+                )}
 
-{/* Scrollable expense history */}
-       <ScrollArea className=" h-[34rem] rounded-xl">
-      <Card className="flex flex-col gap-3 items-center p-2 max-h-[90%] w-[25rem] bg-card">
-        {fakeExpenses.map((fake) => (
-          <>
-            {Number(fake._id.slice(-1)) % 2 == 0 && <p className=" text-center text-xs">7:13 pm</p>}
+                {/* user profile */}
+                <div className="">
+                  <div className="flex gap-4 m-2">
+                    <Avatar className="w-[30px] h-[30px] rounded-[2.4rem]">
+                      <AvatarImage src={data.avatar} alt={data.fullName} />
+                      <AvatarFallback>
+                        <img src="/altAvatar1.jpg" alt="fallback avatar" />
+                      </AvatarFallback>
+                    </Avatar>
 
-            {/* user profile */}
-            <div className="">
-                 <div className="flex gap-4 m-2">
-              <Avatar className="w-[30px] h-[30px] rounded-[2.4rem]">
-                <AvatarImage src={data.avatar} alt={data.fullName} />
-                <AvatarFallback>
-                  <img src="/altAvatar1.jpg" alt="fallback avatar" />
-                </AvatarFallback>
-              </Avatar>
+                    <div className="flex gap-10 sm:gap-20 items-center justify-center">
+                      <p className="max-w-[120px] truncate text-center">
+                        {data?.fullName}
+                      </p>
+                    </div>
+                  </div>
+                  {/* expense cards */}
+                  <ExpenseCard key={fake._id} userId={_id} expense={fake} />
+                </div>
+              </>
+            ))}
+          </Card>
+        </ScrollArea>
+        <div className=" bg-card py-2 rounded-xl"></div>
+      </div>
+     
 
-              <div className="flex gap-10 sm:gap-20 items-center justify-center">
-                <p className="max-w-[120px] truncate text-center">
-                  {data?.fullName}
-                </p>
-              </div>
-            </div>
-            <ExpenseCard key={fake._id} userId={_id} expense={fake} />
-            </div>
-           
-          </>
-        ))}
-      </Card>
-
-    </ScrollArea>
-
-{/* expense form */}
-     <div className=" w-full max-w-[25rem] p-10 rounded-xl bg-card">
-         
-          <ExpenseForm
-              onClose={() => {}}
-              participants={participants}
-              onSubmit={() => setIsFormOpen(false)}
-            />
-     </div>
-          
-   </div>
- 
+      {/* expense form */}
+      <div className=" w-full max-w-[25rem] p-10 rounded-xl bg-card">
+        <ExpenseForm
+          onClose={() => {}}
+          participants={participants}
+          onSubmit={() => setIsFormOpen(false)}
+        />
+      </div>
+    </div>
   );
 };
 
