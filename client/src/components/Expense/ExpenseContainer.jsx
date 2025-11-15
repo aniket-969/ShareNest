@@ -349,8 +349,8 @@ const ExpenseContainer = ({ participants }) => {
                 <div className="">
 
                       {/* user profile */}
-                  <div className="flex gap-3 m-2 items-center">
-                    <Avatar className="w-[25px] h-[25px] rounded-[2.4rem]">
+                  <div className="flex gap-2 m-2 items-center">
+                    <Avatar className="w-[25px] h-[25px] rounded-lg">
                       <AvatarImage src={data.avatar} alt={data.fullName} />
                       <AvatarFallback>
                         <img src="/altAvatar1.jpg" alt="fallback avatar" />
