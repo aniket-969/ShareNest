@@ -1,8 +1,9 @@
-import { currencyOptions } from "@/utils/helper"; import { useState } from "react";
+import { currencyOptions } from "@/utils/helper";
+import { useState } from "react";
 import { format } from "date-fns";
 import {
   Card,
-  CardHeader, 
+  CardHeader,
   CardTitle,
   CardContent,
   CardFooter,
@@ -31,15 +32,14 @@ const ExpenseCard = ({ expense, userId }) => {
   );
 
   // user's share
-  const userPart = expense.participants.find((p) => 
-    p.user._id.toString() === userId.toString()
+  const userPart = expense.participants.find(
+    (p) => p.user._id.toString() === userId.toString()
   );
   const youOwe = userPart?.totalAmountOwed ?? 0;
 
-  // check if user has paid 
-  const paymentRecord = expense.paymentHistory.find((ph) =>
-   ph.user.toString() === userId.toString()
-      
+  // check if user has paid
+  const paymentRecord = expense.paymentHistory.find(
+    (ph) => ph.user.toString() === userId.toString()
   );
   const youPaid = Boolean(paymentRecord);
   const youStatus = youPaid ? "Paid" : "Pending";
@@ -51,34 +51,64 @@ const ExpenseCard = ({ expense, userId }) => {
     <Card className="rounded-xl bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
-        
-          <CardTitle className="text-base tracking-wide font-semibold text-gray-100">
-           Requested for ' {expense.title} '
-          </CardTitle>
-        
-     
+        <CardTitle className="text-base tracking-wide font-semibold text-gray-100">
+          Requested for ' {expense.title} '
+        </CardTitle>
       </CardHeader>
 
       {/* ───── Card Content ───── */}
-      <CardContent className="">
-       
-            <span className="text-4xl font-medium text-gray-100">
-           {symbol}
-              {youOwe}
-            </span>
-            <div className="flex items-center gap-3 ">
-              <Progress className="w-[60%] h-[0.35rem] bg-pink-200" value={2/3 *100}/>
-          <span className="text-xs my-2 tracking-wide">2/3 paid</span>
-            </div>
-            
-       
+      <CardContent className="space-y-2">
+        {/* amount owed */}
+        <span className="text-4xl font-medium text-gray-100"> 
+          {symbol}
+          {youOwe}
+        </span>
+        
+          {/* Grouped avatars */}
+          <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+            <Avatar className="w-6 h-6 rounded-lg ">
+              <AvatarImage 
+                src="https://avatar.iran.liara.run/public/10"
+                alt="@shadcn"
+              />
+              <AvatarFallback>
+                {" "}
+                <img src="/altAvatar1.jpg" alt="fallback avatar" />
+              </AvatarFallback>
+            </Avatar>
+            <Avatar className="w-6 h-6 rounded-lg">
+              <AvatarImage
+                src="https://avatar.iran.liara.run/public/8"
+                alt="@maxleiter"
+              />
+              <AvatarFallback>LR</AvatarFallback>
+            </Avatar>
+            <Avatar className="w-6 h-6 rounded-lg">
+              <AvatarImage
+                src="https://avatar.iran.liara.run/public/9"
+                alt="@evilrabbit"
+              />
+              <AvatarFallback>ER</AvatarFallback>
+            </Avatar>
+          </div>
+        {/* progress bar and paid count */}
+        <div className="flex items-center gap-3">
+          <Progress
+            className="w-[60%] h-[0.35rem] bg-pink-200 "
+            value={((Math.floor(Math.random() * 3) + 1) / 3) * 100}
+          />
+          <span className="text-xs tracking-wide">
+            {Math.floor(Math.random() * 3) + 1}/3 paid
+          </span>
+        </div>
       </CardContent>
 
       {/* ───── Card Footer ───── */}
       <CardFooter className="">
-        <Button variant="destructive" className="w-full mx-auto">Mark as paid</Button>
+        <Button variant="destructive" className="w-full mx-auto">
+          Mark as paid
+        </Button>
       </CardFooter>
-
     </Card>
   );
 };
