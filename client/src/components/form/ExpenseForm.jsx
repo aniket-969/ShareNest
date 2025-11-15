@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useExpense } from "@/hooks/useExpense";
 import { useParams } from "react-router-dom";
-import ParticipantSelector from "../ParticipantsSelector";
 import { Spinner } from "@/components/ui/spinner";
 import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";

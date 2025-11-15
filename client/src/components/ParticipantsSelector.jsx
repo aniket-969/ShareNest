@@ -1,4 +1,3 @@
-// ParticipantSelector.jsx
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -19,12 +18,11 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
       selectedIds.includes(u._id)
     );
 
-    // sort those by the timestamp in `selectionOrder` (multi‐only)
+    // sort by the timestamp in selectionOrder
     selectedParticipants.sort((a, b) => {
       return (selectionOrder[a._id] || 0) - (selectionOrder[b._id] || 0);
     });
 
-    // then list all unselected after
     const unselectedParticipants = participants.filter(
       (u) => !selectedIds.includes(u._id)
     );
@@ -34,9 +32,9 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
 
   const handleClick = (user) => {
     if (single) {
-      // In single‐select mode, only that one user
+    
       if (selected === user._id) {
-        // clicking the already‐selected user will unselect them
+      
         setSelected(null);
         onChange(null);
       } else {
@@ -46,7 +44,6 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
       return;
     }
 
-    // Multi‐select logic (unchanged)
     const isSelected = selected.includes(user._id);
     let updated;
 
@@ -82,7 +79,7 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
               key={user._id}
               onClick={() => handleClick(user)}
               className={`flex items-center space-x-2 cursor-pointer px-2 py-1 rounded-lg ${
-                isSelected ? "bg-card text-card-foreground" : ""
+                isSelected ? "bg-card text-card-foreground " : ""
               }`}
             >
               <img

@@ -47,7 +47,7 @@ const ExpenseCard = ({ expense, userId }) => {
     : null;
 
   return (
-    <Card className="rounded-xl bg-black shadow-lg border-none">
+    <Card className="rounded-xl bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
         

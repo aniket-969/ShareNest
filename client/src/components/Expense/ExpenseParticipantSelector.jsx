@@ -140,7 +140,7 @@ const ExpenseParticipantSelector = ({
 
   return (
     <div className="space-y-2">
-      <ScrollArea className="h-[14rem] w-full rounded-md border p-2">
+      <ScrollArea className="h-[14rem] w-full rounded-md p-2 ">
         {getParticipantsList().map((participant, index) => {
           const isSelected = fields.some(
             (field) => field.userId === participant._id
@@ -154,8 +154,8 @@ const ExpenseParticipantSelector = ({
             <div
               key={participant._id}
               onClick={() => handleParticipantSelect(participant)}
-              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-accent/50 mb-2 ${
-                isSelected ? "bg-card text-card-foreground" : ""
+              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-accent/30 mb-2 ${
+                isSelected ? "bg-card-muted text-card-foreground" : ""
               }`}
             >
               <div className="flex-1">
