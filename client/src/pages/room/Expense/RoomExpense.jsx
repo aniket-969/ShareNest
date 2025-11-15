@@ -39,7 +39,7 @@ const RoomExpense = () => {
         <h2 className="font-bold text-2xl">Expense</h2>
         {/* icons */}
         <div className="flex gap-3">
-          <Button
+          <Button className="md:hidden"
             size="icon"
             variant="primary"
             onClick={() => setIsFormOpen(true)}

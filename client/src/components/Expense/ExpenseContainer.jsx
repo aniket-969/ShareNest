@@ -333,7 +333,7 @@ const ExpenseContainer = ({ participants }) => {
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-8">
 
  {/* Scrollable expense history */}
-      <Card className="">
+      <Card className="border-none">
         {/* top div */}
         <div className=" py-2 rounded-t-xl "></div>
 
@@ -342,14 +342,14 @@ const ExpenseContainer = ({ participants }) => {
             {fakeExpenses.map((fake) => (
               <>
                 {Number(fake._id.slice(-1)) % 2 == 0 && (
-                  <p className=" text-center text-xs">7:13 pm</p>
+                  <p className=" text-center text-xs">6 nov, 7:13 pm</p>
                 )}
 
               
                 <div className="">
 
                       {/* user profile */}
-                  <div className="flex gap-4 m-2 items-center">
+                  <div className="flex gap-3 m-2 items-center">
                     <Avatar className="w-[25px] h-[25px] rounded-[2.4rem]">
                       <AvatarImage src={data.avatar} alt={data.fullName} />
                       <AvatarFallback>
