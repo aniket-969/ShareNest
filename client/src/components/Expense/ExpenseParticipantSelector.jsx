@@ -140,8 +140,8 @@ const ExpenseParticipantSelector = ({
   };
 
   return (
-    <div className="space-y-2">
-      <ScrollArea className="h-[14rem] w-full rounded-md p-2 ">
+    <div className="space-y-2 ">
+      <ScrollArea className="h-[14rem] w-full rounded-md py-2 ">
         {getParticipantsList().map((participant, index) => {
           const isSelected = fields.some(
             (field) => field.userId === participant._id
@@ -160,6 +160,7 @@ const ExpenseParticipantSelector = ({
               }`}
             >
               <div className="flex-1">
+
                 <div className="flex items-center space-x-3">
 
                     <Avatar className="w-8 h-8 rounded-[2.4rem]">
@@ -169,7 +170,6 @@ const ExpenseParticipantSelector = ({
                       </AvatarFallback>
                     </Avatar>
 
-
                   <div>
                     <p className="font-semibold">{participant.username}</p>
                     <p
@@ -178,6 +178,7 @@ const ExpenseParticipantSelector = ({
                       {participant.fullName}
                     </p>
                   </div>
+
                 </div>
                 {field?.additionalCharges?.length > 0 && (
                   <div className="mt-2 ml-11 space-y-1">

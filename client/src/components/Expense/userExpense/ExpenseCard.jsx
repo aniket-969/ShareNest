@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import ParticipantsModal from "./ParticipantsModal";
 import MarkAsPaid from "./MarkAsPaid";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 const ExpenseCard = ({ expense, userId }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,8 +66,11 @@ const ExpenseCard = ({ expense, userId }) => {
            {symbol}
               {youOwe}
             </span>
-          <p className="text-sm my-2">1/3 paid</p>
-          <p className="text-sm">Unpaid</p>
+            <div className="flex items-center gap-3 ">
+              <Progress className="w-[60%] h-[0.35rem] bg-pink-200" value={2/3 *100}/>
+          <span className="text-xs my-2 tracking-wide">2/3 paid</span>
+            </div>
+            
        
       </CardContent>
 
