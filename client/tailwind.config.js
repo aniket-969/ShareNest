@@ -19,8 +19,6 @@ export default {
       },
       colors: {
         background: "#040404",
-        // background: '#0d1117',
-        // background: '#121212',
         foreground: "#ffffff",
 
         card: {
@@ -31,10 +29,6 @@ export default {
           border: "#2a2a2a",
         },
 
-        // card: {
-        // 	DEFAULT: '#de8c9d',
-        // 	foreground: '#fe2858'
-        // },
         popover: {
           DEFAULT: "#040404",
           foreground: "#de8c9d",

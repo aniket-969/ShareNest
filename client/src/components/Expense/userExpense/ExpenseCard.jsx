@@ -59,38 +59,44 @@ const ExpenseCard = ({ expense, userId }) => {
       {/* ───── Card Content ───── */}
       <CardContent className="space-y-2">
         {/* amount owed */}
-        <span className="text-4xl font-medium text-gray-100"> 
+        <span className="text-4xl font-medium text-gray-100">
           {symbol}
           {youOwe}
         </span>
-        
-          {/* Grouped avatars */}
-          <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-            <Avatar className="w-6 h-6 rounded-lg ">
-              <AvatarImage 
-                src="https://avatar.iran.liara.run/public/10"
-                alt="@shadcn"
-              />
-              <AvatarFallback>
-                {" "}
-                <img src="/altAvatar1.jpg" alt="fallback avatar" />
-              </AvatarFallback>
-            </Avatar>
-            <Avatar className="w-6 h-6 rounded-lg">
-              <AvatarImage
-                src="https://avatar.iran.liara.run/public/8"
-                alt="@maxleiter"
-              />
-              <AvatarFallback>LR</AvatarFallback>
-            </Avatar>
-            <Avatar className="w-6 h-6 rounded-lg">
-              <AvatarImage
-                src="https://avatar.iran.liara.run/public/9"
-                alt="@evilrabbit"
-              />
-              <AvatarFallback>ER</AvatarFallback>
-            </Avatar>
-          </div>
+
+        {/* Grouped avatars */}
+        <div className="flex -space-x-2">
+          <Avatar className="w-7 h-7 rounded-full overflow-visible">
+            <AvatarImage
+              className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+              src="https://avatar.iran.liara.run/public/10"
+            />
+            <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
+              CN
+            </AvatarFallback>
+          </Avatar>
+
+          <Avatar className="w-7 h-7 rounded-full overflow-visible">
+            <AvatarImage
+              className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+              src="https://avatar.iran.liara.run/public/8"
+            />
+            <AvatarFallback className="ring-2 ring-card-muted ring-offset-2 ring-offset-card-muted rounded-full">
+              LR
+            </AvatarFallback>
+          </Avatar>
+
+          <Avatar className="w-7 h-7 rounded-full overflow-visible">
+            <AvatarImage
+              className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+              src="https://avatar.iran.liara.run/public/9"
+            />
+            <AvatarFallback className="ring-2 ring-card-muted ring-offset-2 ring-offset-card-muted rounded-full">
+              ER
+            </AvatarFallback>
+          </Avatar>
+        </div>
+
         {/* progress bar and paid count */}
         <div className="flex items-center gap-3">
           <Progress

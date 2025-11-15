@@ -27,8 +27,8 @@ const RoomExpense = () => {
 
 
   const participants = [
-    ...(data.tenants || []),
-    ...(data.landlord ? [data.landlord] : []),
+    ...(data?.tenants || []),
+    ...(data?.landlord ? [data?.landlord] : []),
   ];
 
   return (
