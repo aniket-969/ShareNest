@@ -6,13 +6,13 @@ import ChatSkeleton from '../Chat/chatSkeleton'
 
 const RoomDetailsLoader = () => {
   return (
-      <div className=" flex w-full items-center justify-center xl:gap-20 gap-10 my-5 ">
+      <div className=" flex w-full items-center justify-center  gap-10 my-5 ">
 
       {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">
       
           <CalendarSkeleton/>
-
+ 
         {/* Polls */}
         <PollSkeleton />
       </div>
