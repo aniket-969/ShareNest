@@ -83,12 +83,12 @@ const BalanceSheet = () => {
       <DrawerContent className="bg-car border-none py-3 ">
         {/* Header */}
         <DrawerHeader className="p-0">
-          <DrawerTitle className="text-xl text-center my-3">Expense</DrawerTitle>
+          <DrawerTitle className="text-xl text-center md:my-3 my-1">Expense</DrawerTitle>
           <DrawerDescription />
         </DrawerHeader>
 
         {/* Content */}
-        <div className="flex items-center mx-6 justify-center gap-12 my-2">
+        <div className="flex items-center mx-6 justify-center md:gap-12 md:my-2 md:flex-row flex-col ">
           {/* Owed by you */}
           <div className="w-full max-w-lg ">
             <h2 className="m-3">
@@ -114,7 +114,7 @@ const BalanceSheet = () => {
 
         {/* Footer */}
         <DrawerFooter>
-          <Button className="mx-auto px-10 rounded-full mt-3" variant="outline">
+          <Button className="mx-auto px-10 rounded-full md:mt-3" variant="outline">
             Settle Up
           </Button>
         </DrawerFooter>

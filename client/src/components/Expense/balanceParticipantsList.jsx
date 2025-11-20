@@ -5,14 +5,14 @@ import { ScrollArea } from "../ui/scroll-area";
 
 const BalanceParticipantsList = ({ userData, currency }) => {
   return (
-    <ScrollArea className="h-[196px] px-3 py-1">
+    <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1">
         <div className="flex flex-col gap-2 justify-center ">
 
        
       {userData.map((data) => (
         <Card
           key={data.userId}
-          className="border-none bg-card-muted px-8 py-4 flex flex-row items-center justify-between"
+          className="border-none bg-card-muted px-8 py-4 flex flex-row items-center justify-between "
         >
           {/* Profile with name */}
           <div className="flex gap-2 items-center">
