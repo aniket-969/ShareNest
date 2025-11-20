@@ -61,13 +61,13 @@ export const fakeBalances = {
       amount: 475,
       pendingCount: 1,
     },
-    {
-      userId: "u303",
-      fullName: "Priya Singh",
-      avatar: "https://avatar.iran.liara.run/public/54",
-      amount: 300,
-      pendingCount: 1,
-    },
+    // {
+    //   userId: "u303",
+    //   fullName: "Priya Singh",
+    //   avatar: "https://avatar.iran.liara.run/public/54",
+    //   amount: 300,
+    //   pendingCount: 1,
+    // },
   ],
 };
 
@@ -80,18 +80,18 @@ const BalanceSheet = () => {
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="bg-card border-none py-3 ">
+      <DrawerContent className="bg-car border-none py-3 ">
         {/* Header */}
         <DrawerHeader className="p-0">
-          <DrawerTitle className="text-lg text-center my-3">Expense</DrawerTitle>
+          <DrawerTitle className="text-xl text-center my-3">Expense</DrawerTitle>
           <DrawerDescription />
         </DrawerHeader>
 
         {/* Content */}
-        <div className="flex items-center mx-6 justify-center gap-16 my-2">
+        <div className="flex items-center mx-6 justify-center gap-12 my-2">
           {/* Owed by you */}
           <div className="w-full max-w-lg ">
-            <h2 className="my-3 mx-1">
+            <h2 className="m-3">
               {fakeBalances.owedByYou.length} people owe you
             </h2>
             <BalanceParticipantsList
@@ -102,7 +102,7 @@ const BalanceSheet = () => {
 
           {/* You owe */}
           <div className="w-full max-w-lg ">
-            <h2 className="my-3 mx-1">
+            <h2 className="m-3">
               You owe to {fakeBalances.owedToYou.length} people
             </h2>
             <BalanceParticipantsList
