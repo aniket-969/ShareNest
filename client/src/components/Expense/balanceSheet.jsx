@@ -81,7 +81,7 @@ const BalanceSheet = () => {
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="bg-car border-none py-3 ">
+      <DrawerContent className="bg-car border-none pt-3 pb-10">
         {/* Header */}
         <DrawerHeader className="p-0">
           <DrawerTitle className="text-xl text-center md:my-3 my-1">Expense</DrawerTitle>
@@ -113,7 +113,7 @@ const BalanceSheet = () => {
           </div>
         </div>
 
-      
+      <SettleUp/>
       </DrawerContent>
     </Drawer>
   );

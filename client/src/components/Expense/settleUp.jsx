@@ -9,14 +9,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input"; 
 import { Label } from "@/components/ui/label";
 import BalanceParticipantsList from "./balanceParticipantsList";
+import { Card } from "../ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const SettleUp = ({owedByYou}) => {
-    console.log(owedByYou)
+const SettleUp = () => {
+    
   return (
-    <Dialog>
+    <Dialog className="">
       <DialogTrigger asChild className="">
         <Button
           className="px-10 rounded-full md:mt-3 mx-auto block"
@@ -25,29 +27,39 @@ const SettleUp = ({owedByYou}) => {
           Settle Up
         </Button>
       </DialogTrigger>
-      <form className="">
-        <DialogContent className="sm:max-w-[425px]">
+    
+        <DialogContent className="bg-card max-w-sm w-full">
             {/* header */}
           <DialogHeader>
-            <DialogTitle>Settle Up</DialogTitle>
-            <DialogDescription>
-              Mark all the unpaid expenses as paid at once.
-            </DialogDescription>
-          </DialogHeader>
-          {/* form */}
-       
-                   <div className="w-full max-w-lg ">
-            <h2 className="m-3">
-              You owe to {owedByYou.length} people
-            </h2>
-            <BalanceParticipantsList
-              userData={owedByYou}
-              currency={"Rs"}
-            />
+            <DialogTitle>
+
+              <div className="flex items-center justify-around">
+
+          
+               <div className="flex gap-2 items-center">
+                {/* avatar */}
+            <Avatar className="w-[35px] h-[35px] rounded-lg">
+              <AvatarImage src="https://avatar.iran.liara.run/public/49" alt="fd" />
+              <AvatarFallback>
+                <img src="/altAvatar1.jpg" alt="fallback avatar" />
+              </AvatarFallback>
+            </Avatar>
+
+            <p className="max-w-[120px] truncate text-center text-sm">
+              Dev Patel
+            </p>
           </div>
+              <span className="text-green-600"> ₹ 950</span>
+                 </div>
+            </DialogTitle>
+           
+          </DialogHeader>
+           <Input placeholder="Enter Payment Method..."/>
+         <Button className="mx-auto" variant="outline" size="sm">Settle Up</Button>
+                  
          
         </DialogContent>
-      </form>
+      
     </Dialog>
   );
 };
