@@ -330,15 +330,15 @@ const ExpenseContainer = ({ participants }) => {
   const { _id } = JSON.parse(localStorage.getItem("session"));
 
   return (
-    <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-8">
+    <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
 
  {/* Scrollable expense history */}
-      <Card className="border-none">
+      <Card className="w-full max-w-[25rem] border-none ">
         {/* top div */}
         <div className=" py-3 rounded-t-xl "></div>
 
-        <ScrollArea className=" h-[31rem] ">
-          <Card className="flex flex-col gap-6  items-center max-h-[90%] w-[25rem] border-none rounded-none">
+        <ScrollArea className=" h-[31rem]">
+          <Card className="flex flex-col gap-6  items-center max-h-[90%] border-none rounded-none ">
             {fakeExpenses.map((fake) => (
               <>
                 {Number(fake._id.slice(-1)) % 2 == 0 && (

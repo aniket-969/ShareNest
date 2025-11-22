@@ -13,6 +13,7 @@ import { ScrollText } from "lucide-react";
 import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import BalanceParticipantsList from "./balanceParticipantsList";
+import SettleUp from "./settleUp";
 
 export const fakeBalances = {
   currency: "₹",
@@ -114,9 +115,7 @@ const BalanceSheet = () => {
 
         {/* Footer */}
         <DrawerFooter>
-          <Button className="mx-auto px-10 rounded-full md:mt-3" variant="outline">
-            Settle Up
-          </Button>
+          <SettleUp owedByYou={fakeBalances.owedByYou}/>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
