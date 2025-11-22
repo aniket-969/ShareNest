@@ -113,10 +113,7 @@ const BalanceSheet = () => {
           </div>
         </div>
 
-        {/* Footer */}
-        <DrawerFooter>
-          <SettleUp owedByYou={fakeBalances.owedByYou}/>
-        </DrawerFooter>
+      
       </DrawerContent>
     </Drawer>
   );
