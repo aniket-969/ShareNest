@@ -113,7 +113,6 @@ const BalanceSheet = () => {
           </div>
         </div>
 
-      <SettleUp/>
       </DrawerContent>
     </Drawer>
   );

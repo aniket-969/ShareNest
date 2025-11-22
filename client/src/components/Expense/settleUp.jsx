@@ -10,24 +10,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input"; 
-import { Label } from "@/components/ui/label";
-import BalanceParticipantsList from "./balanceParticipantsList";
-import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const SettleUp = () => {
+const SettleUp = ({userData}) => {
     
   return (
     <Dialog className="">
-      <DialogTrigger asChild className="">
-        <Button
-          className="px-10 rounded-full md:mt-3 mx-auto block"
-          variant="outline"
-        >
-          Settle Up
-        </Button>
-      </DialogTrigger>
-    
+     
         <DialogContent className="bg-card max-w-sm w-full">
             {/* header */}
           <DialogHeader>
@@ -55,7 +44,7 @@ const SettleUp = () => {
            
           </DialogHeader>
            <Input placeholder="Enter Payment Method..."/>
-         <Button className="mx-auto" variant="outline" size="sm">Settle Up</Button>
+         <Button className="mx-auto text-xs" variant="outline" size="sm">Mark all as paid</Button>
                   
          
         </DialogContent>
