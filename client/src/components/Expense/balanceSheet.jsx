@@ -14,6 +14,7 @@ import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import BalanceParticipantsList from "./balanceParticipantsList";
 import SettleUp from "./settleUp";
+import { ScrollArea } from "../ui/scroll-area";
 
 export const fakeBalances = {
   currency: "₹",
@@ -73,6 +74,10 @@ export const fakeBalances = {
 };
 
 const BalanceSheet = () => {
+  const onParticipantClick = () => {
+    console.log("clicked");
+  };
+
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -84,7 +89,9 @@ const BalanceSheet = () => {
       <DrawerContent className="bg-car border-none pt-3 pb-10">
         {/* Header */}
         <DrawerHeader className="p-0">
-          <DrawerTitle className="text-xl text-center md:my-3 my-1">Expense</DrawerTitle>
+          <DrawerTitle className="text-xl text-center md:my-3 my-1">
+            Expense
+          </DrawerTitle>
           <DrawerDescription />
         </DrawerHeader>
 
@@ -93,26 +100,33 @@ const BalanceSheet = () => {
           {/* Owed by you */}
           <div className="w-full max-w-lg ">
             <h2 className="m-3">
-              {fakeBalances.owedByYou.length} people owe you
+              You owe to {fakeBalances.owedByYou.length} people
             </h2>
-            <BalanceParticipantsList
-              userData={fakeBalances.owedByYou}
-              currency={fakeBalances.currency}
-            />
+            <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1">
+              <div className="flex flex-col gap-2 justify-center ">
+                {fakeBalances.owedByYou.map((data) => (
+                  <SettleUp
+                    key={data.userId}
+                    userData={data}
+                    currency={fakeBalances.currency}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
           </div>
 
-          {/* You owe */}
+          {/* Owed to you */}
           <div className="w-full max-w-lg ">
             <h2 className="m-3">
-              You owe to {fakeBalances.owedToYou.length} people
+              {fakeBalances.owedToYou.length} people owe you
             </h2>
+
             <BalanceParticipantsList
               userData={fakeBalances.owedToYou}
               currency={fakeBalances.currency}
             />
           </div>
         </div>
-
       </DrawerContent>
     </Drawer>
   );
