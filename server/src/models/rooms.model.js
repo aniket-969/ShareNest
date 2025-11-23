@@ -24,10 +24,6 @@ const roomSchema = new Schema(
       ref: "User",
       required: true,
     },
-    landlord: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
     tenants: [
       {
         type: Schema.Types.ObjectId,

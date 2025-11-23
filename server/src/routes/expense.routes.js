@@ -8,6 +8,7 @@ import {
   getUserExpenses,
   updateExpense,
   updatePayment,
+  getSettleUpDrawer
 } from "../controllers/expense.controller.js";
 import { checkMember } from "../middleware/room.middleware.js";
 import { validate } from "./../middleware/validator.middleware.js";
@@ -18,20 +19,18 @@ import {
 } from "../zod/expense.schema.js";
 
 const router = Router();
-// 1) Collection / user-scoped routes (static)
+
 router.route("/").get(verifyJWT, getUserExpenses);
 router.route("/pending").get(verifyJWT, getPendingPayments);
 
-// 2) Room-scoped routes (keep :roomId where controller/middleware expect it)
+
 router
   .route("/:roomId")
   .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense);
 
-// router
-  // .route("/:roomId/balance")
-  // .get(verifyJWT, checkMember, getRoomBalances);
+  router.route("/:roomId/settle-up")
+  .get(verifyJWT, checkMember, getSettleUpDrawer);
 
-// 3) Expense-specific routes (put these after room-scoped & static routes)
 router
   .route("/:expenseId/payment")
   .patch(verifyJWT, validate(updatePaymentSchema), updatePayment);

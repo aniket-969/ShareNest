@@ -7,6 +7,7 @@ import { emitSocketEvent } from "../socket/index.js";
 import { fcm } from "./../firebase/config.js";
 import { User } from "../models/user.model.js";
 import { mongoose } from "mongoose";
+import { Room } from "../models/rooms.model.js";
 
 const getUserExpenses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -43,15 +44,129 @@ const getPendingPayments = asyncHandler(async (req, res) => {
   );
 });
 
-const getExpense = asyncHandler(async(req,res)=>{
-  const {roomId}= req.params
-  
-})
+const getExpense = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+});
+
+const getSettleUpDrawer = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const currentUserId = req.user._id;
+
+ const room = req.room
+  const coll = mongoose.connection.collection("expenses");
+
+  const pipeline = [
+    { $match: { roomId: ObjectId(roomId), isDeleted: { $ne: true } } },
+
+    {
+      $facet: {
+        owedToYou: [
+          { $unwind: "$participants" },
+          {
+            $match: {
+              "paidBy.id": ObjectId(currentUserId),
+              "participants.id": { $ne: ObjectId(currentUserId) },
+            },
+          },
+          {
+            $group: {
+              _id: "$participants.id",
+              amount: { $sum: "$participants.totalAmountOwed" },
+              lastActivityAt: { $max: "$updatedAt" },
+              firstFullName: { $first: "$participants.fullName" },
+              firstUsername: { $first: "$participants.username" },
+              firstAvatar: { $first: "$participants.avatar" },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              participantId: "$_id",
+              amount: 1,
+              lastActivityAt: 1,
+              user: {
+                id: "$_id",
+                fullName: "$firstFullName",
+                username: "$firstUsername",
+                avatar: "$firstAvatar",
+              },
+            },
+          },
+          { $sort: { amount: -1 } },
+        ],
+
+        // People the current user owes
+        youOwed: [
+          { $unwind: "$participants" },
+          {
+            $match: {
+              "participants.id": ObjectId(currentUserId),
+              "paidBy.id": { $ne: ObjectId(currentUserId) },
+            },
+          },
+          {
+            $group: {
+              _id: "$paidBy.id",
+              amount: { $sum: "$participants.totalAmountOwed" },
+              lastActivityAt: { $max: "$updatedAt" },
+              firstFullName: { $first: "$paidBy.fullName" },
+              firstUsername: { $first: "$paidBy.username" },
+              firstAvatar: { $first: "$paidBy.avatar" },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              participantId: "$_id",
+              amount: 1,
+              lastActivityAt: 1,
+              user: {
+                id: "$_id",
+                fullName: "$firstFullName",
+                username: "$firstUsername",
+                avatar: "$firstAvatar",
+              },
+            },
+          },
+          { $sort: { amount: -1 } },
+        ],
+
+        currency: [{ $limit: 1 }, { $project: { currency: "$currency" } }],
+      },
+    },
+  ];
+
+  const aggResult = await coll.aggregate(pipeline).toArray();
+  const result = aggResult[0] || {};
+
+  const owedToYou = result.owedToYou || [];
+  const youOwed = result.youOwed || [];
+
+  const totalOwedToMe = owedToYou.reduce((s, r) => s + (r.amount || 0), 0);
+  const totalOwe = youOwed.reduce((s, r) => s + (r.amount || 0), 0);
+
+  const currency =
+    room.currency ||
+    (result.currency && result.currency[0] && result.currency[0].currency) ||
+    "INR";
+
+  const payload = {
+    roomId,
+    currency,
+    youOwed,
+    owedToYou,
+    totalOwedToMe,
+    totalOwe,
+  };
+
+  return res.json(
+    new ApiResponse(200, payload, "settle-up drawer data fetched successfully")
+  );
+});
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, participants, currency } =
-    req.body;
+  const { title, totalAmount, participants, currency } = req.body;
   const paidBy = req.user._id;
 
   if (!participants?.length) {
@@ -226,13 +341,7 @@ const getExpenseDetails = asyncHandler(async (req, res) => {
 const updateExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
   const userId = req.user.id;
-  const {
-    name,
-    totalAmount,
-    paidBy,
-    participants,
-    paymentHistory,
-  } = req.body;
+  const { name, totalAmount, paidBy, participants, paymentHistory } = req.body;
 
   // Fetch the expense to validate ownership
   const expense = await Expense.findById(expenseId);
@@ -277,6 +386,7 @@ export {
   updatePayment,
   getUserExpenses,
   getPendingPayments,
+  getSettleUpDrawer,
   deleteExpense,
   getExpenseDetails,
   updateExpense,
