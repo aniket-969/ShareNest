@@ -44,10 +44,6 @@ const getPendingPayments = asyncHandler(async (req, res) => {
   );
 });
 
-const getExpense = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
-});
-
 const getSettleUpDrawer = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const currentUserId = req.user._id;
@@ -162,6 +158,10 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
   return res.json(
     new ApiResponse(200, payload, "settle-up drawer data fetched successfully")
   );
+});
+
+const getExpense = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
 });
 
 const createExpense = asyncHandler(async (req, res) => {
