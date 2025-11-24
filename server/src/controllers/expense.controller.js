@@ -166,47 +166,88 @@ const getExpense = asyncHandler(async (req, res) => {
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, participants, currency } = req.body;
-  const paidBy = req.user._id;
+  const { title, totalAmount, participants = [], currency } = req.body;
+  const creator = req.user;
 
-  if (!participants?.length) {
+  if (!Array.isArray(participants) || participants.length === 0) {
     throw new ApiError(400, "At least one participant is required");
   }
 
-  const baseAmount = Math.round(totalAmount / participants.length);
-  const formattedParticipants = participants.map(
-    ({ userId, additionalCharges }) => {
-      const charges = (additionalCharges || []).map(({ amount, reason }) => ({
-        amount,
-        reason,
-      }));
-      const additionalTotal = charges.reduce((sum, c) => sum + c.amount, 0);
-      return {
-        user: userId,
-        baseAmount,
-        additionalCharges: charges,
-        totalAmountOwed: baseAmount + additionalTotal,
-      };
-    }
+  const participantIds = participants.map((p) => String(p.userId));
+
+  const users = await User.find(
+    { _id: { $in: participantIds } },
+    { fullName: 1, avatar: 1, notificationToken: 1 }
+  ).lean();
+
+  const userMap = {};
+  users.forEach((u) => {
+    userMap[String(u._id)] = u;
+  });
+
+  const missing = participantIds.filter((id) => !userMap[id]);
+  if (missing.length > 0) {
+    throw new ApiError(400, `Some participants not found: ${missing.join(", ")}`);
+  }
+
+  const baseAmount = Math.round(Number(totalAmount) / participantIds.length);
+
+  const formattedParticipants = participantIds.map((userId) => {
+    const incoming = participants.find((p) => String(p.userId) === String(userId)) || {};
+    const charges = (incoming.additionalCharges || []).map(({ amount, reason }) => ({
+      amount: Number(amount),
+      reason,
+    }));
+    const additionalTotal = charges.reduce((s, c) => s + (Number(c.amount) || 0), 0);
+    const totalAmountOwed = baseAmount + additionalTotal;
+    const userSnapshot = userMap[userId];
+
+    return {
+      id: userId,
+      fullName: userSnapshot.fullName || "",
+      avatar: userSnapshot.avatar || null,
+      baseAmount,
+      additionalCharges: charges,
+      totalAmountOwed,
+      hasPaid: false,
+      paidAt: null,
+      paymentMode: null,
+    };
+  });
+
+  const creatorIdx = formattedParticipants.findIndex(
+    (p) => String(p.id) === String(creator._id)
   );
-  const payerPart = formattedParticipants.find(
-    (p) => p.user.toString() === paidBy.toString()
-  );
-  const payerAmount = payerPart?.totalAmountOwed ?? 0;
+
+  const now = new Date();
+  let initialPaymentHistory = [];
+
+  if (creatorIdx !== -1) {
+    const payerPart = formattedParticipants[creatorIdx];
+    payerPart.hasPaid = true;
+    payerPart.paidAt = now;
+    payerPart.paymentMode = "SELF";
+
+    initialPaymentHistory.push({
+      user: creator._id,
+      amount: payerPart.totalAmountOwed,
+      paymentDate: now,
+      paymentMode: "SELF",
+      description: "Self-paid share",
+    });
+  }
+
   const expense = await Expense.create({
     title,
-    paidBy,
     roomId,
+    totalAmount: Number(totalAmount),
+    paidBy: {
+      id: creator._id,
+      fullName: creator.fullName,
+      avatar: creator.avatar || null,
+    },
     participants: formattedParticipants,
-    totalAmountPaid: 0,
-    paymentHistory: [
-      {
-        user: paidBy,
-        amount: payerAmount,
-        paymentDate: new Date(),
-        description: "Self-paid share",
-      },
-    ],
+    paymentHistory: initialPaymentHistory,
     currency: currency || "INR",
   });
 
@@ -216,24 +257,24 @@ const createExpense = asyncHandler(async (req, res) => {
 
   emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
 
-  // FCM notification
   try {
-    const recipientIds = formattedParticipants.map((p) => p.user);
-    const users = await User.find(
-      { _id: { $in: recipientIds } },
-      "notificationToken"
-    ).lean();
+    const recipientIds = formattedParticipants
+      .map((p) => p.id)
+      .filter((id) => String(id) !== String(creator._id));
 
-    const tokens = users.map((u) => u.notificationToken).filter(Boolean);
-    if (tokens.length) {
-      const actorName = req.user.fullName || req.user.username || "Someone";
-      await fcm.sendToDevice(tokens, {
-        notification: {
-          title: "New Expense Added",
-          body: `${actorName} added "${expense.title}"`,
-        },
-        data: { expenseId: expense._id.toString() },
-      });
+    if (recipientIds.length) {
+      const usersForPush = users.filter((u) => recipientIds.includes(String(u._id)));
+      const tokens = usersForPush.map((u) => u.notificationToken).filter(Boolean);
+      if (tokens.length) {
+        const actorName = creator.fullName || creator.username || "Someone";
+        await fcm.sendToDevice(tokens, {
+          notification: {
+            title: "New Expense Added",
+            body: `${actorName} added "${expense.title}"`,
+          },
+          data: { expenseId: expense._id.toString() },
+        });
+      }
     }
   } catch (err) {
     console.error("FCM push error:", err);
