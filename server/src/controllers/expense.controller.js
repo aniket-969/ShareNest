@@ -244,51 +244,71 @@ const createExpense = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, expense, "Expense created successfully"));
 });
 
+
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { expenseId, roomId } = req.params;
-  const { paymentMode } = req.body;
-
+  const { paymentMode, description } = req.body;
+  
   const expense = await Expense.findOne({
     _id: expenseId,
-    "participants.user": userId,
-  });
+    "participants.id": userId,
+  }).lean();
+
   if (!expense) {
     throw new ApiError(404, "Expense not found or you’re not a participant");
   }
 
-  const alreadyPaid = expense.paymentHistory.some((ph) =>
+  const alreadyPaidInHistory = (expense.paymentHistory || []).some((ph) =>
     ph.user.equals(userId)
   );
-  if (alreadyPaid) {
+  if (alreadyPaidInHistory) {
     throw new ApiError(400, "You have already paid for this expense");
   }
 
-  const participant = expense.participants.find((p) => p.user.equals(userId));
+  const participant = (expense.participants || []).find((p) =>
+    p.id.equals(userId)
+  );
+  if (!participant) {
+    throw new ApiError(404, "Participant not found in expense");
+  }
+
+  if (participant.hasPaid) {
+    throw new ApiError(400, "You have already paid for this expense");
+  }
+
   const paymentAmount = participant.totalAmountOwed;
 
+  const now = new Date();
   const updatedExpense = await Expense.findOneAndUpdate(
     {
       _id: expenseId,
-      "participants.user": userId,
+      "participants.id": userId,
       "paymentHistory.user": { $ne: userId },
+      "participants.hasPaid": { $ne: true },
     },
     {
       $push: {
         paymentHistory: {
           user: userId,
           amount: paymentAmount,
-          paymentDate: new Date(),
-          description: paymentMode || "",
+          paymentDate: now,
+          paymentMode: paymentMode || null,
+          description: description || "",
         },
       },
-      $inc: { totalAmountPaid: paymentAmount },
+      $set: {
+        "participants.$[p].hasPaid": true,
+        "participants.$[p].paidAt": now,
+        "participants.$[p].paymentMode": paymentMode || null,
+      },
     },
     {
       new: true,
       runValidators: true,
+      arrayFilters: [{ "p.id": userId }],
     }
-  );
+  ).lean();
 
   if (!updatedExpense) {
     throw new ApiError(400, "You have already paid for this expense");
@@ -305,6 +325,7 @@ const updatePayment = asyncHandler(async (req, res) => {
     new ApiResponse(200, updatedExpense, "Payment recorded successfully")
   );
 });
+
 
 const deleteExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
