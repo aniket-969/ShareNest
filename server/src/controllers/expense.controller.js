@@ -9,113 +9,7 @@ import { User } from "../models/user.model.js";
 import { mongoose } from "mongoose";
 import { Room } from "../models/rooms.model.js";
 
-const makeCursor = (doc) =>
-  `${doc.createdAt.toISOString()}|${doc._id.toString()}`;
 
-const parseCursor = (cursor) => {
-  if (!cursor) return null;
-  const [createdAtStr, idStr] = cursor.split("|");
-  if (!createdAtStr || !idStr) return null;
-  const createdAt = new Date(createdAtStr);
-  if (isNaN(createdAt)) return null;
-  try {
-    const _id = new mongoose.Types.ObjectId(idStr);
-    return { createdAt, _id };
-  } catch {
-    return null;
-  }
-};
-
-const getExpenses = asyncHandler(async (req, res) => {
-  const roomId = req.query.roomId || req.params.roomId;
-  if (!roomId) {
-    throw new ApiError(400, "roomId is required");
-  }
-
-  const userId = req.user._id.toString();
-  const before = parseCursor(req.query.before);
-  const q = (req.query.q || "").trim();
-  const limit = Math.min(parseInt(req.query.limit) || 20, 50);
-
-  const match = {
-    roomId: new mongoose.Types.ObjectId(roomId),
-    isDeleted: { $ne: true },
-  };
-
-  if (before) {
-    match.$or = [
-      { createdAt: { $lt: before.createdAt } },
-      { $and: [{ createdAt: before.createdAt }, { _id: { $lt: before._id } }] },
-    ];
-  }
-
-  if (q) {
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-    match.$or = match.$or || [];
-    match.$or.push(
-      { title: re },
-      { "paidBy.fullName": re },
-      { "participants.fullName": re }
-    );
-  }
-
-  const projection = {
-    title: 1,
-    paidBy: 1,
-    roomId: 1,
-    totalAmount: 1,
-    currency: 1,
-    participants: 1,
-    createdAt: 1,
-    updatedAt: 1,
-    isDeleted: 1,
-  };
-
-  const docs = await Expense.find(match, projection)
-    .sort({ createdAt: -1, _id: -1 })
-    .limit(limit + 1)
-    .lean();
-
-  const hasMore = docs.length > limit;
-  const page = hasMore ? docs.slice(0, limit) : docs;
-
-  const expenses = page.map((exp) => {
-    const participants = Array.isArray(exp.participants) ? exp.participants : [];
-
-    const participantAvatars = participants
-      .map((p) => p.avatar)
-      .filter(Boolean)
-      .slice(0, 3);
-
-    const paidCount = participants.filter((p) => p.hasPaid).length;
-    const unpaidCount = participants.length - paidCount;
-
-    const userP = participants.find((p) => p.id && p.id.toString() === userId);
-    const isUserParticipant = Boolean(userP);
-    const hasUserPaid = userP ? Boolean(userP.hasPaid) : false;
-    const requesterTotal = userP ? userP.totalAmountOwed : null;
-
-    return {
-      ...exp,
-      participantAvatars,
-      paidCount,
-      unpaidCount,
-      isUserParticipant,
-      hasUserPaid,
-      requesterTotal,
-    };
-  });
-
-  const nextBefore = hasMore ? makeCursor(page[page.length - 1]) : null;
-
-  return res.json(
-    new ApiResponse(
-      200,
-      { expenses, meta: { limit, returned: expenses.length, nextBefore} },
-      "Expenses fetched successfully"
-    )
-  );
-});
 
 const getUserExpenses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -268,6 +162,105 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
   );
 });
 
+const getExpenses = asyncHandler(async (req, res) => {
+  const roomId = req.query.roomId || req.params.roomId;
+  if (!roomId) throw new ApiError(400, "roomId is required");
+
+  const userId = req.user._id.toString();
+  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 50);
+  const beforeId = req.query.beforeId || null;
+  const q = (req.query.q || "").trim();
+
+  const match = {
+    roomId: new mongoose.Types.ObjectId(roomId),
+    isDeleted: { $ne: true },
+  };
+
+  if (beforeId) {
+    if (!mongoose.Types.ObjectId.isValid(beforeId)) {
+      throw new ApiError(400, "invalid beforeId");
+    }
+
+    const beforeDoc = await Expense.findById(beforeId).select("createdAt").lean();
+    if (!beforeDoc || !beforeDoc.createdAt) {
+     
+      return res.json(
+        new ApiResponse(
+          200,
+          { expenses: [], meta: { hasMore: false, nextBeforeId: null, limit, returned: 0 } },
+          "Expenses fetched"
+        )
+      );
+    }
+
+    match.createdAt = { $lt: new Date(beforeDoc.createdAt) };
+  }
+
+  // Search 
+  if (q) {
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    match.$or = [
+      { title: re },
+      { "paidBy.fullName": re },
+      { "participants.fullName": re },
+      { "participants.username": re },
+    ];
+  }
+
+  const projection = {
+    title: 1,
+    paidBy: 1,
+    roomId: 1,
+    totalAmount: 1,
+    currency: 1,
+    participants: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    isDeleted: 1,
+  };
+
+  const docs = await Expense.find(match, projection)
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(limit + 1)
+    .lean();
+
+  const hasMore = docs.length > limit;
+  const page = hasMore ? docs.slice(0, limit) : docs;
+
+  const expenses = page.map((exp) => {
+    const participants =  exp.participants;
+
+    const participantAvatars = participants.map((p) => p.avatar).filter(Boolean).slice(0, 3);
+
+    const paidCount = participants.filter((p) => p.hasPaid).length;
+    const unpaidCount = participants.length - paidCount;
+
+    const userP = participants.find((p) => p.id && p.id.toString() === userId);
+    const isUserParticipant = Boolean(userP);
+    const hasUserPaid = userP ? Boolean(userP.hasPaid) : false;
+    const requesterTotal = userP ? userP.totalAmountOwed : null;
+
+    return {
+      ...exp,
+      requesterTotal,
+      participantAvatars,
+      paidCount,
+      unpaidCount,
+      isUserParticipant,
+      hasUserPaid,
+    };
+  });
+
+  const nextBeforeId = hasMore ? docs[limit]._id.toString() : null;
+
+  return res.json(
+    new ApiResponse(
+      200,
+      { expenses, meta: { hasMore, nextBeforeId, limit, returned: expenses.length } },
+      "Expenses fetched successfully"
+    )
+  );
+});
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
