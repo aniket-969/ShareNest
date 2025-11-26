@@ -1,13 +1,17 @@
-import React from "react";
-import { ScrollArea } from "../ui/scroll-area";
-import ExpenseCard from "./userExpense/ExpenseCard";
+
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { Card } from "../ui/card";
-import FormWrapper from "../ui/formWrapper";
-import ExpenseForm from "../form/ExpenseForm";
-import { motion } from "framer-motion";
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { lazy, Suspense, useState } from "react";
+import ExpenseCard from "../Expense/userExpense/ExpenseCard";
+
+import TaskForm  from '@/components/form/tasks/TaskForm';
+const RecurringTaskForm = lazy(()=>import ("@/components/form/tasks/RecurringTaskForm"))
+
 
 export const fakeExpenses = [
   {
@@ -328,7 +332,7 @@ const TaskContainer = ({ participants }) => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
   const { _id } = JSON.parse(localStorage.getItem("session"));
-
+const [taskType, setTaskType] = useState("one-time");
   return (
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
 
@@ -337,7 +341,7 @@ const TaskContainer = ({ participants }) => {
         {/* top div */}
         <div className=" py-3 rounded-t-xl "></div>
 
-        <ScrollArea className=" h-[31rem]">
+        <ScrollArea className=" h-[32rem] ">
           <Card className="flex flex-col gap-6  items-center max-h-[90%] border-none rounded-none ">
             {fakeExpenses.map((fake) => (
               <>
@@ -375,16 +379,35 @@ const TaskContainer = ({ participants }) => {
         {/* bottom div */}
         <div className=" bg-card py-3 rounded-b-xl"></div>
       </Card>
-     
 
-      {/* expense form */}
-      <Card className=" w-full max-w-[25rem] p-10 rounded-xl bg-card border-none md:block hidden">
-        <ExpenseForm
-          onClose={() => {}}
-          participants={participants}
-          onSubmit={() => setIsFormOpen(false)}
-        />
-      </Card>
+      {/* task form */}
+     
+    <Card className=" w-full max-w-[25rem] py-8 px- rounded-xl bg-card border-none md:block hidden space-y-5">
+     
+              <div className="flex flex-col gap-3 px-8">
+                <RadioGroup value={taskType} onValueChange={setTaskType} className="flex flex-col gap-3">
+                  <Label className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="one-time" />
+                    One-Time Task
+                  </Label>
+                  <Label className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="recurring" />
+                    Recurring Task
+                  </Label>
+                </RadioGroup>
+              </div>
+<ScrollArea className="b h-[27rem] px-8 ">
+    <Suspense fallback={<Spinner />}>
+                {taskType === "recurring" ? (
+                  <RecurringTaskForm participants={participants} />
+                ) : (
+                  <TaskForm participants={participants} />
+                )}
+              </Suspense>
+</ScrollArea>
+              
+            
+    </Card>
     </div>
     
     
