@@ -111,7 +111,7 @@ const ExpenseCard = ({ expense, userId }) => {
 
       {/* ───── Card Footer ───── */}
       <CardFooter className="">
-        <Button variant="destructive" className="w-full mx-auto">
+        <Button variant="outline" className="w-full mx-auto">
           Mark as paid
         </Button>
       </CardFooter>

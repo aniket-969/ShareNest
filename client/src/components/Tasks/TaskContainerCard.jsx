@@ -87,7 +87,7 @@ const TaskContainerCard = ({ expense, userId }) => {
       <CardFooter>
         <p className="text-xs">
           Created by:
-          <Badge className="mx-2 font-normal" variant="outlined">
+          <Badge className="mx-2 font-normal border-white" variant="outlined">
             Eti Shree
           </Badge>
         </p>
