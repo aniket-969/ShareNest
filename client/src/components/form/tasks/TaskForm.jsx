@@ -65,8 +65,8 @@ const TaskForm = ({ participants }) => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form {...form} >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2 ">
         {/* Title */}
         <FormField
           control={form.control}
