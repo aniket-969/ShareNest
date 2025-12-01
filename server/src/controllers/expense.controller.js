@@ -263,38 +263,20 @@ const getExpenses = asyncHandler(async (req, res) => {
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, participants = [] } = req.body; 
+  const { title, totalAmount, participants = [] } = req.body;
   const creator = req.user;
-
 
   const room = await Room.findById(roomId).select("currency tenants");
   if (!room) throw new ApiError(404, "Room not found");
 
-
-  const roomMemberIds = [
-    ...(room.tenants || []).map((t) => String(t._id)),
-  ];
-  if (!roomMemberIds.includes(String(creator._id))) {
-    throw new ApiError(403, "Creator is not a member of this room");
+  const isMember = room.tenants.some(
+    (id) => String(id) === String(creator._id)
+  );
+  if (!isMember) {
+    throw new ApiError(403, "You are not a member of this room");
   }
 
- 
-  const incomingMap = {};
-  const participantIds = participants.map((p) => {
-    const id = String(p.userId || p.id);
-    incomingMap[id] = p;
-    return id;
-  });
-
-  
-  if (!participantIds.includes(String(creator._id))) {
-    participantIds.push(String(creator._id));
-    incomingMap[String(creator._id)] = incomingMap[String(creator._id)] || {};
-  }
-
-  if (participantIds.length === 0) {
-    throw new ApiError(400, "At least one participant required");
-  }
+  const participantIds = participants.map((p) => String(p.userId));
 
   const users = await User.find(
     { _id: { $in: participantIds } },
@@ -303,45 +285,29 @@ const createExpense = asyncHandler(async (req, res) => {
 
   const userMap = {};
   users.forEach((u) => (userMap[String(u._id)] = u));
+
   const missing = participantIds.filter((id) => !userMap[id]);
-  if (missing.length > 0) {
+  if (missing.length) {
     throw new ApiError(400, `Some participants not found: ${missing.join(", ")}`);
   }
 
-  // Distribute totalAmount deterministically to avoid rounding mismatch:
-  // use integer cents approach OR distribute remainder to first N participants.
-  // Here: treat money as cents to avoid float issues (multiply by 100).
-  const totalCents = Math.round(total * 100);
-  const n = participantIds.length;
-  const baseCents = Math.floor(totalCents / n);
-  let remainder = totalCents - baseCents * n;
+  const baseAmount = Number(totalAmount) / participantIds.length;
 
   const formattedParticipants = participantIds.map((userId) => {
-    const incoming = incomingMap[userId] || {};
-    const rawCharges = incoming.additionalCharges || [];
-    const charges = rawCharges.map(({ amount = 0, reason = "" }) => {
-      const amt = Number(amount) || 0;
-      return { amount: amt, reason: String(reason || "") };
-    });
-
+    const incoming = participants.find((p) => String(p.userId) === userId) || {};
+    const charges = (incoming.additionalCharges || []).map((c) => ({
+      amount: Number(c.amount),
+      reason: c.reason,
+    }));
     const additionalTotal = charges.reduce((s, c) => s + c.amount, 0);
-    // derive share in cents (base + possible + additional)
-    // convert additionalTotal to cents
-    const additionalCents = Math.round(additionalTotal * 100);
-    // allocate remainder deterministically (first participants get +1 cent)
-    const extraCent = remainder > 0 ? 1 : 0;
-    if (remainder > 0) remainder -= 1;
-
-    const totalAmountOwedCents = baseCents + extraCent + additionalCents;
-    const totalAmountOwed = totalAmountOwedCents / 100;
-
+    const totalAmountOwed = baseAmount + additionalTotal;
     const userSnapshot = userMap[userId];
 
     return {
       id: userId,
-      fullName: userSnapshot.fullName || "",
+      fullName: userSnapshot.fullName,
       avatar: userSnapshot.avatar || null,
-      baseAmount: (baseCents + extraCent) / 100, // base share this participant got
+      baseAmount,
       additionalCharges: charges,
       totalAmountOwed,
       hasPaid: false,
@@ -350,47 +316,32 @@ const createExpense = asyncHandler(async (req, res) => {
     };
   });
 
-  // Ensure the sum of participant.totalAmountOwed equals total (safety assert)
-  const sumOwed = formattedParticipants.reduce((s, p) => s + Number(p.totalAmountOwed), 0);
-  // use cents compare to avoid float issues
-  const sumOwedCents = Math.round(sumOwed * 100);
-  if (sumOwedCents !== totalCents) {
-    // fallback: adjust first participant's total to reconcile
-    const diff = totalCents - sumOwedCents;
-    formattedParticipants[0].totalAmountOwed = (Math.round(formattedParticipants[0].totalAmountOwed * 100) + diff) / 100;
-  }
-
-  // mark creator as paid if they're a participant (auto-added above)
-  const creatorIdx = formattedParticipants.findIndex(
+  const creatorPart = formattedParticipants.find(
     (p) => String(p.id) === String(creator._id)
   );
-
   const now = new Date();
   let initialPaymentHistory = [];
 
-  if (creatorIdx !== -1) {
-    const payerPart = formattedParticipants[creatorIdx];
-    payerPart.hasPaid = true;
-    payerPart.paidAt = now;
-    payerPart.paymentMode = "SELF";
+  if (creatorPart) {
+    creatorPart.hasPaid = true;
+    creatorPart.paidAt = now;
+    creatorPart.paymentMode = "SELF";
 
     initialPaymentHistory.push({
       user: creator._id,
-      amount: Number(payerPart.totalAmountOwed),
-      currency: room.currency,           // payment in room currency
-      amountInRoomCurrency: Number(payerPart.totalAmountOwed),
-      exchangeRate: null,
+      amount: creatorPart.totalAmountOwed,
       paymentDate: now,
       paymentMode: "SELF",
       description: "Self-paid share",
     });
   }
 
-  // CREATE expense explicitly setting room.currency (immutable in schema)
+  const expenseCurrency = room.currency || "INR";
+
   const expense = await Expense.create({
     title,
     roomId,
-    totalAmount: total,
+    totalAmount: Number(totalAmount),
     paidBy: {
       id: creator._id,
       fullName: creator.fullName,
@@ -398,43 +349,16 @@ const createExpense = asyncHandler(async (req, res) => {
     },
     participants: formattedParticipants,
     paymentHistory: initialPaymentHistory,
-    currency: room.currency || "INR",
+    currency: expenseCurrency,
   });
 
-  if (!expense) {
-    throw new ApiError(500, "Expense creation failed");
-  }
-
-  // emit + push (non-blocking push handled with try/catch)
   emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
-
-  try {
-    const recipientIds = formattedParticipants
-      .map((p) => p.id)
-      .filter((id) => String(id) !== String(creator._id));
-
-    if (recipientIds.length) {
-      const usersForPush = users.filter((u) => recipientIds.includes(String(u._id)));
-      const tokens = usersForPush.map((u) => u.notificationToken).filter(Boolean);
-      if (tokens.length) {
-        const actorName = creator.fullName || creator.username || "Someone";
-        await fcm.sendToDevice(tokens, {
-          notification: {
-            title: "New Expense Added",
-            body: `${actorName} added "${expense.title}"`,
-          },
-          data: { expenseId: expense._id.toString() },
-        });
-      }
-    }
-  } catch (err) {
-    console.error("FCM push error:", err);
-  }
 
   return res
     .status(201)
     .json(new ApiResponse(201, expense, "Expense created successfully"));
 });
+
 
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
