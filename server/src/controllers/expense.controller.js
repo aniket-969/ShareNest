@@ -10,7 +10,6 @@ import { mongoose } from "mongoose";
 import { Room } from "../models/rooms.model.js";
 
 
-
 const getUserExpenses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
@@ -264,14 +263,38 @@ const getExpenses = asyncHandler(async (req, res) => {
 
 const createExpense = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const { title, totalAmount, participants = [], currency } = req.body;
+  const { title, totalAmount, participants = [] } = req.body; 
   const creator = req.user;
 
-  if (!Array.isArray(participants) || participants.length === 0) {
-    throw new ApiError(400, "At least one participant is required");
+
+  const room = await Room.findById(roomId).select("currency tenants");
+  if (!room) throw new ApiError(404, "Room not found");
+
+
+  const roomMemberIds = [
+    ...(room.tenants || []).map((t) => String(t._id)),
+  ];
+  if (!roomMemberIds.includes(String(creator._id))) {
+    throw new ApiError(403, "Creator is not a member of this room");
   }
 
-  const participantIds = participants.map((p) => String(p.userId));
+ 
+  const incomingMap = {};
+  const participantIds = participants.map((p) => {
+    const id = String(p.userId || p.id);
+    incomingMap[id] = p;
+    return id;
+  });
+
+  
+  if (!participantIds.includes(String(creator._id))) {
+    participantIds.push(String(creator._id));
+    incomingMap[String(creator._id)] = incomingMap[String(creator._id)] || {};
+  }
+
+  if (participantIds.length === 0) {
+    throw new ApiError(400, "At least one participant required");
+  }
 
   const users = await User.find(
     { _id: { $in: participantIds } },
@@ -279,32 +302,46 @@ const createExpense = asyncHandler(async (req, res) => {
   ).lean();
 
   const userMap = {};
-  users.forEach((u) => {
-    userMap[String(u._id)] = u;
-  });
-
+  users.forEach((u) => (userMap[String(u._id)] = u));
   const missing = participantIds.filter((id) => !userMap[id]);
   if (missing.length > 0) {
     throw new ApiError(400, `Some participants not found: ${missing.join(", ")}`);
   }
 
-  const baseAmount = Math.round(Number(totalAmount) / participantIds.length);
+  // Distribute totalAmount deterministically to avoid rounding mismatch:
+  // use integer cents approach OR distribute remainder to first N participants.
+  // Here: treat money as cents to avoid float issues (multiply by 100).
+  const totalCents = Math.round(total * 100);
+  const n = participantIds.length;
+  const baseCents = Math.floor(totalCents / n);
+  let remainder = totalCents - baseCents * n;
 
   const formattedParticipants = participantIds.map((userId) => {
-    const incoming = participants.find((p) => String(p.userId) === String(userId)) || {};
-    const charges = (incoming.additionalCharges || []).map(({ amount, reason }) => ({
-      amount: Number(amount),
-      reason,
-    }));
-    const additionalTotal = charges.reduce((s, c) => s + (Number(c.amount) || 0), 0);
-    const totalAmountOwed = baseAmount + additionalTotal;
+    const incoming = incomingMap[userId] || {};
+    const rawCharges = incoming.additionalCharges || [];
+    const charges = rawCharges.map(({ amount = 0, reason = "" }) => {
+      const amt = Number(amount) || 0;
+      return { amount: amt, reason: String(reason || "") };
+    });
+
+    const additionalTotal = charges.reduce((s, c) => s + c.amount, 0);
+    // derive share in cents (base + possible + additional)
+    // convert additionalTotal to cents
+    const additionalCents = Math.round(additionalTotal * 100);
+    // allocate remainder deterministically (first participants get +1 cent)
+    const extraCent = remainder > 0 ? 1 : 0;
+    if (remainder > 0) remainder -= 1;
+
+    const totalAmountOwedCents = baseCents + extraCent + additionalCents;
+    const totalAmountOwed = totalAmountOwedCents / 100;
+
     const userSnapshot = userMap[userId];
 
     return {
       id: userId,
       fullName: userSnapshot.fullName || "",
       avatar: userSnapshot.avatar || null,
-      baseAmount,
+      baseAmount: (baseCents + extraCent) / 100, // base share this participant got
       additionalCharges: charges,
       totalAmountOwed,
       hasPaid: false,
@@ -313,6 +350,17 @@ const createExpense = asyncHandler(async (req, res) => {
     };
   });
 
+  // Ensure the sum of participant.totalAmountOwed equals total (safety assert)
+  const sumOwed = formattedParticipants.reduce((s, p) => s + Number(p.totalAmountOwed), 0);
+  // use cents compare to avoid float issues
+  const sumOwedCents = Math.round(sumOwed * 100);
+  if (sumOwedCents !== totalCents) {
+    // fallback: adjust first participant's total to reconcile
+    const diff = totalCents - sumOwedCents;
+    formattedParticipants[0].totalAmountOwed = (Math.round(formattedParticipants[0].totalAmountOwed * 100) + diff) / 100;
+  }
+
+  // mark creator as paid if they're a participant (auto-added above)
   const creatorIdx = formattedParticipants.findIndex(
     (p) => String(p.id) === String(creator._id)
   );
@@ -328,17 +376,21 @@ const createExpense = asyncHandler(async (req, res) => {
 
     initialPaymentHistory.push({
       user: creator._id,
-      amount: payerPart.totalAmountOwed,
+      amount: Number(payerPart.totalAmountOwed),
+      currency: room.currency,           // payment in room currency
+      amountInRoomCurrency: Number(payerPart.totalAmountOwed),
+      exchangeRate: null,
       paymentDate: now,
       paymentMode: "SELF",
       description: "Self-paid share",
     });
   }
 
+  // CREATE expense explicitly setting room.currency (immutable in schema)
   const expense = await Expense.create({
     title,
     roomId,
-    totalAmount: Number(totalAmount),
+    totalAmount: total,
     paidBy: {
       id: creator._id,
       fullName: creator.fullName,
@@ -346,13 +398,14 @@ const createExpense = asyncHandler(async (req, res) => {
     },
     participants: formattedParticipants,
     paymentHistory: initialPaymentHistory,
-    currency: currency || "INR",
+    currency: room.currency || "INR",
   });
 
   if (!expense) {
     throw new ApiError(500, "Expense creation failed");
   }
 
+  // emit + push (non-blocking push handled with try/catch)
   emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
 
   try {

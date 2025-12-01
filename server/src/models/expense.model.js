@@ -71,9 +71,6 @@ const expenseSchema = new Schema(
   { timestamps: true }
 );
 
-
-
-
 expenseSchema.index({ room: 1 });
 expenseSchema.index({ "participants.user": 1 });
 expenseSchema.index({ "participants.hasPaid": 1 });
