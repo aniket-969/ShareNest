@@ -28,7 +28,7 @@ const createExpense = asyncHandler(async (req, res) => {
 
   const users = await User.find(
     { _id: { $in: participantIds } },
-    { fullName: 1, avatar: 1, notificationToken: 1 }
+    { fullName: 1, avatar: 1, username:1,notificationToken: 1 }
   ).lean();
 
   const userMap = {};
@@ -54,6 +54,7 @@ const createExpense = asyncHandler(async (req, res) => {
     return {
       id: userId,
       fullName: userSnapshot.fullName,
+      username: userSnapshot.username,
       avatar: userSnapshot.avatar || null,
       baseAmount,
       additionalCharges: charges,
@@ -93,6 +94,7 @@ const createExpense = asyncHandler(async (req, res) => {
     paidBy: {
       id: creator._id,
       fullName: creator.fullName,
+      username:creator.username,
       avatar: creator.avatar || null,
     },
     participants: formattedParticipants,
@@ -176,6 +178,7 @@ const getExpenses = asyncHandler(async (req, res) => {
   const docs = await Expense.find(match, {
     "participants.id": 1,
     "participants.fullName": 1,
+    "participants.username": 1,
     "participants.avatar": 1,
     "participants.totalAmountOwed": 1,
     "participants.hasPaid": 1,
@@ -300,105 +303,220 @@ const getPendingPayments = asyncHandler(async (req, res) => {
 
 const getSettleUpDrawer = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const currentUserId = req.user._id;
+  const currentUserId = req.user._id; 
+  const room = req.room; 
 
- const room = req.room
-  const coll = mongoose.connection.collection("expenses");
+  if (!mongoose.Types.ObjectId.isValid(roomId)) {
+    throw new ApiError(400, "invalid roomId");
+  }
+
+  const OID = mongoose.Types.ObjectId;
+  const coll = Expense.collection;
 
   const pipeline = [
-    { $match: { roomId: ObjectId(roomId), isDeleted: { $ne: true } } },
+    { $match: { roomId: OID(roomId), isDeleted: { $ne: true } } },
 
     {
       $facet: {
+      
         owedToYou: [
           { $unwind: "$participants" },
+
+          {
+            $addFields: {
+              paidTowardsParticipant: {
+                $reduce: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ["$paymentHistory", []] },
+                      as: "ph",
+                      cond: { $eq: ["$$ph.user", "$participants.id"] }
+                    }
+                  },
+                  initialValue: 0,
+                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
+                }
+              }
+            }
+          },
+
           {
             $match: {
-              "paidBy.id": ObjectId(currentUserId),
-              "participants.id": { $ne: ObjectId(currentUserId) },
-            },
+              "paidBy.id": OID(currentUserId),
+              "participants.id": { $ne: OID(currentUserId) },
+              $expr: {
+                $gt: [
+                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
+                  0
+                ]
+              }
+            }
           },
+
+          {
+            $project: {
+              participantId: "$participants.id",
+              outstanding: {
+                $round: [
+                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
+                  2
+                ]
+              },
+              lastActivityAt: "$updatedAt",
+              firstFullName: "$participants.fullName",
+              firstUsername: "$participants.username",
+              firstAvatar: "$participants.avatar"
+            }
+          },
+
+       
           {
             $group: {
-              _id: "$participants.id",
-              amount: { $sum: "$participants.totalAmountOwed" },
-              lastActivityAt: { $max: "$updatedAt" },
-              firstFullName: { $first: "$participants.fullName" },
-              firstUsername: { $first: "$participants.username" },
-              firstAvatar: { $first: "$participants.avatar" },
-            },
+              _id: "$participantId",
+              amount: { $sum: "$outstanding" },
+              lastActivityAt: { $max: "$lastActivityAt" },
+              firstFullName: { $first: "$firstFullName" },
+              firstUsername: { $first: "$firstUsername" },
+              firstAvatar: { $first: "$firstAvatar" }
+            }
           },
+
           {
             $project: {
               _id: 0,
-              participantId: "$_id",
-              amount: 1,
+              participantId: { $toString: "$_id" },
+              amount: { $round: ["$amount", 2] },
               lastActivityAt: 1,
               user: {
-                id: "$_id",
+                id: { $toString: "$_id" },
                 fullName: "$firstFullName",
                 username: "$firstUsername",
-                avatar: "$firstAvatar",
-              },
-            },
+                avatar: "$firstAvatar"
+              }
+            }
           },
-          { $sort: { amount: -1 } },
+
+          { $sort: { amount: -1, lastActivityAt: -1 } }
         ],
 
-        // People the current user owes
         youOwed: [
           { $unwind: "$participants" },
+
+          {
+            $addFields: {
+              paidByCurrentUserTowardsThisExpense: {
+                $reduce: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ["$paymentHistory", []] },
+                      as: "ph",
+                      cond: { $eq: ["$$ph.user", OID(currentUserId)] }
+                    }
+                  },
+                  initialValue: 0,
+                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
+                }
+              },
+              paidTowardsParticipant: {
+                $reduce: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ["$paymentHistory", []] },
+                      as: "ph",
+                      cond: { $eq: ["$$ph.user", "$participants.id"] }
+                    }
+                  },
+                  initialValue: 0,
+                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
+                }
+              }
+            }
+          },
+
+       
           {
             $match: {
-              "participants.id": ObjectId(currentUserId),
-              "paidBy.id": { $ne: ObjectId(currentUserId) },
-            },
+              "participants.id": OID(currentUserId),
+              "paidBy.id": { $ne: OID(currentUserId) },
+              $expr: {
+                $gt: [
+                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
+                  0
+                ]
+              }
+            }
           },
+
+        
+          {
+            $project: {
+              creditorId: "$paidBy.id",
+              outstanding: {
+                $round: [
+                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
+                  2
+                ]
+              },
+              lastActivityAt: "$updatedAt",
+              firstFullName: "$paidBy.fullName",
+              firstUsername: "$paidBy.username",
+              firstAvatar: "$paidBy.avatar"
+            }
+          },
+
           {
             $group: {
-              _id: "$paidBy.id",
-              amount: { $sum: "$participants.totalAmountOwed" },
-              lastActivityAt: { $max: "$updatedAt" },
-              firstFullName: { $first: "$paidBy.fullName" },
-              firstUsername: { $first: "$paidBy.username" },
-              firstAvatar: { $first: "$paidBy.avatar" },
-            },
+              _id: "$creditorId",
+              amount: { $sum: "$outstanding" },
+              lastActivityAt: { $max: "$lastActivityAt" },
+              firstFullName: { $first: "$firstFullName" },
+              firstUsername: { $first: "$firstUsername" },
+              firstAvatar: { $first: "$firstAvatar" }
+            }
           },
+
           {
             $project: {
               _id: 0,
-              participantId: "$_id",
-              amount: 1,
+              participantId: { $toString: "$_id" },
+              amount: { $round: ["$amount", 2] },
               lastActivityAt: 1,
               user: {
-                id: "$_id",
+                id: { $toString: "$_id" },
                 fullName: "$firstFullName",
                 username: "$firstUsername",
-                avatar: "$firstAvatar",
-              },
-            },
+                avatar: "$firstAvatar"
+              }
+            }
           },
-          { $sort: { amount: -1 } },
-        ],
 
-        currency: [{ $limit: 1 }, { $project: { currency: "$currency" } }],
-      },
-    },
+          { $sort: { amount: -1, lastActivityAt: -1 } }
+        ]
+      }
+    }
   ];
 
   const aggResult = await coll.aggregate(pipeline).toArray();
   const result = aggResult[0] || {};
 
-  const owedToYou = result.owedToYou || [];
-  const youOwed = result.youOwed || [];
+  const owedToYou = (result.owedToYou || []).map((r) => ({
+    participantId: r.participantId,
+    amount: Number(r.amount || 0),
+    lastActivityAt: r.lastActivityAt,
+    user: r.user,
+  }));
 
-  const totalOwedToMe = owedToYou.reduce((s, r) => s + (r.amount || 0), 0);
-  const totalOwe = youOwed.reduce((s, r) => s + (r.amount || 0), 0);
+  const youOwed = (result.youOwed || []).map((r) => ({
+    participantId: r.participantId,
+    amount: Number(r.amount || 0),
+    lastActivityAt: r.lastActivityAt,
+    user: r.user,
+  }));
 
-  const currency =
-    room.currency ||
-    (result.currency && result.currency[0] && result.currency[0].currency) ||
-    "INR";
+  const totalOwedToMe = Number(owedToYou.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2));
+  const totalOwe = Number(youOwed.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2));
+
+  const currency = room && room.currency ? room.currency : "INR";
 
   const payload = {
     roomId,
@@ -409,9 +527,7 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
     totalOwe,
   };
 
-  return res.json(
-    new ApiResponse(200, payload, "settle-up drawer data fetched successfully")
-  );
+  return res.json(new ApiResponse(200, payload, "settle-up drawer data fetched successfully"));
 });
 
 const updatePayment = asyncHandler(async (req, res) => {
