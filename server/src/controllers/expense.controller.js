@@ -28,7 +28,7 @@ const createExpense = asyncHandler(async (req, res) => {
 
   const users = await User.find(
     { _id: { $in: participantIds } },
-    { fullName: 1, avatar: 1, username:1,notificationToken: 1 }
+    { fullName: 1, avatar: 1, username: 1, notificationToken: 1 }
   ).lean();
 
   const userMap = {};
@@ -36,13 +36,17 @@ const createExpense = asyncHandler(async (req, res) => {
 
   const missing = participantIds.filter((id) => !userMap[id]);
   if (missing.length) {
-    throw new ApiError(400, `Some participants not found: ${missing.join(", ")}`);
+    throw new ApiError(
+      400,
+      `Some participants not found: ${missing.join(", ")}`
+    );
   }
 
   const baseAmount = Number(totalAmount) / participantIds.length;
 
   const formattedParticipants = participantIds.map((userId) => {
-    const incoming = participants.find((p) => String(p.userId) === userId) || {};
+    const incoming =
+      participants.find((p) => String(p.userId) === userId) || {};
     const charges = (incoming.additionalCharges || []).map((c) => ({
       amount: Number(c.amount),
       reason: c.reason,
@@ -94,7 +98,7 @@ const createExpense = asyncHandler(async (req, res) => {
     paidBy: {
       id: creator._id,
       fullName: creator.fullName,
-      username:creator.username,
+      username: creator.username,
       avatar: creator.avatar || null,
     },
     participants: formattedParticipants,
@@ -129,12 +133,17 @@ const getExpenses = asyncHandler(async (req, res) => {
       throw new ApiError(400, "invalid beforeId");
     }
 
-    const beforeDoc = await Expense.findById(beforeId).select("createdAt").lean();
+    const beforeDoc = await Expense.findById(beforeId)
+      .select("createdAt")
+      .lean();
     if (!beforeDoc || !beforeDoc.createdAt) {
       return res.json(
         new ApiResponse(
           200,
-          { expenses: [], meta: { hasMore: false, nextBeforeId: null, limit, returned: 0 } },
+          {
+            expenses: [],
+            meta: { hasMore: false, nextBeforeId: null, limit, returned: 0 },
+          },
           "Expenses fetched"
         )
       );
@@ -144,11 +153,14 @@ const getExpenses = asyncHandler(async (req, res) => {
 
     match.$or = [
       { createdAt: { $lt: beforeCreated } },
-      { createdAt: beforeCreated, _id: { $lt: mongoose.Types.ObjectId(beforeId) } },
+      {
+        createdAt: beforeCreated,
+        _id: { $lt: mongoose.Types.ObjectId(beforeId) },
+      },
     ];
   }
 
-  // Search 
+  // Search
   if (q) {
     const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
     match.$or = match.$or || [];
@@ -159,7 +171,6 @@ const getExpenses = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const projection = {
     title: 1,
     paidBy: 1,
@@ -167,13 +178,12 @@ const getExpenses = asyncHandler(async (req, res) => {
     totalAmount: 1,
     currency: 1,
     participants: {
-      $slice: ["$participants", 5] 
+      $slice: ["$participants", 5],
     },
     createdAt: 1,
     updatedAt: 1,
     isDeleted: 1,
   };
-
 
   const docs = await Expense.find(match, {
     "participants.id": 1,
@@ -203,7 +213,7 @@ const getExpenses = asyncHandler(async (req, res) => {
 
     const participantAvatars = participants
       .map((p) => p.avatar)
-      .filter(Boolean)
+      .filter(Boolean);
 
     const paidCount = participants.filter((p) => p.hasPaid).length;
     const unpaidCount = participants.length - paidCount;
@@ -229,7 +239,10 @@ const getExpenses = asyncHandler(async (req, res) => {
   return res.json(
     new ApiResponse(
       200,
-      { expenses, meta: { hasMore, nextBeforeId, limit, returned: expenses.length } },
+      {
+        expenses,
+        meta: { hasMore, nextBeforeId, limit, returned: expenses.length },
+      },
       "Expenses fetched successfully"
     )
   );
@@ -261,8 +274,340 @@ const deleteExpense = asyncHandler(async (req, res) => {
     expenseId
   );
 
+  return res.json(new ApiResponse(200, {}, "Expense deleted successfully"));
+});
+
+const getSettleUpDrawer = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const currentUserId = req.user._id;
+  const room = req.room;
+
+  if (!mongoose.Types.ObjectId.isValid(roomId)) {
+    throw new ApiError(400, "invalid roomId");
+  }
+
+  const OID = mongoose.Types.ObjectId;
+  const coll = Expense.collection;
+
+  const pipeline = [
+    { $match: { roomId: OID(roomId), isDeleted: { $ne: true } } },
+
+    {
+      $facet: {
+        owedToYou: [
+          { $unwind: "$participants" },
+
+          {
+            $addFields: {
+              paidTowardsParticipant: {
+                $reduce: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ["$paymentHistory", []] },
+                      as: "ph",
+                      cond: { $eq: ["$$ph.user", "$participants.id"] },
+                    },
+                  },
+                  initialValue: 0,
+                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] },
+                },
+              },
+            },
+          },
+
+          {
+            $match: {
+              "paidBy.id": OID(currentUserId),
+              "participants.id": { $ne: OID(currentUserId) },
+              $expr: {
+                $gt: [
+                  {
+                    $subtract: [
+                      "$participants.totalAmountOwed",
+                      "$paidTowardsParticipant",
+                    ],
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+
+          {
+            $project: {
+              participantId: "$participants.id",
+              outstanding: {
+                $round: [
+                  {
+                    $subtract: [
+                      "$participants.totalAmountOwed",
+                      "$paidTowardsParticipant",
+                    ],
+                  },
+                  2,
+                ],
+              },
+              lastActivityAt: "$updatedAt",
+              firstFullName: "$participants.fullName",
+              firstUsername: "$participants.username",
+              firstAvatar: "$participants.avatar",
+            },
+          },
+
+          {
+            $group: {
+              _id: "$participantId",
+              amount: { $sum: "$outstanding" },
+              lastActivityAt: { $max: "$lastActivityAt" },
+              firstFullName: { $first: "$firstFullName" },
+              firstUsername: { $first: "$firstUsername" },
+              firstAvatar: { $first: "$firstAvatar" },
+            },
+          },
+
+          {
+            $project: {
+              _id: 0,
+              participantId: { $toString: "$_id" },
+              amount: { $round: ["$amount", 2] },
+              lastActivityAt: 1,
+              user: {
+                id: { $toString: "$_id" },
+                fullName: "$firstFullName",
+                username: "$firstUsername",
+                avatar: "$firstAvatar",
+              },
+            },
+          },
+
+          { $sort: { amount: -1, lastActivityAt: -1 } },
+        ],
+
+        youOwed: [
+          { $unwind: "$participants" },
+
+          {
+            $addFields: {
+              paidByCurrentUserTowardsThisExpense: {
+                $reduce: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ["$paymentHistory", []] },
+                      as: "ph",
+                      cond: { $eq: ["$$ph.user", OID(currentUserId)] },
+                    },
+                  },
+                  initialValue: 0,
+                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] },
+                },
+              },
+              paidTowardsParticipant: {
+                $reduce: {
+                  input: {
+                    $filter: {
+                      input: { $ifNull: ["$paymentHistory", []] },
+                      as: "ph",
+                      cond: { $eq: ["$$ph.user", "$participants.id"] },
+                    },
+                  },
+                  initialValue: 0,
+                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] },
+                },
+              },
+            },
+          },
+
+          {
+            $match: {
+              "participants.id": OID(currentUserId),
+              "paidBy.id": { $ne: OID(currentUserId) },
+              $expr: {
+                $gt: [
+                  {
+                    $subtract: [
+                      "$participants.totalAmountOwed",
+                      "$paidTowardsParticipant",
+                    ],
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+
+          {
+            $project: {
+              creditorId: "$paidBy.id",
+              outstanding: {
+                $round: [
+                  {
+                    $subtract: [
+                      "$participants.totalAmountOwed",
+                      "$paidTowardsParticipant",
+                    ],
+                  },
+                  2,
+                ],
+              },
+              lastActivityAt: "$updatedAt",
+              firstFullName: "$paidBy.fullName",
+              firstUsername: "$paidBy.username",
+              firstAvatar: "$paidBy.avatar",
+            },
+          },
+
+          {
+            $group: {
+              _id: "$creditorId",
+              amount: { $sum: "$outstanding" },
+              lastActivityAt: { $max: "$lastActivityAt" },
+              firstFullName: { $first: "$firstFullName" },
+              firstUsername: { $first: "$firstUsername" },
+              firstAvatar: { $first: "$firstAvatar" },
+            },
+          },
+
+          {
+            $project: {
+              _id: 0,
+              participantId: { $toString: "$_id" },
+              amount: { $round: ["$amount", 2] },
+              lastActivityAt: 1,
+              user: {
+                id: { $toString: "$_id" },
+                fullName: "$firstFullName",
+                username: "$firstUsername",
+                avatar: "$firstAvatar",
+              },
+            },
+          },
+
+          { $sort: { amount: -1, lastActivityAt: -1 } },
+        ],
+      },
+    },
+  ];
+
+  const aggResult = await coll.aggregate(pipeline).toArray();
+  const result = aggResult[0] || {};
+
+  const owedToYou = (result.owedToYou || []).map((r) => ({
+    participantId: r.participantId,
+    amount: Number(r.amount || 0),
+    lastActivityAt: r.lastActivityAt,
+    user: r.user,
+  }));
+
+  const youOwed = (result.youOwed || []).map((r) => ({
+    participantId: r.participantId,
+    amount: Number(r.amount || 0),
+    lastActivityAt: r.lastActivityAt,
+    user: r.user,
+  }));
+
+  const totalOwedToMe = Number(
+    owedToYou.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2)
+  );
+  const totalOwe = Number(
+    youOwed.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2)
+  );
+
+  const currency = room && room.currency ? room.currency : "INR";
+
+  const payload = {
+    roomId,
+    currency,
+    youOwed,
+    owedToYou,
+    totalOwedToMe,
+    totalOwe,
+  };
+
   return res.json(
-    new ApiResponse(200, {}, "Expense deleted successfully")
+    new ApiResponse(200, payload, "settle-up drawer data fetched successfully")
+  );
+});
+
+const updatePayment = asyncHandler(async (req, res) => {
+  const userId = req.user._id; 
+  const userIdStr = String(userId);
+  const { expenseId, roomId } = req.params;
+  const { paymentMode = null} = req.body;
+
+  const expense = await Expense.findOne({
+    _id: expenseId,
+    "participants.id": userId,
+  }).lean();
+
+  if (!expense) {
+    throw new ApiError(404, "Expense not found or you’re not a participant");
+  }
+
+  const alreadyPaidInHistory = (expense.paymentHistory || []).some(
+    (ph) => String(ph.user) === userIdStr
+  );
+  if (alreadyPaidInHistory) {
+    throw new ApiError(400, "You have already paid for this expense");
+  }
+
+  const participant = (expense.participants || []).find(
+    (p) => String(p.id) === userIdStr
+  );
+  if (!participant) {
+    throw new ApiError(404, "Participant not found in expense");
+  }
+
+  if (participant.hasPaid) {
+    throw new ApiError(400, "You have already paid for this expense");
+  }
+
+  const paymentAmount = Number(participant.totalAmountOwed);
+
+  const now = new Date();
+
+  const paymentObj = {
+    user: mongoose.Types.ObjectId(userId),
+    amount: paymentAmount,
+    paymentDate: now,
+    paymentMode: paymentMode || null,
+  };
+
+  const updatedExpense = await Expense.findOneAndUpdate(
+    {
+      _id: expenseId,
+      "participants.id": mongoose.Types.ObjectId(userId),    
+      "paymentHistory.user": { $ne: mongoose.Types.ObjectId(userId) },
+      "participants.hasPaid": { $ne: true },
+    },
+    {
+      $push: { paymentHistory: paymentObj },
+      $set: {
+        "participants.$[p].hasPaid": true,
+        "participants.$[p].paidAt": now,
+        "participants.$[p].paymentMode": paymentMode || null,
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+      arrayFilters: [{ "p.id": mongoose.Types.ObjectId(userId) }],
+    }
+  ).lean();
+
+  if (!updatedExpense) {
+   
+    throw new ApiError(400, "You have already paid for this expense");
+  }
+
+  emitSocketEvent(
+    req,
+    roomId,
+    ExpenseEventEnum.EXPENSE_UPDATED_EVENT,
+    { expenseId, updaterId: String(userId), paidAt: now }
+  );
+
+  return res.json(
+    new ApiResponse(200, updatedExpense, "Payment recorded successfully")
   );
 });
 
@@ -298,316 +643,6 @@ const getPendingPayments = asyncHandler(async (req, res) => {
       pendingExpense,
       " Pending payments owed to user fetched successfully"
     )
-  );
-});
-
-const getSettleUpDrawer = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
-  const currentUserId = req.user._id; 
-  const room = req.room; 
-
-  if (!mongoose.Types.ObjectId.isValid(roomId)) {
-    throw new ApiError(400, "invalid roomId");
-  }
-
-  const OID = mongoose.Types.ObjectId;
-  const coll = Expense.collection;
-
-  const pipeline = [
-    { $match: { roomId: OID(roomId), isDeleted: { $ne: true } } },
-
-    {
-      $facet: {
-      
-        owedToYou: [
-          { $unwind: "$participants" },
-
-          {
-            $addFields: {
-              paidTowardsParticipant: {
-                $reduce: {
-                  input: {
-                    $filter: {
-                      input: { $ifNull: ["$paymentHistory", []] },
-                      as: "ph",
-                      cond: { $eq: ["$$ph.user", "$participants.id"] }
-                    }
-                  },
-                  initialValue: 0,
-                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
-                }
-              }
-            }
-          },
-
-          {
-            $match: {
-              "paidBy.id": OID(currentUserId),
-              "participants.id": { $ne: OID(currentUserId) },
-              $expr: {
-                $gt: [
-                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
-                  0
-                ]
-              }
-            }
-          },
-
-          {
-            $project: {
-              participantId: "$participants.id",
-              outstanding: {
-                $round: [
-                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
-                  2
-                ]
-              },
-              lastActivityAt: "$updatedAt",
-              firstFullName: "$participants.fullName",
-              firstUsername: "$participants.username",
-              firstAvatar: "$participants.avatar"
-            }
-          },
-
-       
-          {
-            $group: {
-              _id: "$participantId",
-              amount: { $sum: "$outstanding" },
-              lastActivityAt: { $max: "$lastActivityAt" },
-              firstFullName: { $first: "$firstFullName" },
-              firstUsername: { $first: "$firstUsername" },
-              firstAvatar: { $first: "$firstAvatar" }
-            }
-          },
-
-          {
-            $project: {
-              _id: 0,
-              participantId: { $toString: "$_id" },
-              amount: { $round: ["$amount", 2] },
-              lastActivityAt: 1,
-              user: {
-                id: { $toString: "$_id" },
-                fullName: "$firstFullName",
-                username: "$firstUsername",
-                avatar: "$firstAvatar"
-              }
-            }
-          },
-
-          { $sort: { amount: -1, lastActivityAt: -1 } }
-        ],
-
-        youOwed: [
-          { $unwind: "$participants" },
-
-          {
-            $addFields: {
-              paidByCurrentUserTowardsThisExpense: {
-                $reduce: {
-                  input: {
-                    $filter: {
-                      input: { $ifNull: ["$paymentHistory", []] },
-                      as: "ph",
-                      cond: { $eq: ["$$ph.user", OID(currentUserId)] }
-                    }
-                  },
-                  initialValue: 0,
-                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
-                }
-              },
-              paidTowardsParticipant: {
-                $reduce: {
-                  input: {
-                    $filter: {
-                      input: { $ifNull: ["$paymentHistory", []] },
-                      as: "ph",
-                      cond: { $eq: ["$$ph.user", "$participants.id"] }
-                    }
-                  },
-                  initialValue: 0,
-                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] }
-                }
-              }
-            }
-          },
-
-       
-          {
-            $match: {
-              "participants.id": OID(currentUserId),
-              "paidBy.id": { $ne: OID(currentUserId) },
-              $expr: {
-                $gt: [
-                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
-                  0
-                ]
-              }
-            }
-          },
-
-        
-          {
-            $project: {
-              creditorId: "$paidBy.id",
-              outstanding: {
-                $round: [
-                  { $subtract: ["$participants.totalAmountOwed", "$paidTowardsParticipant"] },
-                  2
-                ]
-              },
-              lastActivityAt: "$updatedAt",
-              firstFullName: "$paidBy.fullName",
-              firstUsername: "$paidBy.username",
-              firstAvatar: "$paidBy.avatar"
-            }
-          },
-
-          {
-            $group: {
-              _id: "$creditorId",
-              amount: { $sum: "$outstanding" },
-              lastActivityAt: { $max: "$lastActivityAt" },
-              firstFullName: { $first: "$firstFullName" },
-              firstUsername: { $first: "$firstUsername" },
-              firstAvatar: { $first: "$firstAvatar" }
-            }
-          },
-
-          {
-            $project: {
-              _id: 0,
-              participantId: { $toString: "$_id" },
-              amount: { $round: ["$amount", 2] },
-              lastActivityAt: 1,
-              user: {
-                id: { $toString: "$_id" },
-                fullName: "$firstFullName",
-                username: "$firstUsername",
-                avatar: "$firstAvatar"
-              }
-            }
-          },
-
-          { $sort: { amount: -1, lastActivityAt: -1 } }
-        ]
-      }
-    }
-  ];
-
-  const aggResult = await coll.aggregate(pipeline).toArray();
-  const result = aggResult[0] || {};
-
-  const owedToYou = (result.owedToYou || []).map((r) => ({
-    participantId: r.participantId,
-    amount: Number(r.amount || 0),
-    lastActivityAt: r.lastActivityAt,
-    user: r.user,
-  }));
-
-  const youOwed = (result.youOwed || []).map((r) => ({
-    participantId: r.participantId,
-    amount: Number(r.amount || 0),
-    lastActivityAt: r.lastActivityAt,
-    user: r.user,
-  }));
-
-  const totalOwedToMe = Number(owedToYou.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2));
-  const totalOwe = Number(youOwed.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2));
-
-  const currency = room && room.currency ? room.currency : "INR";
-
-  const payload = {
-    roomId,
-    currency,
-    youOwed,
-    owedToYou,
-    totalOwedToMe,
-    totalOwe,
-  };
-
-  return res.json(new ApiResponse(200, payload, "settle-up drawer data fetched successfully"));
-});
-
-const updatePayment = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const { expenseId, roomId } = req.params;
-  const { paymentMode, description } = req.body;
-  
-  const expense = await Expense.findOne({
-    _id: expenseId,
-    "participants.id": userId,
-  }).lean();
-
-  if (!expense) {
-    throw new ApiError(404, "Expense not found or you’re not a participant");
-  }
-
-  const alreadyPaidInHistory = (expense.paymentHistory || []).some((ph) =>
-    ph.user.equals(userId)
-  );
-  if (alreadyPaidInHistory) {
-    throw new ApiError(400, "You have already paid for this expense");
-  }
-
-  const participant = (expense.participants || []).find((p) =>
-    p.id.equals(userId)
-  );
-  if (!participant) {
-    throw new ApiError(404, "Participant not found in expense");
-  }
-
-  if (participant.hasPaid) {
-    throw new ApiError(400, "You have already paid for this expense");
-  }
-
-  const paymentAmount = participant.totalAmountOwed;
-
-  const now = new Date();
-  const updatedExpense = await Expense.findOneAndUpdate(
-    {
-      _id: expenseId,
-      "participants.id": userId,
-      "paymentHistory.user": { $ne: userId },
-      "participants.hasPaid": { $ne: true },
-    },
-    {
-      $push: {
-        paymentHistory: {
-          user: userId,
-          amount: paymentAmount,
-          paymentDate: now,
-          paymentMode: paymentMode || null,
-          description: description || "",
-        },
-      },
-      $set: {
-        "participants.$[p].hasPaid": true,
-        "participants.$[p].paidAt": now,
-        "participants.$[p].paymentMode": paymentMode || null,
-      },
-    },
-    {
-      new: true,
-      runValidators: true,
-      arrayFilters: [{ "p.id": userId }],
-    }
-  ).lean();
-
-  if (!updatedExpense) {
-    throw new ApiError(400, "You have already paid for this expense");
-  }
-
-  emitSocketEvent(
-    req,
-    roomId,
-    ExpenseEventEnum.EXPENSE_UPDATED_EVENT,
-    updatedExpense
-  );
-
-  return res.json(
-    new ApiResponse(200, updatedExpense, "Payment recorded successfully")
   );
 });
 
