@@ -11,7 +11,8 @@ const expenseSchema = new Schema(
     paidBy: {
       id: { type: Schema.Types.ObjectId, ref: "User", required: true },
       fullName: { type: String, required: true },
-      avatar: { type: String, default: null }
+      username: { type: String, default: null }, // <--- new
+      avatar: { type: String, default: null },
     },
 
     roomId: {
@@ -27,9 +28,9 @@ const expenseSchema = new Schema(
 
     participants: [
       {
-       
         id: { type: Schema.Types.ObjectId, ref: "User", required: true },
         fullName: { type: String, required: true },
+        username: { type: String, default: null }, // <--- new
         avatar: { type: String, default: null },
 
         baseAmount: { type: Number, required: true },
@@ -37,7 +38,7 @@ const expenseSchema = new Schema(
           {
             amount: { type: Number, required: true },
             reason: { type: String, required: true },
-          }
+          },
         ],
         totalAmountOwed: { type: Number, required: true },
 
@@ -53,20 +54,20 @@ const expenseSchema = new Schema(
         amount: { type: Number, required: true },
         paymentDate: { type: Date, required: true },
         paymentMode: { type: String, default: null },
-        description: { type: String, default: "" }
+        description: { type: String, default: "" },
       },
     ],
 
     currency: {
       type: String,
       default: "INR",
-      match: /^[A-Z]{3}$/
+      match: /^[A-Z]{3}$/,
     },
 
     isDeleted: {
       type: Boolean,
       default: false,
-    }
+    },
   },
   { timestamps: true }
 );

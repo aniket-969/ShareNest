@@ -9,6 +9,259 @@ import { User } from "../models/user.model.js";
 import { mongoose } from "mongoose";
 import { Room } from "../models/rooms.model.js";
 
+const createExpense = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const { title, totalAmount, participants = [] } = req.body;
+  const creator = req.user;
+
+  const room = await Room.findById(roomId).select("currency tenants");
+  if (!room) throw new ApiError(404, "Room not found");
+
+  const isMember = room.tenants.some(
+    (id) => String(id) === String(creator._id)
+  );
+  if (!isMember) {
+    throw new ApiError(403, "You are not a member of this room");
+  }
+
+  const participantIds = participants.map((p) => String(p.userId));
+
+  const users = await User.find(
+    { _id: { $in: participantIds } },
+    { fullName: 1, avatar: 1, notificationToken: 1 }
+  ).lean();
+
+  const userMap = {};
+  users.forEach((u) => (userMap[String(u._id)] = u));
+
+  const missing = participantIds.filter((id) => !userMap[id]);
+  if (missing.length) {
+    throw new ApiError(400, `Some participants not found: ${missing.join(", ")}`);
+  }
+
+  const baseAmount = Number(totalAmount) / participantIds.length;
+
+  const formattedParticipants = participantIds.map((userId) => {
+    const incoming = participants.find((p) => String(p.userId) === userId) || {};
+    const charges = (incoming.additionalCharges || []).map((c) => ({
+      amount: Number(c.amount),
+      reason: c.reason,
+    }));
+    const additionalTotal = charges.reduce((s, c) => s + c.amount, 0);
+    const totalAmountOwed = baseAmount + additionalTotal;
+    const userSnapshot = userMap[userId];
+
+    return {
+      id: userId,
+      fullName: userSnapshot.fullName,
+      avatar: userSnapshot.avatar || null,
+      baseAmount,
+      additionalCharges: charges,
+      totalAmountOwed,
+      hasPaid: false,
+      paidAt: null,
+      paymentMode: null,
+    };
+  });
+
+  const creatorPart = formattedParticipants.find(
+    (p) => String(p.id) === String(creator._id)
+  );
+  const now = new Date();
+  let initialPaymentHistory = [];
+
+  if (creatorPart) {
+    creatorPart.hasPaid = true;
+    creatorPart.paidAt = now;
+    creatorPart.paymentMode = "SELF";
+
+    initialPaymentHistory.push({
+      user: creator._id,
+      amount: creatorPart.totalAmountOwed,
+      paymentDate: now,
+      paymentMode: "SELF",
+      description: "Self-paid share",
+    });
+  }
+
+  const expenseCurrency = room.currency || "INR";
+
+  const expense = await Expense.create({
+    title,
+    roomId,
+    totalAmount: Number(totalAmount),
+    paidBy: {
+      id: creator._id,
+      fullName: creator.fullName,
+      avatar: creator.avatar || null,
+    },
+    participants: formattedParticipants,
+    paymentHistory: initialPaymentHistory,
+    currency: expenseCurrency,
+  });
+
+  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, expense, "Expense created successfully"));
+});
+
+const getExpenses = asyncHandler(async (req, res) => {
+  const roomId = req.query.roomId || req.params.roomId;
+  if (!roomId) throw new ApiError(400, "roomId is required");
+
+  const userId = req.user._id.toString();
+  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 50);
+  const beforeId = req.query.beforeId || null;
+  const q = (req.query.q || "").trim();
+
+  const match = {
+    roomId: new mongoose.Types.ObjectId(roomId),
+    isDeleted: { $ne: true },
+  };
+
+  // Cursor
+  if (beforeId) {
+    if (!mongoose.Types.ObjectId.isValid(beforeId)) {
+      throw new ApiError(400, "invalid beforeId");
+    }
+
+    const beforeDoc = await Expense.findById(beforeId).select("createdAt").lean();
+    if (!beforeDoc || !beforeDoc.createdAt) {
+      return res.json(
+        new ApiResponse(
+          200,
+          { expenses: [], meta: { hasMore: false, nextBeforeId: null, limit, returned: 0 } },
+          "Expenses fetched"
+        )
+      );
+    }
+
+    const beforeCreated = new Date(beforeDoc.createdAt);
+
+    match.$or = [
+      { createdAt: { $lt: beforeCreated } },
+      { createdAt: beforeCreated, _id: { $lt: mongoose.Types.ObjectId(beforeId) } },
+    ];
+  }
+
+  // Search 
+  if (q) {
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    match.$or = match.$or || [];
+    match.$or.push(
+      { title: re },
+      { "paidBy.fullName": re },
+      { "participants.fullName": re }
+    );
+  }
+
+  
+  const projection = {
+    title: 1,
+    paidBy: 1,
+    roomId: 1,
+    totalAmount: 1,
+    currency: 1,
+    participants: {
+      $slice: ["$participants", 5] 
+    },
+    createdAt: 1,
+    updatedAt: 1,
+    isDeleted: 1,
+  };
+
+
+  const docs = await Expense.find(match, {
+    "participants.id": 1,
+    "participants.fullName": 1,
+    "participants.avatar": 1,
+    "participants.totalAmountOwed": 1,
+    "participants.hasPaid": 1,
+    title: 1,
+    paidBy: 1,
+    roomId: 1,
+    totalAmount: 1,
+    currency: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    isDeleted: 1,
+  })
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(limit + 1)
+    .lean();
+
+  const hasMore = docs.length > limit;
+  const page = hasMore ? docs.slice(0, limit) : docs;
+
+  const expenses = page.map((exp) => {
+    const participants = exp.participants || [];
+
+    const participantAvatars = participants
+      .map((p) => p.avatar)
+      .filter(Boolean)
+
+    const paidCount = participants.filter((p) => p.hasPaid).length;
+    const unpaidCount = participants.length - paidCount;
+
+    const userP = participants.find((p) => p.id && String(p.id) === userId);
+    const isUserParticipant = Boolean(userP);
+    const hasUserPaid = userP ? Boolean(userP.hasPaid) : false;
+    const requesterTotal = userP ? userP.totalAmountOwed : null;
+
+    return {
+      ...exp,
+      requesterTotal,
+      participantAvatars,
+      paidCount,
+      unpaidCount,
+      isUserParticipant,
+      hasUserPaid,
+    };
+  });
+
+  const nextBeforeId = hasMore ? docs[limit]._id.toString() : null;
+
+  return res.json(
+    new ApiResponse(
+      200,
+      { expenses, meta: { hasMore, nextBeforeId, limit, returned: expenses.length } },
+      "Expenses fetched successfully"
+    )
+  );
+});
+
+const deleteExpense = asyncHandler(async (req, res) => {
+  const { expenseId, roomId } = req.params;
+  const userId = req.user._id.toString();
+
+  const expense = await Expense.findById(expenseId);
+  if (!expense || expense.isDeleted) {
+    throw new ApiError(404, "Expense not found");
+  }
+
+  if (String(expense.paidBy.id) !== userId) {
+    throw new ApiError(403, "You are not allowed to delete this expense");
+  }
+
+  const updated = await Expense.findByIdAndUpdate(
+    expenseId,
+    { isDeleted: true },
+    { new: true }
+  );
+
+  emitSocketEvent(
+    req,
+    roomId,
+    ExpenseEventEnum.EXPENSE_DELETED_EVENT,
+    expenseId
+  );
+
+  return res.json(
+    new ApiResponse(200, {}, "Expense deleted successfully")
+  );
+});
 
 const getUserExpenses = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -161,229 +414,6 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
   );
 });
 
-const getExpenses = asyncHandler(async (req, res) => {
-  const roomId = req.query.roomId || req.params.roomId;
-  if (!roomId) throw new ApiError(400, "roomId is required");
-
-  const userId = req.user._id.toString();
-  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 50);
-  const beforeId = req.query.beforeId || null;
-  const q = (req.query.q || "").trim();
-
-  const match = {
-    roomId: new mongoose.Types.ObjectId(roomId),
-    isDeleted: { $ne: true },
-  };
-
-  // Cursor
-  if (beforeId) {
-    if (!mongoose.Types.ObjectId.isValid(beforeId)) {
-      throw new ApiError(400, "invalid beforeId");
-    }
-
-    const beforeDoc = await Expense.findById(beforeId).select("createdAt").lean();
-    if (!beforeDoc || !beforeDoc.createdAt) {
-      return res.json(
-        new ApiResponse(
-          200,
-          { expenses: [], meta: { hasMore: false, nextBeforeId: null, limit, returned: 0 } },
-          "Expenses fetched"
-        )
-      );
-    }
-
-    const beforeCreated = new Date(beforeDoc.createdAt);
-
-    match.$or = [
-      { createdAt: { $lt: beforeCreated } },
-      { createdAt: beforeCreated, _id: { $lt: mongoose.Types.ObjectId(beforeId) } },
-    ];
-  }
-
-  // Search 
-  if (q) {
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-    match.$or = match.$or || [];
-    match.$or.push(
-      { title: re },
-      { "paidBy.fullName": re },
-      { "participants.fullName": re }
-    );
-  }
-
-  
-  const projection = {
-    title: 1,
-    paidBy: 1,
-    roomId: 1,
-    totalAmount: 1,
-    currency: 1,
-    participants: {
-      $slice: ["$participants", 5] 
-    },
-    createdAt: 1,
-    updatedAt: 1,
-    isDeleted: 1,
-  };
-
-
-  const docs = await Expense.find(match, {
-    "participants.id": 1,
-    "participants.fullName": 1,
-    "participants.avatar": 1,
-    "participants.totalAmountOwed": 1,
-    "participants.hasPaid": 1,
-    title: 1,
-    paidBy: 1,
-    roomId: 1,
-    totalAmount: 1,
-    currency: 1,
-    createdAt: 1,
-    updatedAt: 1,
-    isDeleted: 1,
-  })
-    .sort({ createdAt: -1, _id: -1 })
-    .limit(limit + 1)
-    .lean();
-
-  const hasMore = docs.length > limit;
-  const page = hasMore ? docs.slice(0, limit) : docs;
-
-  const expenses = page.map((exp) => {
-    const participants = exp.participants || [];
-
-    const participantAvatars = participants
-      .map((p) => p.avatar)
-      .filter(Boolean)
-
-    const paidCount = participants.filter((p) => p.hasPaid).length;
-    const unpaidCount = participants.length - paidCount;
-
-    const userP = participants.find((p) => p.id && String(p.id) === userId);
-    const isUserParticipant = Boolean(userP);
-    const hasUserPaid = userP ? Boolean(userP.hasPaid) : false;
-    const requesterTotal = userP ? userP.totalAmountOwed : null;
-
-    return {
-      ...exp,
-      requesterTotal,
-      participantAvatars,
-      paidCount,
-      unpaidCount,
-      isUserParticipant,
-      hasUserPaid,
-    };
-  });
-
-  const nextBeforeId = hasMore ? docs[limit]._id.toString() : null;
-
-  return res.json(
-    new ApiResponse(
-      200,
-      { expenses, meta: { hasMore, nextBeforeId, limit, returned: expenses.length } },
-      "Expenses fetched successfully"
-    )
-  );
-});
-
-const createExpense = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
-  const { title, totalAmount, participants = [] } = req.body;
-  const creator = req.user;
-
-  const room = await Room.findById(roomId).select("currency tenants");
-  if (!room) throw new ApiError(404, "Room not found");
-
-  const isMember = room.tenants.some(
-    (id) => String(id) === String(creator._id)
-  );
-  if (!isMember) {
-    throw new ApiError(403, "You are not a member of this room");
-  }
-
-  const participantIds = participants.map((p) => String(p.userId));
-
-  const users = await User.find(
-    { _id: { $in: participantIds } },
-    { fullName: 1, avatar: 1, notificationToken: 1 }
-  ).lean();
-
-  const userMap = {};
-  users.forEach((u) => (userMap[String(u._id)] = u));
-
-  const missing = participantIds.filter((id) => !userMap[id]);
-  if (missing.length) {
-    throw new ApiError(400, `Some participants not found: ${missing.join(", ")}`);
-  }
-
-  const baseAmount = Number(totalAmount) / participantIds.length;
-
-  const formattedParticipants = participantIds.map((userId) => {
-    const incoming = participants.find((p) => String(p.userId) === userId) || {};
-    const charges = (incoming.additionalCharges || []).map((c) => ({
-      amount: Number(c.amount),
-      reason: c.reason,
-    }));
-    const additionalTotal = charges.reduce((s, c) => s + c.amount, 0);
-    const totalAmountOwed = baseAmount + additionalTotal;
-    const userSnapshot = userMap[userId];
-
-    return {
-      id: userId,
-      fullName: userSnapshot.fullName,
-      avatar: userSnapshot.avatar || null,
-      baseAmount,
-      additionalCharges: charges,
-      totalAmountOwed,
-      hasPaid: false,
-      paidAt: null,
-      paymentMode: null,
-    };
-  });
-
-  const creatorPart = formattedParticipants.find(
-    (p) => String(p.id) === String(creator._id)
-  );
-  const now = new Date();
-  let initialPaymentHistory = [];
-
-  if (creatorPart) {
-    creatorPart.hasPaid = true;
-    creatorPart.paidAt = now;
-    creatorPart.paymentMode = "SELF";
-
-    initialPaymentHistory.push({
-      user: creator._id,
-      amount: creatorPart.totalAmountOwed,
-      paymentDate: now,
-      paymentMode: "SELF",
-      description: "Self-paid share",
-    });
-  }
-
-  const expenseCurrency = room.currency || "INR";
-
-  const expense = await Expense.create({
-    title,
-    roomId,
-    totalAmount: Number(totalAmount),
-    paidBy: {
-      id: creator._id,
-      fullName: creator.fullName,
-      avatar: creator.avatar || null,
-    },
-    participants: formattedParticipants,
-    paymentHistory: initialPaymentHistory,
-    currency: expenseCurrency,
-  });
-
-  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
-
-  return res
-    .status(201)
-    .json(new ApiResponse(201, expense, "Expense created successfully"));
-});
-
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { expenseId, roomId } = req.params;
@@ -462,37 +492,6 @@ const updatePayment = asyncHandler(async (req, res) => {
 
   return res.json(
     new ApiResponse(200, updatedExpense, "Payment recorded successfully")
-  );
-});
-
-const deleteExpense = asyncHandler(async (req, res) => {
-  const { expenseId, roomId } = req.params;
-  const userId = req.user._id.toString();
-
-  const expense = await Expense.findById(expenseId);
-  if (!expense || expense.isDeleted) {
-    throw new ApiError(404, "Expense not found");
-  }
-
-  if (String(expense.paidBy.id) !== userId) {
-    throw new ApiError(403, "You are not allowed to delete this expense");
-  }
-
-  const updated = await Expense.findByIdAndUpdate(
-    expenseId,
-    { isDeleted: true },
-    { new: true }
-  );
-
-  emitSocketEvent(
-    req,
-    roomId,
-    ExpenseEventEnum.EXPENSE_DELETED_EVENT,
-    expenseId
-  );
-
-  return res.json(
-    new ApiResponse(200, {}, "Expense deleted successfully")
   );
 });
 
