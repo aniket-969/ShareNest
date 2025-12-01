@@ -175,6 +175,7 @@ const getExpenses = asyncHandler(async (req, res) => {
     isDeleted: { $ne: true },
   };
 
+  // Cursor
   if (beforeId) {
     if (!mongoose.Types.ObjectId.isValid(beforeId)) {
       throw new ApiError(400, "invalid beforeId");
@@ -182,7 +183,6 @@ const getExpenses = asyncHandler(async (req, res) => {
 
     const beforeDoc = await Expense.findById(beforeId).select("createdAt").lean();
     if (!beforeDoc || !beforeDoc.createdAt) {
-     
       return res.json(
         new ApiResponse(
           200,
@@ -192,33 +192,56 @@ const getExpenses = asyncHandler(async (req, res) => {
       );
     }
 
-    match.createdAt = { $lt: new Date(beforeDoc.createdAt) };
+    const beforeCreated = new Date(beforeDoc.createdAt);
+
+    match.$or = [
+      { createdAt: { $lt: beforeCreated } },
+      { createdAt: beforeCreated, _id: { $lt: mongoose.Types.ObjectId(beforeId) } },
+    ];
   }
 
   // Search 
   if (q) {
     const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-    match.$or = [
+    match.$or = match.$or || [];
+    match.$or.push(
       { title: re },
       { "paidBy.fullName": re },
-      { "participants.fullName": re },
-      { "participants.username": re },
-    ];
+      { "participants.fullName": re }
+    );
   }
 
+  
   const projection = {
     title: 1,
     paidBy: 1,
     roomId: 1,
     totalAmount: 1,
     currency: 1,
-    participants: 1,
+    participants: {
+      $slice: ["$participants", 5] 
+    },
     createdAt: 1,
     updatedAt: 1,
     isDeleted: 1,
   };
 
-  const docs = await Expense.find(match, projection)
+
+  const docs = await Expense.find(match, {
+    "participants.id": 1,
+    "participants.fullName": 1,
+    "participants.avatar": 1,
+    "participants.totalAmountOwed": 1,
+    "participants.hasPaid": 1,
+    title: 1,
+    paidBy: 1,
+    roomId: 1,
+    totalAmount: 1,
+    currency: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    isDeleted: 1,
+  })
     .sort({ createdAt: -1, _id: -1 })
     .limit(limit + 1)
     .lean();
@@ -227,14 +250,16 @@ const getExpenses = asyncHandler(async (req, res) => {
   const page = hasMore ? docs.slice(0, limit) : docs;
 
   const expenses = page.map((exp) => {
-    const participants =  exp.participants;
+    const participants = exp.participants || [];
 
-    const participantAvatars = participants.map((p) => p.avatar).filter(Boolean).slice(0, 3);
+    const participantAvatars = participants
+      .map((p) => p.avatar)
+      .filter(Boolean)
 
     const paidCount = participants.filter((p) => p.hasPaid).length;
     const unpaidCount = participants.length - paidCount;
 
-    const userP = participants.find((p) => p.id && p.id.toString() === userId);
+    const userP = participants.find((p) => p.id && String(p.id) === userId);
     const isUserParticipant = Boolean(userP);
     const hasUserPaid = userP ? Boolean(userP.hasPaid) : false;
     const requesterTotal = userP ? userP.totalAmountOwed : null;
@@ -359,7 +384,6 @@ const createExpense = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, expense, "Expense created successfully"));
 });
 
-
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const { expenseId, roomId } = req.params;
@@ -443,19 +467,33 @@ const updatePayment = asyncHandler(async (req, res) => {
 
 const deleteExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
+  const userId = req.user._id.toString();
 
-  const deletedExpense = await Expense.findByIdAndDelete(expenseId);
-  if (!deletedExpense) {
-    throw new ApiError(404, "Expense not find");
+  const expense = await Expense.findById(expenseId);
+  if (!expense || expense.isDeleted) {
+    throw new ApiError(404, "Expense not found");
   }
-  const user = req.user;
+
+  if (String(expense.paidBy.id) !== userId) {
+    throw new ApiError(403, "You are not allowed to delete this expense");
+  }
+
+  const updated = await Expense.findByIdAndUpdate(
+    expenseId,
+    { isDeleted: true },
+    { new: true }
+  );
+
   emitSocketEvent(
     req,
     roomId,
     ExpenseEventEnum.EXPENSE_DELETED_EVENT,
     expenseId
   );
-  return res.json(new ApiResponse(200, {}, "Expense deleted successfully"));
+
+  return res.json(
+    new ApiResponse(200, {}, "Expense deleted successfully")
+  );
 });
 
 const getExpenseDetails = asyncHandler(async (req, res) => {
