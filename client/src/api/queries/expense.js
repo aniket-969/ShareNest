@@ -2,6 +2,15 @@ import axiosClient from "../axiosClient";
 
 const baseExpense = "expense";
 
+export const getUserExpense = async (roomId, beforeId = null, limit = 10, q = "") => {
+  console.log("in get user expense api query")
+  const response = await axiosClient.get(`/${baseExpense}/${roomId}`, {
+      params: { beforeId, limit, q },
+    });
+  console.log(response)
+  return response?.data?.data
+};
+
 export const createExpense = async (data, roomId) => { 
   console.log(data,roomId)
  
@@ -14,30 +23,6 @@ export const deleteExpense = async (expenseId) => {
  
 export const updateExpense = async (expenseId, data) => {
   return axiosClient.patch(`/${baseExpense}/${expenseId}`, data);
-};
-
-export const getExpenseDetails = async (expenseId) => {
-  return axiosClient.get(`/${baseExpense}/${expenseId}`);
-};
-
-export const getPendingPayments = async () => {
-  const response = await axiosClient.get(`/${baseExpense}/pending`);
-  // console.log(response)
-  return response?.data?.data
-};
-
-// export const getBalances = async () => {
-//   const response = await axiosClient.get(`/${baseExpense}/balance`);
-//   console.log(response)
-//   return response
-//   // return response?.data?.data
-// };
-
-export const getUserExpense = async () => {
-  console.log("in get user expense api query")
-  const response = await axiosClient.get(`/${baseExpense}/`);
-  // console.log(response)
-  return response?.data?.data
 };
 
 export const updatePayment = async (expenseId, updatedData) => {
