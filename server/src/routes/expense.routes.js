@@ -3,12 +3,10 @@ import { verifyJWT } from "./../middleware/auth.middleware.js";
 import {
   createExpense,
   deleteExpense,
-  getExpenseDetails,
-  getPendingPayments,
-  getUserExpenses,
   updateExpense,
   updatePayment,
-  getSettleUpDrawer
+  getSettleUpDrawer,
+  getExpenses
 } from "../controllers/expense.controller.js";
 import { checkMember } from "../middleware/room.middleware.js";
 import { validate } from "./../middleware/validator.middleware.js";
@@ -20,13 +18,9 @@ import {
 
 const router = Router();
 
-router.route("/").get(verifyJWT, getUserExpenses);
-router.route("/pending").get(verifyJWT, getPendingPayments);
-
-
 router
   .route("/:roomId")
-  .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense);
+  .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense).get(verifyJWT,checkMember,getExpenses);
 
   router.route("/:roomId/settle-up")
   .get(verifyJWT, checkMember, getSettleUpDrawer);
@@ -37,7 +31,6 @@ router
 
 router
   .route("/:expenseId")
-  .get(verifyJWT, getExpenseDetails)
   .patch(verifyJWT, validate(updateExpenseSchema), updateExpense)
   .delete(verifyJWT, deleteExpense);
 

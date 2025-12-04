@@ -611,92 +611,35 @@ const updatePayment = asyncHandler(async (req, res) => {
   );
 });
 
-const getUserExpenses = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-
-  const expenses = await Expense.find({
-    "participants.user": userId,
-    paidBy: { $ne: userId },
-  })
-    .populate("paidBy", "fullName avatar")
-    .populate("participants.user", "fullName avatar")
-    .lean();
-  console.log("This is expense", expenses);
-  return res.json(
-    new ApiResponse(200, expenses, "user expenses fetched successfully")
-  );
-});
-
-const getPendingPayments = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
-  const pendingExpense = await Expense.find({ paidBy: userId })
-    .populate("paidBy", "fullName avatar")
-    .populate("participants.user", "fullName avatar");
-
-  if (!pendingExpense.length) {
-    return res.json(new ApiResponse(200, [], "No user payment found"));
-  }
-
-  return res.json(
-    new ApiResponse(
-      200,
-      pendingExpense,
-      " Pending payments owed to user fetched successfully"
-    )
-  );
-});
-
-const getExpenseDetails = asyncHandler(async (req, res) => {
-  const { expenseId } = req.params;
-  const expense = await Expense.findById(expenseId)
-    .populate("paidBy", "fullName avatar")
-    .populate("participants.user", "fullName avatar");
-
-  if (!expense) {
-    throw new ApiError(404, "Expense not found");
-  }
-
-  return res.json(
-    new ApiResponse(200, expense, "Expense details fetched successfully")
-  );
-});
-
 const updateExpense = asyncHandler(async (req, res) => {
   const { expenseId, roomId } = req.params;
-  const userId = req.user.id;
-  const { name, totalAmount, paidBy, participants, paymentHistory } = req.body;
+  const userId = String(req.user._id);
+  const { title } = req.body;
 
-  // Fetch the expense to validate ownership
+  if (title === undefined) {
+    throw new ApiError(400, "Only 'title' can be updated");
+  }
+
   const expense = await Expense.findById(expenseId);
-  if (!expense) {
+  if (!expense || expense.isDeleted) {
     throw new ApiError(404, "Expense not found");
   }
 
-  // Validate if the user is allowed to update the expense
-  if (expense.paidBy.toString() !== userId) {
-    throw new ApiError(403, "You are not authorized to update this expense");
+  if (String(expense.paidBy?.id) !== userId) {
+    throw new ApiError(403, "You are not allowed to update this expense");
   }
 
-  // Prepare updates based on provided fields
-  const updates = {
-    ...(name !== undefined && { name }),
-    ...(totalAmount !== undefined && { totalAmount }),
-    ...(paidBy !== undefined && { paidBy }),
-    ...(participants !== undefined && { participants }),
-    ...(paymentHistory !== undefined && { paymentHistory }),
-  };
+  const updatedExpense = await Expense.findByIdAndUpdate(
+    expenseId,
+    { $set: { title: String(title).trim() } },
+    { new: true, runValidators: true }
+  ).lean();
 
-  // Update the expense document
-  const updatedExpense = await Expense.findByIdAndUpdate(expenseId, updates, {
-    new: true, // Return the updated document
-    runValidators: true, // Ensure validation rules are enforced
-  });
-  const user = req.user;
   emitSocketEvent(
     req,
     roomId,
-    ExpenseEventEnum.MAINTENANCE_DELETED_EVENT,
-    updatedExpense
+    ExpenseEventEnum.EXPENSE_UPDATED_EVENT,
+    { expenseId, title: updatedExpense.title }
   );
 
   return res.json(
@@ -704,13 +647,13 @@ const updateExpense = asyncHandler(async (req, res) => {
   );
 });
 
+
+
 export {
   createExpense,
   updatePayment,
-  getUserExpenses,
-  getPendingPayments,
   getSettleUpDrawer,
   deleteExpense,
-  getExpenseDetails,
   updateExpense,
+  getExpenses
 };
