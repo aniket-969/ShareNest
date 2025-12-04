@@ -118,7 +118,7 @@ const getExpenses = asyncHandler(async (req, res) => {
   if (!roomId) throw new ApiError(400, "roomId is required");
 
   const userId = req.user._id.toString();
-  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 50);
+  const limit = Math.min(parseInt(req.query.limit, 10) || 10, 50);
   const beforeId = req.query.beforeId || null;
   const q = (req.query.q || "").trim();
 
