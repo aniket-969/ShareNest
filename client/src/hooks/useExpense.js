@@ -4,6 +4,7 @@ import {
   deleteExpense,
   updateExpense,
   updatePayment,
+  getSettleUpExpense,
 } from "@/api/queries/expense";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -62,5 +63,18 @@ export const useExpenseQuery = (roomId) => {
     refetchOnWindowFocus: false,
     staleTime: 30 * 60 * 1000,
     cacheTime: 60 * 60 * 1000,
+  });
+};
+
+export const useSettleUpQuery = (roomId) => {
+  return useQuery({
+    queryKey: ["settleUp", roomId],
+    queryFn: () => getSettleUpExpense(roomId),
+    enabled: !!roomId,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false, 
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+    retry: 3,
   });
 };

@@ -33,11 +33,11 @@ const ExpenseCard = ({ expense, userId }) => {
   const symbol = currency === "INR" ? "₹" : "";
 
   return (
-    <Card className="rounded-xl w-[260px] bg-card-muted shadow-lg border-none">
+    <Card className="rounded-xl w-[280px] bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
         <CardTitle className="text-base tracking-wide font-semibold text-gray-100">
-          Requested for ' {title} '
+          Requested for - {title}
         </CardTitle>
       </CardHeader>
 

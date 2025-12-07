@@ -335,10 +335,9 @@ const ExpenseContainer = ({ participants }) => {
   const {roomId} = useParams()
   
 const {data:expenseData} =useExpenseQuery(roomId)
-console.log(expenseData?.pages[0].expenses)
+
 console.log(expenseData?.pages[0].meta)
 const expenses =  expenseData?.pages?.flatMap((page) => page.expenses) ?? [];
-console.log(expenses)
 
   return (
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
