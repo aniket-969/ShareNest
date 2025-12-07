@@ -14,109 +14,83 @@ import ParticipantsModal from "./ParticipantsModal";
 import MarkAsPaid from "./MarkAsPaid";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-
 const ExpenseCard = ({ expense, userId }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    title,
+    participantAvatars = [],
+    paidCount,
+    unpaidCount,
+    hasUserPaid,
+    requesterTotal,
+    currency = "INR",
+  } = expense;
 
-  // Format the creation date
-  const createdDate = format(new Date(expense.createdAt), "dd MMM yyyy");
+  const totalParticipants = paidCount + unpaidCount;
+  const progressValue = totalParticipants
+    ? (paidCount / totalParticipants) * 100
+    : 0;
 
-  // Figure out currency symbol
-  const currencyObj = currencyOptions.find((c) => c.code === expense.currency);
-  const symbol = currencyObj?.label.match(/\((.*)\)/)?.[1] || expense.currency;
-
-  // Total of all participants' owed amounts
-  const totalExpense = expense.participants.reduce(
-    (sum, p) => sum + p.totalAmountOwed,
-    0
-  );
-
-  // user's share
-  const userPart = expense.participants.find(
-    (p) => p.user._id.toString() === userId.toString()
-  );
-  const youOwe = userPart?.totalAmountOwed ?? 0;
-
-  // check if user has paid
-  const paymentRecord = expense.paymentHistory.find(
-    (ph) => ph.user.toString() === userId.toString()
-  );
-  const youPaid = Boolean(paymentRecord);
-  const youStatus = youPaid ? "Paid" : "Pending";
-  const paidDate = paymentRecord
-    ? format(new Date(paymentRecord.paymentDate), "dd MMM yyyy")
-    : null;
+  const symbol = currency === "INR" ? "₹" : "";
 
   return (
-    <Card className="rounded-xl bg-card-muted shadow-lg border-none ">
+    <Card className="rounded-xl w-[260px] bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
         <CardTitle className="text-base tracking-wide font-semibold text-gray-100">
-          Requested for ' {expense.title} '
+          Requested for ' {title} '
         </CardTitle>
       </CardHeader>
 
       {/* ───── Card Content ───── */}
       <CardContent className="space-y-2">
         {/* amount owed */}
-        <span className="text-4xl font-medium text-gray-100">
+        <span className="text-2xl font-medium text-gray-100 ">
           {symbol}
-          {youOwe}
+          {Number(requesterTotal).toFixed(2)}
         </span>
 
         {/* Grouped avatars */}
         <div className="flex -space-x-2">
-          <Avatar className="w-7 h-7 rounded-full overflow-visible">
-            <AvatarImage
-              className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-              src="https://avatar.iran.liara.run/public/10"
-            />
-            <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
-              CN
-            </AvatarFallback>
-          </Avatar>
-
-          <Avatar className="w-7 h-7 rounded-full overflow-visible">
-            <AvatarImage
-              className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-              src="https://avatar.iran.liara.run/public/8"
-            />
-            <AvatarFallback className="ring-2 ring-card-muted ring-offset-2 ring-offset-card-muted rounded-full">
-              LR
-            </AvatarFallback>
-          </Avatar>
-
-          <Avatar className="w-7 h-7 rounded-full overflow-visible">
-            <AvatarImage
-              className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-              src="https://avatar.iran.liara.run/public/9"
-            />
-            <AvatarFallback className="ring-2 ring-card-muted ring-offset-2 ring-offset-card-muted rounded-full">
-              ER
-            </AvatarFallback>
-          </Avatar>
+          {participantAvatars.slice(0, 3).map((img, idx) => (
+            <Avatar key={idx} className="w-7 h-7 rounded-full overflow-visible">
+              <AvatarImage
+                className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+                src={img}
+              />
+              <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
+                ??
+              </AvatarFallback>
+            </Avatar>
+          ))}
         </div>
 
         {/* progress bar and paid count */}
         <div className="flex items-center gap-3">
           <Progress
             className="w-[60%] h-[0.35rem] bg-pink-200 "
-            value={((Math.floor(Math.random() * 3) + 1) / 3) * 100}
+            value={progressValue}
           />
           <span className="text-xs tracking-wide">
-            {Math.floor(Math.random() * 3) + 1}/3 paid
+            {paidCount}/{totalParticipants} paid
           </span>
         </div>
       </CardContent>
 
       {/* ───── Card Footer ───── */}
       <CardFooter className="">
-        <Button variant="outline" className="w-full mx-auto">
-          Mark as paid
-        </Button>
+        {!hasUserPaid ? (
+          <Button variant="outline" className="w-full mx-auto">
+            Mark as paid
+          </Button>
+        ) : (
+          <div className="w-full mx-auto text-center text-sm text-green-400 font-medium">
+            You already paid
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
 };
+
 
 export default ExpenseCard;

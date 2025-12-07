@@ -5,6 +5,7 @@ import {
   updateExpense,
   updatePayment,
 } from "@/api/queries/expense";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useExpense = (roomId) => {

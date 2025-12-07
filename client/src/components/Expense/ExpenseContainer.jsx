@@ -8,6 +8,8 @@ import { Card } from "../ui/card";
 import FormWrapper from "../ui/formWrapper";
 import ExpenseForm from "../form/ExpenseForm";
 import { motion } from "framer-motion";
+import { useExpenseQuery } from "@/hooks/useExpense";
+import { useParams } from 'react-router-dom';
 
 export const fakeExpenses = [
   {
@@ -326,54 +328,64 @@ export const fakeExpenses = [
 
 const ExpenseContainer = ({ participants }) => {
   const { sessionQuery } = useAuth();
-  const { data, isLoading, isError } = sessionQuery;
+  
+  const { data } = sessionQuery;
   const { _id } = JSON.parse(localStorage.getItem("session"));
+
+  const {roomId} = useParams()
+  
+const {data:expenseData} =useExpenseQuery(roomId)
+console.log(expenseData?.pages[0].expenses)
+console.log(expenseData?.pages[0].meta)
+const expenses =  expenseData?.pages?.flatMap((page) => page.expenses) ?? [];
+console.log(expenses)
 
   return (
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
 
  {/* Scrollable expense history */}
-      <Card className="w-full max-w-[25rem] border-none py-6 ">
-        {/* top div */}
-       
-        <ScrollArea className=" h-[31rem]">
-          <Card className="flex flex-col gap-6  items-center max-h-[90%] border-none rounded-none ">
-            {fakeExpenses.map((fake) => (
-              <>
-                {Number(fake._id.slice(-1)) % 2 == 0 && (
-                  <p className=" text-center text-xs">6 nov, 7:13 pm</p>
-                )}
+     <Card className="w-full max-w-[25rem] border-none py-6 ">
+  <ScrollArea className="h-[31rem]">
+    <Card className="flex flex-col gap-6 items-center border-none rounded-none  " >
 
-              
-                <div className="">
+      {expenses.map((exp) => (
+        <div className="" key={exp._id}>
+          
+          {/* Timestamp */}
+          <p className="text-center text-xs">
+            {new Date(exp.createdAt).toLocaleString("en-IN", {
+              day: "numeric",
+              month: "short",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
 
-                      {/* user profile */}
-                  <div className="flex gap-2 m-2 items-center">
-                    <Avatar className="w-[25px] h-[25px] rounded-lg">
-                      <AvatarImage src={data?.avatar} alt={data?.fullName} />
-                      <AvatarFallback>
-                        <img src="/altAvatar1.jpg" alt="fallback avatar" />
-                      </AvatarFallback>
-                    </Avatar>
+          {/* Paid by */}
+          <div className="flex gap-2 m-2 items-center">
+            <Avatar className="w-[25px] h-[25px] rounded-lg">
+              <AvatarImage
+                src={exp.paidBy.avatar}
+                alt={exp.paidBy.fullName}
+              />
+              <AvatarFallback>
+                <img src="/altAvatar1.jpg" alt="fallback" />
+              </AvatarFallback>
+            </Avatar>
 
-                   
-                      <p className="max-w-[120px] truncate text-center text-sm">
-                        {data?.fullName}
-                      </p>
-                  </div>
+            <p className="max-w-[120px] truncate text-center text-sm">
+              {exp.paidBy.fullName}
+            </p>
+          </div>
 
-                  {/* expense cards */}
-                  <ExpenseCard key={fake._id} userId={_id} expense={fake} />
+          {/* Expense card */}
+          <ExpenseCard userId={_id} expense={exp} />
+        </div>
+      ))}
 
-                </div>
-              </>
-            ))}
-          </Card>
-        </ScrollArea>
- 
-       
-      </Card>
-     
+    </Card>
+  </ScrollArea>
+</Card>
 
       {/* expense form */}
       <Card className=" w-full max-w-[25rem] p-10 rounded-xl bg-card border-none md:block hidden">

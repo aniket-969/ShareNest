@@ -50,7 +50,7 @@ const ExpenseForm = ({ participants,onClose,currency }) => {
     },
   });
 
-  console.log(form.formState.errors);
+  // console.log(form.formState.errors);
   return (
     <>
     <Form {...form}>
