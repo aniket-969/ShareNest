@@ -279,18 +279,43 @@ const deleteExpense = asyncHandler(async (req, res) => {
 
 const getSettleUpDrawer = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const currentUserId = req.user._id;
-  const room = req.room;
 
-  if (!mongoose.Types.ObjectId.isValid(roomId)) {
-    throw new ApiError(400, "invalid roomId");
+  const ObjectId = mongoose.Types.ObjectId;
+
+  if (!roomId || !ObjectId.isValid(roomId)) {
+    throw new ApiError(400, "Invalid or missing roomId");
   }
 
-  const OID = mongoose.Types.ObjectId;
+  const room = await Room.findById(roomId).lean();
+  if (!room) throw new ApiError(404, "Room not found");
+
+  const currentUserId = req.user && req.user._id;
+  if (!currentUserId || !ObjectId.isValid(String(currentUserId))) {
+    throw new ApiError(401, "Invalid user");
+  }
+
+  const isMember = (room.tenants || [])
+    .map((t) => String(t))
+    .includes(String(currentUserId));
+  if (!isMember) throw new ApiError(403, "Unauthorized member");
+
+  const roomObjectId = new ObjectId(roomId);
+  const currentUserObjectId = new ObjectId(String(currentUserId));
+
   const coll = Expense.collection;
 
   const pipeline = [
-    { $match: { roomId: OID(roomId), isDeleted: { $ne: true } } },
+    { $match: { roomId: roomObjectId, isDeleted: { $ne: true } } },
+
+    {
+      $project: {
+        participants: 1,
+        paymentHistory: 1,
+        paidBy: 1,
+        updatedAt: 1,
+        currency: 1,
+      },
+    },
 
     {
       $facet: {
@@ -317,8 +342,8 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
 
           {
             $match: {
-              "paidBy.id": OID(currentUserId),
-              "participants.id": { $ne: OID(currentUserId) },
+              "paidBy.id": currentUserObjectId,
+              "participants.id": { $ne: currentUserObjectId },
               $expr: {
                 $gt: [
                   {
@@ -337,14 +362,9 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
             $project: {
               participantId: "$participants.id",
               outstanding: {
-                $round: [
-                  {
-                    $subtract: [
-                      "$participants.totalAmountOwed",
-                      "$paidTowardsParticipant",
-                    ],
-                  },
-                  2,
+                $subtract: [
+                  "$participants.totalAmountOwed",
+                  "$paidTowardsParticipant",
                 ],
               },
               lastActivityAt: "$updatedAt",
@@ -388,19 +408,6 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
 
           {
             $addFields: {
-              paidByCurrentUserTowardsThisExpense: {
-                $reduce: {
-                  input: {
-                    $filter: {
-                      input: { $ifNull: ["$paymentHistory", []] },
-                      as: "ph",
-                      cond: { $eq: ["$$ph.user", OID(currentUserId)] },
-                    },
-                  },
-                  initialValue: 0,
-                  in: { $add: ["$$value", { $ifNull: ["$$this.amount", 0] }] },
-                },
-              },
               paidTowardsParticipant: {
                 $reduce: {
                   input: {
@@ -419,8 +426,8 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
 
           {
             $match: {
-              "participants.id": OID(currentUserId),
-              "paidBy.id": { $ne: OID(currentUserId) },
+              "participants.id": currentUserObjectId,
+              "paidBy.id": { $ne: currentUserObjectId },
               $expr: {
                 $gt: [
                   {
@@ -439,14 +446,9 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
             $project: {
               creditorId: "$paidBy.id",
               outstanding: {
-                $round: [
-                  {
-                    $subtract: [
-                      "$participants.totalAmountOwed",
-                      "$paidTowardsParticipant",
-                    ],
-                  },
-                  2,
+                $subtract: [
+                  "$participants.totalAmountOwed",
+                  "$paidTowardsParticipant",
                 ],
               },
               lastActivityAt: "$updatedAt",
@@ -484,6 +486,8 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
 
           { $sort: { amount: -1, lastActivityAt: -1 } },
         ],
+
+        currency: [{ $limit: 1 }, { $project: { currency: "$currency" } }],
       },
     },
   ];
@@ -506,13 +510,29 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
   }));
 
   const totalOwedToMe = Number(
-    owedToYou.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2)
-  );
-  const totalOwe = Number(
-    youOwed.reduce((s, r) => s + (r.amount || 0), 0).toFixed(2)
+    owedToYou
+      .reduce(
+        (s, r) =>
+          s + (typeof r.amount === "number" ? r.amount : Number(r.amount || 0)),
+        0
+      )
+      .toFixed(2)
   );
 
-  const currency = room && room.currency ? room.currency : "INR";
+  const totalOwe = Number(
+    youOwed
+      .reduce(
+        (s, r) =>
+          s + (typeof r.amount === "number" ? r.amount : Number(r.amount || 0)),
+        0
+      )
+      .toFixed(2)
+  );
+
+  const currency =
+    (room && room.currency) ||
+    (result.currency && result.currency[0] && result.currency[0].currency) ||
+    "INR";
 
   const payload = {
     roomId,
@@ -529,10 +549,10 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
 });
 
 const updatePayment = asyncHandler(async (req, res) => {
-  const userId = req.user._id; 
+  const userId = req.user._id;
   const userIdStr = String(userId);
   const { expenseId, roomId } = req.params;
-  const { paymentMode = null} = req.body;
+  const { paymentMode = null } = req.body;
 
   const expense = await Expense.findOne({
     _id: expenseId,
@@ -575,7 +595,7 @@ const updatePayment = asyncHandler(async (req, res) => {
   const updatedExpense = await Expense.findOneAndUpdate(
     {
       _id: expenseId,
-      "participants.id": mongoose.Types.ObjectId(userId),    
+      "participants.id": mongoose.Types.ObjectId(userId),
       "paymentHistory.user": { $ne: mongoose.Types.ObjectId(userId) },
       "participants.hasPaid": { $ne: true },
     },
@@ -595,16 +615,14 @@ const updatePayment = asyncHandler(async (req, res) => {
   ).lean();
 
   if (!updatedExpense) {
-   
     throw new ApiError(400, "You have already paid for this expense");
   }
 
-  emitSocketEvent(
-    req,
-    roomId,
-    ExpenseEventEnum.EXPENSE_UPDATED_EVENT,
-    { expenseId, updaterId: String(userId), paidAt: now }
-  );
+  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_UPDATED_EVENT, {
+    expenseId,
+    updaterId: String(userId),
+    paidAt: now,
+  });
 
   return res.json(
     new ApiResponse(200, updatedExpense, "Payment recorded successfully")
@@ -635,19 +653,15 @@ const updateExpense = asyncHandler(async (req, res) => {
     { new: true, runValidators: true }
   ).lean();
 
-  emitSocketEvent(
-    req,
-    roomId,
-    ExpenseEventEnum.EXPENSE_UPDATED_EVENT,
-    { expenseId, title: updatedExpense.title }
-  );
+  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_UPDATED_EVENT, {
+    expenseId,
+    title: updatedExpense.title,
+  });
 
   return res.json(
     new ApiResponse(200, updatedExpense, "Expense updated successfully")
   );
 });
-
-
 
 export {
   createExpense,
@@ -655,5 +669,5 @@ export {
   getSettleUpDrawer,
   deleteExpense,
   updateExpense,
-  getExpenses
+  getExpenses,
 };

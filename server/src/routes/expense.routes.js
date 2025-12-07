@@ -23,7 +23,7 @@ router
   .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense).get(verifyJWT,checkMember,getExpenses);
 
   router.route("/:roomId/settle-up")
-  .get(verifyJWT, checkMember, getSettleUpDrawer);
+  .get(verifyJWT,getSettleUpDrawer);
 
 router
   .route("/:expenseId/payment")
