@@ -5,7 +5,7 @@ import { ScrollArea } from "../ui/scroll-area";
 
 const BalanceParticipantsList = ({ userData, currency,onParticipantClick=null }) => {
   return (
-    <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1">
+    <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1 ">
         <div className="flex flex-col gap-2 justify-center ">
 
        

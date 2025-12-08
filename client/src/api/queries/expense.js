@@ -17,8 +17,8 @@ export const getUserExpense = async (
 };
 
 export const getSettleUpExpense = async (roomId) => {
-  console.log(roomId);
-  const response = await axiosClient.post(
+  console.log("Settling expense");
+  const response = await axiosClient.get(
     `/${baseExpense}/${roomId}/settle-up`
   );
 

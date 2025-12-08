@@ -58,7 +58,7 @@ const ExpenseCard = ({ expense, userId }) => {
                 src={img}
               />
               <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
-                ??
+                <img src="/altAvatar1.jpg" alt="fallback"  className="w-full h-full object-cover rounded-full"/>
               </AvatarFallback>
             </Avatar>
           ))}
@@ -91,6 +91,5 @@ const ExpenseCard = ({ expense, userId }) => {
     </Card>
   );
 };
-
 
 export default ExpenseCard;
