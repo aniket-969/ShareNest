@@ -14,7 +14,7 @@ import ParticipantsModal from "./ParticipantsModal";
 import MarkAsPaid from "./MarkAsPaid";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-const ExpenseCard = ({ expense, userId }) => {
+const ExpenseCard = ({ expense, userId,roomId }) => {
   const {
     title,
     participantAvatars = [],
@@ -79,9 +79,7 @@ const ExpenseCard = ({ expense, userId }) => {
       {/* ───── Card Footer ───── */}
       <CardFooter className="">
         {!hasUserPaid ? (
-          <Button variant="outline" className="w-full mx-auto">
-            Mark as paid
-          </Button>
+         <MarkAsPaid expenseId={expense._id} roomId={roomId}/>
         ) : (
           <div className="w-full mx-auto text-center text-sm text-green-400 font-medium">
             You already paid

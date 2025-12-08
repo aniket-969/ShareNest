@@ -1,5 +1,3 @@
-// components/Expense/MarkAsPaid.jsx
-import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updatePaymentSchema } from "@/schema/expenseSchema";
@@ -19,8 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
-const MarkAsPaid = ({ expenseId, roomId, disabled }) => {
+const MarkAsPaid = ({ expenseId, roomId, disabled = false }) => {
+ 
+  const [open, setOpen] = useState(false);
+
   const { updatePaymentMutation } = useExpense(roomId);
   const {
     register,
@@ -40,21 +42,24 @@ const MarkAsPaid = ({ expenseId, roomId, disabled }) => {
         onSuccess: () => {
           toast.success("Payment updated successfully");
           reset();
+          setOpen(false); 
         },
         onError: (err) => {
-          toast.error(
-            err?.response?.data?.message || "Failed to update payment"
-          );
+          toast.error(err?.response?.data?.message || "Failed to update payment");
+          setOpen(false); 
         },
       }
     );
   };
 
   return (
-    <Dialog>
+  
+    <Dialog open={open} onOpenChange={setOpen}>
       {!disabled ? (
         <DialogTrigger asChild>
-          <Button size="sm">Mark as Paid</Button>
+          <Button size="sm" variant="outline">
+            Mark as Paid
+          </Button>
         </DialogTrigger>
       ) : (
         <Button size="sm" className="invisible">
@@ -64,24 +69,18 @@ const MarkAsPaid = ({ expenseId, roomId, disabled }) => {
 
       <DialogOverlay className="fixed inset-0 z-50 bg-[#121212]/60 " />
       <DialogContent className="fixed z-50 flex items-center justify-center ">
-        <div className="w-full max-w-[30rem] p-10  bg-black mx-3 bmain rounded-[2.5rem]">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-6"
-          >
+        <div className="w-full max-w-[30rem] p-10  bg-card mx-3 rounded-[2.5rem]">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold text-white">
-                Confirm Payment
+                Confirm Payment ?
               </DialogTitle>
-              <DialogDescription className="text-sm text-gray-400">
-                Payment Mode (optional)
-              </DialogDescription>
             </DialogHeader>
 
             {/* Payment Mode Field */}
             <div>
               <Label htmlFor="paymentMode" className="text-sm text-white">
-                Payment Mode
+                Payment Mode (Optional)
               </Label>
               <Input
                 id="paymentMode"

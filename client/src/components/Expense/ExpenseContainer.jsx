@@ -101,7 +101,7 @@ const expenses = expenseData?.pages
                 </div>
 
                 {/* Expense card */}
-                <ExpenseCard userId={_id} expense={exp} />
+                <ExpenseCard userId={_id} expense={exp} roomId={roomId}/>
               </div>
             ))}
           </Card>
