@@ -127,7 +127,6 @@ const getExpenses = asyncHandler(async (req, res) => {
     isDeleted: { $ne: true },
   };
 
-  // Cursor
   if (beforeId) {
     if (!mongoose.Types.ObjectId.isValid(beforeId)) {
       throw new ApiError(400, "invalid beforeId");
@@ -136,6 +135,7 @@ const getExpenses = asyncHandler(async (req, res) => {
     const beforeDoc = await Expense.findById(beforeId)
       .select("createdAt")
       .lean();
+
     if (!beforeDoc || !beforeDoc.createdAt) {
       return res.json(
         new ApiResponse(
@@ -155,12 +155,11 @@ const getExpenses = asyncHandler(async (req, res) => {
       { createdAt: { $lt: beforeCreated } },
       {
         createdAt: beforeCreated,
-        _id: { $lt: mongoose.Types.ObjectId(beforeId) },
+        _id: { $lt: new mongoose.Types.ObjectId(beforeId) },
       },
     ];
   }
 
-  // Search
   if (q) {
     const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
     match.$or = match.$or || [];
@@ -170,20 +169,6 @@ const getExpenses = asyncHandler(async (req, res) => {
       { "participants.fullName": re }
     );
   }
-
-  const projection = {
-    title: 1,
-    paidBy: 1,
-    roomId: 1,
-    totalAmount: 1,
-    currency: 1,
-    participants: {
-      $slice: ["$participants", 5],
-    },
-    createdAt: 1,
-    updatedAt: 1,
-    isDeleted: 1,
-  };
 
   const docs = await Expense.find(match, {
     "participants.id": 1,
@@ -550,29 +535,23 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
 
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const userIdStr = String(userId);
+  const userIdObj = new mongoose.Types.ObjectId(userId);
   const { expenseId, roomId } = req.params;
   const { paymentMode = null } = req.body;
 
   const expense = await Expense.findOne({
     _id: expenseId,
-    "participants.id": userId,
+    "participants.id": userIdObj
   }).lean();
 
   if (!expense) {
     throw new ApiError(404, "Expense not found or you’re not a participant");
   }
 
-  const alreadyPaidInHistory = (expense.paymentHistory || []).some(
-    (ph) => String(ph.user) === userIdStr
-  );
-  if (alreadyPaidInHistory) {
-    throw new ApiError(400, "You have already paid for this expense");
-  }
-
   const participant = (expense.participants || []).find(
-    (p) => String(p.id) === userIdStr
+    (p) => String(p.id) === String(userId)
   );
+
   if (!participant) {
     throw new ApiError(404, "Participant not found in expense");
   }
@@ -581,36 +560,33 @@ const updatePayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "You have already paid for this expense");
   }
 
-  const paymentAmount = Number(participant.totalAmountOwed);
-
   const now = new Date();
-
-  const paymentObj = {
-    user: mongoose.Types.ObjectId(userId),
-    amount: paymentAmount,
-    paymentDate: now,
-    paymentMode: paymentMode || null,
-  };
 
   const updatedExpense = await Expense.findOneAndUpdate(
     {
       _id: expenseId,
-      "participants.id": mongoose.Types.ObjectId(userId),
-      "paymentHistory.user": { $ne: mongoose.Types.ObjectId(userId) },
-      "participants.hasPaid": { $ne: true },
+      "participants.id": userIdObj,
+      "participants.hasPaid": false
     },
     {
-      $push: { paymentHistory: paymentObj },
       $set: {
         "participants.$[p].hasPaid": true,
         "participants.$[p].paidAt": now,
-        "participants.$[p].paymentMode": paymentMode || null,
+        "participants.$[p].paymentMode": paymentMode
       },
+      $push: {
+        paymentHistory: {
+          user: userIdObj,
+          amount: participant.totalAmountOwed,
+          paymentDate: now,
+          paymentMode: paymentMode
+        }
+      }
     },
     {
       new: true,
       runValidators: true,
-      arrayFilters: [{ "p.id": mongoose.Types.ObjectId(userId) }],
+      arrayFilters: [{ "p.id": userIdObj }]
     }
   ).lean();
 
@@ -621,7 +597,7 @@ const updatePayment = asyncHandler(async (req, res) => {
   emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_UPDATED_EVENT, {
     expenseId,
     updaterId: String(userId),
-    paidAt: now,
+    paidAt: now
   });
 
   return res.json(

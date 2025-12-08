@@ -30,9 +30,8 @@ const expenseSchema = new Schema(
       {
         id: { type: Schema.Types.ObjectId, ref: "User", required: true },
         fullName: { type: String, required: true },
-        username: { type: String, default: null }, // <--- new
+        username: { type: String, default: null }, 
         avatar: { type: String, default: null },
-
         baseAmount: { type: Number, required: true },
         additionalCharges: [
           {
