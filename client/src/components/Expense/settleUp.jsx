@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const SettleUp = ({ userData, currency }) => {
+const SettleUp = ({ userData, currency,amount }) => {
+  console.log(amount)
   return (
     <Dialog>
     
@@ -26,7 +27,7 @@ const SettleUp = ({ userData, currency }) => {
           </div>
 
           <p className="text-[#8AFF8A]">
-            {currency} {userData?.amount}
+            {currency} {amount}
           </p>
         </Card>
       </DialogTrigger>
@@ -48,8 +49,8 @@ const SettleUp = ({ userData, currency }) => {
                 </p>
               </div>
 
-              <span className="text-green-600 text-md">
-                {currency} {userData?.amount}
+              <span className="text-green-600 text-md "> 
+                {currency} {amount}
               </span>
             </div>
           </DialogTitle>

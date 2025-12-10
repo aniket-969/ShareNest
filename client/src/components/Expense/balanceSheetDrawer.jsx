@@ -76,15 +76,15 @@ console.log(balanceData)
           {/* Owed by you */}
           <div className="w-full max-w-lg ">
             <h2 className="m-3">
-              You owe to {fakeBalances.owedByYou.length} people
+              You owe to {balanceData?.youOwed.length} people
             </h2>
             <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1">
               <div className="flex flex-col gap-2 justify-center ">
-                {fakeBalances.owedByYou.map((data) => (
+                {balanceData?.youOwed.map((data) => (
                   <SettleUp
-                    key={data.userId}
-                    userData={data}
-                    currency={fakeBalances.currency}
+                    key={data?.user?.id}
+                    userData={data?.user}
+                    currency={balanceData?.currency} amount={data?.amount}
                   />
                 ))}
               </div>
@@ -94,12 +94,12 @@ console.log(balanceData)
           {/* Owed to you */}
           <div className="w-full max-w-lg ">
             <h2 className="m-3">
-              {fakeBalances.owedToYou.length} people owe you
+              {balanceData?.owedToYou.length} people owe you
             </h2>
 
             <BalanceParticipantsList
-              userData={fakeBalances.owedToYou}
-              currency={fakeBalances.currency}
+              userData={balanceData?.owedToYou}
+              currency={balanceData?.currency}
             />
           </div>
         </div>
