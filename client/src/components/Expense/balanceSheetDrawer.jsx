@@ -1,12 +1,12 @@
-import React from 'react'
-import { ScrollArea } from '@/components/ui/scroll-area';
-import BalanceParticipantsList from './balanceParticipantsList';
-import SettleUp from './settleUp';
-import { useSettleUpQuery } from '@/hooks/useExpense';
-import { Spinner } from '@/components/ui/spinner';
-import { useParams } from 'react-router-dom';
+import React from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import BalanceParticipantsList from "./balanceParticipantsList";
+import SettleUp from "./settleUp";
+import { useSettleUpQuery } from "@/hooks/useExpense";
+import { Spinner } from "@/components/ui/spinner";
+import { useParams } from "react-router-dom";
 
-    export const fakeBalances = {
+export const fakeBalances = {
   currency: "₹",
   owedByYou: [
     {
@@ -63,47 +63,62 @@ import { useParams } from 'react-router-dom';
   ],
 };
 const BalanceSheetDrawer = () => {
- const {roomId} = useParams()
+  const { roomId } = useParams();
   const onParticipantClick = () => {
     console.log("clicked");
   };
-const {data:balanceData,isLoading,isError} = useSettleUpQuery(roomId)
-if(isLoading)return <Spinner/>
-if(isError)return <>Something went wrong. Please refresh</>
-console.log(balanceData)
+  const { data: balanceData, isLoading, isError } = useSettleUpQuery(roomId);
+  if (isLoading) return <Spinner />;
+  if (isError) return <>Something went wrong. Please refresh</>;
+  console.log(balanceData);
   return (
-     <div className="flex items-center mx-6 justify-center md:gap-12 md:my-2 md:flex-row flex-col ">
-          {/* Owed by you */}
-          <div className="w-full max-w-lg ">
-            <h2 className="m-3">
-              You owe to {balanceData?.youOwed.length} people
-            </h2>
-            <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1">
-              <div className="flex flex-col gap-2 justify-center ">
-                {balanceData?.youOwed.map((data) => (
-                  <SettleUp
-                    key={data?.user?.id}
-                    userData={data?.user}
-                    currency={balanceData?.currency} amount={data?.amount}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-
-          {/* Owed to you */}
-          <div className="w-full max-w-lg ">
-            <h2 className="m-3">
-              {balanceData?.owedToYou.length} people owe you
-            </h2>
-
-            <BalanceParticipantsList
-              userData={balanceData?.owedToYou}
-              currency={balanceData?.currency}
-            />
-          </div>
+    <div className="flex items-center mx-6 justify-center md:gap-12 md:my-2 md:flex-row flex-col ">
+      {/* Owed by you */}
+      {balanceData?.youOwed.length > 0 && (
+        <div className="w-full max-w-lg ">
+          <h2 className="m-3">
+            You owe to {balanceData?.youOwed.length}{" "}
+            {balanceData?.youOwed.length > 1 ? (
+              <span> people </span>
+            ) : (
+              <span> person </span>
+            )}
+          </h2>
+          <ScrollArea className="h-[135px] md:h-[196px] px-3 py-1">
+            <div className="flex flex-col gap-2 justify-center ">
+              {balanceData?.youOwed.map((data) => (
+                <SettleUp
+                  key={data?.user?.id}
+                  userData={data?.user}
+                  currency={balanceData?.currency}
+                  amount={data?.amount}
+                />
+              ))}
+            </div>
+          </ScrollArea>
         </div>
-  )
-}
+      )}
+      {/* Owed to you */}
+      {balanceData?.owedToYou.length > 0 && (
+        <div className="w-full max-w-lg ">
+          <h2 className="m-3">
+            {balanceData?.owedToYou.length}
+            {balanceData?.owedToYou.length > 1 ? (
+              <span> people </span>
+            ) : (
+              <span> person </span>
+            )}
+            owe you
+          </h2>
 
-export default BalanceSheetDrawer
+          <BalanceParticipantsList
+            userData={balanceData?.owedToYou}
+            currency={balanceData?.currency}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BalanceSheetDrawer;
