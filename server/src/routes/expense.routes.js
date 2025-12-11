@@ -26,7 +26,7 @@ router
   router.route("/:roomId/settle-up")
   .get(verifyJWT,getSettleUpDrawer);
   router.route("/:roomId/settle-up/:owedToUserId")
-  .get(verifyJWT,settleAllWithUser);
+  .post(verifyJWT,settleAllWithUser);
 
 router
   .route("/:expenseId/payment")
