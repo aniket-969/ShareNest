@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const SettleUp = ({ userData, currency,amount }) => {
   console.log(amount)
+  
   return (
     <Dialog>
     

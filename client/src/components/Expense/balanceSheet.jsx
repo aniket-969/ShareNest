@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSettleUpQuery } from "@/hooks/useExpense";
 import { Spinner } from '@/components/ui/spinner';
 import { useParams } from 'react-router-dom';
-import BalanceSheetDrawer from "./balanceSheetDrawer";
+import BalanceDrawer from "./balanceDrawer";
 
 const BalanceSheet = () => {
  
@@ -37,7 +37,7 @@ const BalanceSheet = () => {
         </DrawerHeader>
 
         {/* Content */}
-       <BalanceSheetDrawer/>
+       <BalanceDrawer/>
       </DrawerContent>
     </Drawer>
   );
