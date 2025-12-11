@@ -44,7 +44,7 @@ export const useExpense = (roomId) => {
     updateExpenseMutation,
     deleteExpenseMutation,
     updatePaymentMutation,
-    settleAllExpense,
+    settleAllExpenseMutation,
   };
 };
 
