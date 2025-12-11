@@ -5,6 +5,7 @@ import {
   updateExpense,
   updatePayment,
   getSettleUpExpense,
+  settleAllExpense,
 } from "@/api/queries/expense";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,17 +15,18 @@ export const useExpense = (roomId) => {
 
   const createExpenseMutation = useMutation({
     mutationFn: (data) => createExpense(data, roomId),
-    onSuccess: () => {
-     
-    },
+    onSuccess: () => {},
+  });
+
+  const settleAllExpenseMutation = useMutation({
+    mutationFn: ({ owedToUserId, data }) =>
+      settleAllExpense(roomId, owedToUserId, data),
   });
 
   const updateExpenseMutation = useMutation({
     mutationFn: ({ expenseId, updatedData }) =>
       updateExpense(expenseId, updatedData),
-    onSuccess: (data, { expenseId }) => {
-     
-    },
+    onSuccess: (data, { expenseId }) => {},
   });
 
   const updatePaymentMutation = useMutation({
@@ -34,9 +36,7 @@ export const useExpense = (roomId) => {
 
   const deleteExpenseMutation = useMutation({
     mutationFn: (expenseId) => deleteExpense(expenseId),
-    onSuccess: (data, expenseId) => {
-     
-    },
+    onSuccess: (data, expenseId) => {},
   });
 
   return {
@@ -44,6 +44,7 @@ export const useExpense = (roomId) => {
     updateExpenseMutation,
     deleteExpenseMutation,
     updatePaymentMutation,
+    settleAllExpense,
   };
 };
 
@@ -72,7 +73,7 @@ export const useSettleUpQuery = (roomId) => {
     queryFn: () => getSettleUpExpense(roomId),
     enabled: !!roomId,
     refetchOnWindowFocus: false,
-    refetchOnMount: false, 
+    refetchOnMount: false,
     staleTime: 5 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
     retry: 3,

@@ -16,11 +16,21 @@ export const getUserExpense = async (
   return response?.data?.data;
 };
 
+export const settleAllExpense = async (roomId, owedToUserId, data) => {
+  console.log("Settling expense", roomId, owedToUserId);
+  return;
+  const response = await axiosClient.post(
+    `/${baseExpense}/${roomId}/settle-up/${owedToUserId}`,
+    data
+  );
+
+  console.log(response);
+  return response?.data?.data;
+};
+
 export const getSettleUpExpense = async (roomId) => {
   console.log("Settling expense");
-  const response = await axiosClient.get(
-    `/${baseExpense}/${roomId}/settle-up`
-  );
+  const response = await axiosClient.get(`/${baseExpense}/${roomId}/settle-up`);
 
   console.log(response);
   return response?.data?.data;
