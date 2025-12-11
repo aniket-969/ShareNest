@@ -6,7 +6,8 @@ import {
   updateExpense,
   updatePayment,
   getSettleUpDrawer,
-  getExpenses
+  getExpenses,
+  settleAllWithUser
 } from "../controllers/expense.controller.js";
 import { checkMember } from "../middleware/room.middleware.js";
 import { validate } from "./../middleware/validator.middleware.js";
@@ -24,6 +25,8 @@ router
 
   router.route("/:roomId/settle-up")
   .get(verifyJWT,getSettleUpDrawer);
+  router.route("/:roomId/settle-up/:owedToUserId")
+  .get(verifyJWT,settleAllWithUser);
 
 router
   .route("/:expenseId/payment")

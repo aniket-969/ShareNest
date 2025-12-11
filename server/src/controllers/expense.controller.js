@@ -639,6 +639,167 @@ const updateExpense = asyncHandler(async (req, res) => {
   );
 });
 
+const settleAllWithUser = asyncHandler(async (req, res) => {
+  const { roomId, owedToUserId } = req.params;
+  const userId = req.user?._id;
+  const paymentMode = req.body.paymentMode || null;
+  const { owedToUserName } = req.body;
+
+  if (!roomId || !mongoose.Types.ObjectId.isValid(roomId)) throw new ApiError(400, "Invalid roomId");
+  if (!owedToUserId || !mongoose.Types.ObjectId.isValid(owedToUserId)) throw new ApiError(400, "Invalid owedToUserId");
+  if (!userId || !mongoose.Types.ObjectId.isValid(String(userId))) throw new ApiError(401, "Invalid user");
+
+  const room = await Room.findById(roomId).lean();
+  if (!room) throw new ApiError(404, "Room not found");
+
+  const isMember = (room.tenants || []).map(String).includes(String(userId));
+  if (!isMember) throw new ApiError(403, "Unauthorized member");
+
+  const userObjId = new mongoose.Types.ObjectId(String(userId));
+  const creditorObjId = new mongoose.Types.ObjectId(String(owedToUserId));
+  const roomObjId = new mongoose.Types.ObjectId(String(roomId));
+
+  if (String(userObjId) === String(creditorObjId)) throw new ApiError(400, "Cannot settle with yourself");
+
+  const enforcedCurrency = room.currency || "INR";
+
+  const targetExpenses = await Expense.find(
+    {
+      roomId: roomObjId,
+      currency: enforcedCurrency,
+      "paidBy.id": creditorObjId,
+      participants: { $elemMatch: { id: userObjId, hasPaid: { $ne: true } } },
+      isDeleted: { $ne: true },
+    },
+    { _id: 1, participants: 1 }
+  ).lean();
+
+  if (!targetExpenses.length) {
+    return res.json(new ApiResponse(200, {
+      settledCount: 0,
+      failedCount: 0,
+      totalAmount: 0,
+      currency: enforcedCurrency
+    }, "Nothing to settle"));
+  }
+
+  // Build bulkWrite ops
+  const now = new Date();
+  const ops = [];
+  const targetIds = [];
+  const amountMap = new Map();
+
+  for (const exp of targetExpenses) {
+    const participant = (exp.participants || []).find((p) => String(p.id) === String(userObjId));
+    if (!participant) continue;
+
+    const amountRaw = Number(participant.totalAmountOwed || 0);
+    const roundedAmount = Math.round((amountRaw + Number.EPSILON) * 100) / 100;
+
+    amountMap.set(String(exp._id), roundedAmount);
+    targetIds.push(new mongoose.Types.ObjectId(exp._id));
+
+    ops.push({
+      updateOne: {
+        filter: {
+          _id: new mongoose.Types.ObjectId(exp._id),
+          participants: { $elemMatch: { id: userObjId, hasPaid: { $ne: true } } }
+        },
+        update: {
+          $set: {
+            "participants.$[p].hasPaid": true,
+            "participants.$[p].paidAt": now,
+            "participants.$[p].paymentMode": paymentMode
+          },
+          $push: {
+            paymentHistory: {
+              user: userObjId,
+              amount: roundedAmount,
+              paymentDate: now,
+              paymentMode,
+              description: `Bulk settlement with ${String(creditorObjId)}`
+            }
+          }
+        },
+        arrayFilters: [{ "p.id": userObjId }]
+      }
+    });
+  }
+
+  if (!ops.length) {
+    return res.json(new ApiResponse(200, {
+      settledCount: 0,
+      failedCount: 0,
+      totalAmount: 0,
+      currency: enforcedCurrency
+    }, "Nothing to settle"));
+  }
+
+  let bulkWriteError = null;
+  try {
+    await Expense.bulkWrite(ops, { ordered: false });
+  } catch (err) {
+   
+    bulkWriteError = err;
+    console.error("bulkWrite error in settleAllWithUser:", err && err.stack ? err.stack : err);
+  }
+
+  const settledDocs = await Expense.find(
+    {
+      _id: { $in: targetIds },
+      participants: { $elemMatch: { id: userObjId, hasPaid: true } }
+    },
+    { _id: 1 }
+  ).lean();
+
+  const settledIdSet = new Set(settledDocs.map((d) => String(d._id)));
+  const expenseIdsSettled = targetIds.map((id) => String(id)).filter((id) => settledIdSet.has(id));
+  const expenseIdsFailed = targetIds.map((id) => String(id)).filter((id) => !settledIdSet.has(id));
+
+  const settledCount = expenseIdsSettled.length;
+  const failedCount = expenseIdsFailed.length;
+
+  let totalAmount = 0;
+  for (const id of expenseIdsSettled) {
+    totalAmount += Number(amountMap.get(id) || 0);
+  }
+  totalAmount = Math.round((totalAmount + Number.EPSILON) * 100) / 100;
+
+  const auditEntry = {
+    userId: String(userObjId),
+    creditorId: String(creditorObjId),
+    roomId: String(roomObjId),
+    attemptedExpenseIds: targetIds.map((id) => String(id)),
+    settledExpenseIds: expenseIdsSettled,
+    failedExpenseIds: expenseIdsFailed,
+    settledCount,
+    failedCount,
+    totalAmount,
+    currency: enforcedCurrency,
+    bulkWriteError: bulkWriteError ? (bulkWriteError.message || String(bulkWriteError)) : null,
+    timestamp: now.toISOString()
+  };
+  console.info("settleAllWithUser audit:", auditEntry);
+ 
+  const actorName = req.user?.fullName || "Someone";
+  const displayName = owedToUserName || "someone";
+  const message = `${actorName} paid all expenses of ${displayName}`;
+
+  if (settledCount > 0 || failedCount > 0) {
+    emitSocketEvent(req, roomId, "settleAll:completed", { message });
+  }
+
+  return res.json(new ApiResponse(200, {
+    settledCount,
+    failedCount,
+    totalAmount,
+    currency: enforcedCurrency,
+    settledExpenseIds: expenseIdsSettled,
+    failedExpenseIds: expenseIdsFailed
+  }, "Bulk settlement completed"));
+});
+
+
 export {
   createExpense,
   updatePayment,
@@ -646,4 +807,5 @@ export {
   deleteExpense,
   updateExpense,
   getExpenses,
+  settleAllWithUser
 };
