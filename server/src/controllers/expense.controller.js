@@ -177,6 +177,7 @@ const getExpenses = asyncHandler(async (req, res) => {
     "participants.avatar": 1,
     "participants.totalAmountOwed": 1,
     "participants.hasPaid": 1,
+    "participants.paidAt": 1,
     title: 1,
     paidBy: 1,
     roomId: 1,
