@@ -12,12 +12,12 @@ import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useExpense } from "@/hooks/useExpense";
 import { useParams } from "react-router-dom";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const SettleUp = ({ userData, currency, amount }) => {
   const { roomId } = useParams();
-  const { settleAllExpenseMutation } = useExpense(roomId); 
- 
+  const { settleAllExpenseMutation } = useExpense(roomId);
+
   // console.log(settleAllExpenseMutation)
   const [open, setOpen] = useState(false);
   const [paymentMode, setPaymentMode] = useState("");
@@ -30,7 +30,7 @@ const SettleUp = ({ userData, currency, amount }) => {
         owedToUserId: userData.id,
         data: {
           paymentMode: paymentMode || null,
-          owedToUserName: userData.fullName, 
+          owedToUserName: userData.fullName,
         },
       },
       {
@@ -76,7 +76,10 @@ const SettleUp = ({ userData, currency, amount }) => {
             <div className="flex items-center gap-4 ">
               <div className="flex gap-2 items-center">
                 <Avatar className="w-[35px] h-[35px] rounded-lg">
-                  <AvatarImage src={userData?.avatar} alt={userData?.fullName} />
+                  <AvatarImage
+                    src={userData?.avatar}
+                    alt={userData?.fullName}
+                  />
                   <AvatarFallback>
                     <img src="/altAvatar1.jpg" alt="fallback avatar" />
                   </AvatarFallback>
@@ -108,7 +111,9 @@ const SettleUp = ({ userData, currency, amount }) => {
           onClick={onSubmit}
           disabled={settleAllExpenseMutation.isLoading}
         >
-          {settleAllExpenseMutation.isLoading ? "Marking..." : "Mark all as paid"}
+          {settleAllExpenseMutation.isLoading
+            ? "Marking..."
+            : "Mark all as paid"}
         </Button>
       </DialogContent>
     </Dialog>

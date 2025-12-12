@@ -14,6 +14,8 @@ import ParticipantsModal from "./ParticipantsModal";
 import MarkAsPaid from "./MarkAsPaid";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ChevronRight } from 'lucide-react';
+
 const ExpenseCard = ({ expense, userId,roomId }) => {
   const {
     title,
@@ -65,7 +67,7 @@ const ExpenseCard = ({ expense, userId,roomId }) => {
         </div>
 
         {/* progress bar and paid count */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ">
           <Progress
             className="w-[60%] h-[0.35rem] bg-pink-200 "
             value={progressValue}
@@ -73,6 +75,8 @@ const ExpenseCard = ({ expense, userId,roomId }) => {
           <span className="text-xs tracking-wide">
             {paidCount}/{totalParticipants} paid
           </span>
+          <ParticipantsModal expense={expense} currency={symbol}/>
+
         </div>
       </CardContent>
 

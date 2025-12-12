@@ -13,86 +13,88 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 
-const ParticipantsModal = ({ expense, symbol }) => {
+const ParticipantsModal = ({ expense, currency = "₹" }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const paidMap = (expense.paymentHistory || []).reduce((acc, ph) => {
-    acc[ph.user.toString()] = ph.paymentDate;
-    return acc;
-  }, {});
-
-  const payerId = expense.paidBy._id.toString();
-  if (!paidMap[payerId]) {
-    paidMap[payerId] = expense.createdAt;
-  }
+  if (!expense) return null;
+  // if (expense.title == "Soda" ) console.log(expense);
+  const payerId = expense.paidBy?.id?.toString();
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full" size="sm">
-          Show Participants
-        </Button>
+        <button aria-label="Open participants">
+          <ChevronRight size={14} />
+        </button>
       </DialogTrigger>
 
       <DialogContent className="max-w-md bg-gray-900 text-gray-100">
         <DialogHeader>
           <DialogTitle>Participants</DialogTitle>
-          <DialogDescription>Additional Charges</DialogDescription>
+          <DialogDescription>Expense details & payments</DialogDescription>
         </DialogHeader>
+
+        <div className="px-4 mt-2 text-sm text-gray-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-medium">{expense.title}</div>
+              <div className="text-xs text-gray-400">
+                Total: {currency}
+                {Number(expense.totalAmount || 0).toFixed(2)}
+              </div>
+            </div>
+            <div className="text-xs text-gray-400">
+              {expense.paidCount ?? 0}/{expense.participants?.length ?? 0} paid
+            </div>
+          </div>
+        </div>
 
         <ScrollArea className="mt-4 max-h-72 overflow-auto px-4">
           <div className="space-y-4">
-            {expense.participants.map((p) => {
-              const uid = p.user._id.toString();
-              const paidDate = paidMap[uid];
-              const hasPaid = Boolean(paidDate);
+            {(expense.participants || []).map((p) => {
+              const uid = p.id?.toString();
+              const hasPaid = Boolean(p.hasPaid);
+              const paidDate = p.paidAt ? new Date(p.paidAt) : null;
               const status = hasPaid ? "Paid" : "Pending";
 
               return (
-                <div key={p._id} className="flex flex-col space-y-1">
+                <div key={uid} className="flex flex-col space-y-1">
                   <div className="flex items-center justify-between">
                     {/* Avatar + Name */}
                     <div className="flex items-center space-x-2">
-                      <Avatar className="w-7 h-7 ring-1 ring-gray-700">
-                        <AvatarImage
-                          src={p.user.avatar}
-                          alt={p.user.fullName}
-                        />
+                      <Avatar className="w-7 h-7 rounded-[2.4rem] ring-1 ring-gray-700">
+                        <AvatarImage src={p.avatar} alt={p.fullName} />
                         <AvatarFallback>
-                          {p.user.fullName.charAt(0)}
+                          <img src="/altAvatar1.jpg" alt="fallback avatar" />
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm">{p.user.fullName}</span>
+                      <span className="text-sm">{p.fullName}</span>
                     </div>
 
                     {/* Owed amount */}
                     <span className="text-sm font-medium">
-                      {symbol}
-                      {p.totalAmountOwed}
+                      {currency}
+                      {Number(p.totalAmountOwed ?? 0).toFixed(2)}
                     </span>
                   </div>
 
-                  {/* Base amount */}
-                  <div className="ml-10 text-sm text-gray-300">
-                    Base: {symbol}
-                    {p.baseAmount}
-                  </div>
+                  {/* Additional Charges */}
+                  {Array.isArray(p.additionalCharges) &&
+                    p.additionalCharges.length > 0 && (
+                      <div className="ml-10 mt-1 space-y-1">
+                        <span className="text-sm text-gray-300">Extras:</span>
+                        {p.additionalCharges.map((c) => (
+                          <div key={c._id} className="text-sm text-gray-200">
+                            • {currency}
+                            {Number(c.amount).toFixed(2)} – {c.reason}
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  {/* Extra charges */}
-                  {p.additionalCharges.length > 0 && (
-                    <div className="ml-10 mt-1 space-y-1">
-                      <span className="text-sm text-gray-300">Extras:</span>
-                      {p.additionalCharges.map((c) => (
-                        <div key={c._id} className="text-sm text-gray-200">
-                          • {symbol}
-                          {c.amount} – {c.reason}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Paid / Pending badge (and date if paid) */}
+                  {/* Paid / Pending */}
                   <div className="ml-10 mt-2 flex items-center space-x-2">
                     <Badge
                       variant={hasPaid ? "secondary" : ""}
@@ -100,9 +102,10 @@ const ParticipantsModal = ({ expense, symbol }) => {
                     >
                       {status}
                     </Badge>
+
                     {hasPaid && paidDate && (
                       <span className="text-xs text-gray-400">
-                        on {format(new Date(paidDate), "dd MMM yyyy")}
+                        on {format(paidDate, "dd MMM yyyy")}
                       </span>
                     )}
                   </div>
