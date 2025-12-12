@@ -98,7 +98,7 @@ const ParticipantsModal = ({ expense, currency = "₹" }) => {
                   <div className="ml-10 mt-2 flex items-center space-x-2">
                     <Badge
                       variant={hasPaid ? "secondary" : ""}
-                      className="text-[0.7rem] uppercase px-2 py-1"
+                      className="text-[0.65rem] uppercase px-2 py-1 tracking-wide"
                     >
                       {status}
                     </Badge>
@@ -115,11 +115,11 @@ const ParticipantsModal = ({ expense, currency = "₹" }) => {
           </div>
         </ScrollArea>
 
-        <div className="mt-6 flex justify-end">
+        {/* <div className="mt-6 flex justify-end">
           <DialogClose asChild>
             <Button variant="ghost">Close</Button>
           </DialogClose>
-        </div>
+        </div> */}
       </DialogContent>
     </Dialog>
   );
