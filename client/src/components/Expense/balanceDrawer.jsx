@@ -32,7 +32,7 @@ const BalanceDrawer = () => {
       {/* Owed to you */}
       {balanceData?.owedToYou.length > 0 && (
         <div className="w-full max-w-lg ">
-          <h2 className="m-3">
+          <h2 className="my-3 mx-4 ">
             {balanceData?.owedToYou.length}
             {balanceData?.owedToYou.length > 1 ? <span> people </span> : <span> person </span>}
             owe you
