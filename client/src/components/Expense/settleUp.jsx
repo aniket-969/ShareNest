@@ -15,6 +15,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const SettleUp = ({ userData, currency, amount }) => {
+  console.log(userData)
   const { roomId } = useParams();
   const { settleAllExpenseMutation } = useExpense(roomId);
 

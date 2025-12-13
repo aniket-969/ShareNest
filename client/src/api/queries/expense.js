@@ -18,7 +18,7 @@ export const getUserExpense = async (
 
 export const settleAllExpense = async (roomId, owedToUserId, data) => {
   console.log("Settling expense", roomId, owedToUserId);
-  return;
+  // return;
   const response = await axiosClient.post(
     `/${baseExpense}/${roomId}/settle-up/${owedToUserId}`,
     data
