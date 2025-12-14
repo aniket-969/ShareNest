@@ -79,3 +79,14 @@ export const useSettleUpQuery = (roomId) => {
     retry: 3,
   });
 };
+
+export const useSearchExpenseQuery = (roomId, q) => {
+  return useInfiniteQuery({
+    queryKey: ["expenseSearch", roomId, q],
+    queryFn: ({ pageParam = null }) =>
+      getUserExpense(roomId, pageParam, 10, q),
+    enabled: !!roomId && q.length > 0,
+    getNextPageParam: (lastPage) =>
+      lastPage?.meta?.hasMore ? lastPage.meta.nextBeforeId : undefined,
+  });
+};
