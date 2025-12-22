@@ -67,110 +67,145 @@ const roomSchema = new Schema(
       },
     ],
     tasks: [
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    description: {
+      type: String,
+      trim: true,
+    },
+
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    assignmentMode: {
+      type: String,
+      enum: ["single", "rotation"],
+      required: true,
+    },
+
+    // Rotation order (authoritative)
+    participants: [
       {
-        _id: {
-          type: Schema.Types.ObjectId,
-          default: () => new mongoose.Types.ObjectId(),
-        },
-        title: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
+    recurrence: {
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+
+      frequency: {
+        type: String,
+        enum: ["daily", "weekly", "monthly"],
+        required: true,
+      },
+
+      interval: {
+        type: Number,
+        min: 1,
+        default: 1,
+      },
+
+      startDate: {
+        type: Date,
+        required: true,
+      },
+
+      selector: {
+        type: {
           type: String,
+          enum: ["none", "weekdays", "ordinalWeekday", "monthDay"],
           required: true,
         },
-        description: {
-          type: String,
+
+        // Weekly selector (0 = Sun, 6 = Sat)
+        days: [
+          {
+            type: Number,
+            min: 0,
+            max: 6,
+          },
+        ],
+
+        // Monthly ordinal selector
+        weekday: {
+          type: Number,
+          min: 0,
+          max: 6,
         },
-        createdBy: {
+
+        ordinal: {
+          type: String,
+          enum: ["first", "second", "third", "fourth", "last"],
+        },
+
+        // Monthly day selector
+        day: {
+          type: Schema.Types.Mixed,
+          validate: {
+            validator: function (value) {
+              if (typeof value === "number") {
+                return value >= 1 && value <= 31;
+              }
+              if (typeof value === "string") {
+                return value === "last";
+              }
+              return false;
+            },
+            message: "day must be a number (1–31) or 'last'",
+          },
+        },
+      },
+    },
+
+    swapRequests: [
+      {
+        occurrenceDate: {
+          type: Date,
+          required: true,
+        },
+
+        from: {
           type: Schema.Types.ObjectId,
           ref: "User",
           required: true,
         },
-        assignmentMode: {
-          type: String,
-          enum: ["single", "rotation"],
-          default: "single",
-        },
-        currentAssignee: {
+
+        to: {
           type: Schema.Types.ObjectId,
           ref: "User",
           required: true,
         },
-        participants: [
-          {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-          },
-        ],
-        rotationOrder: [
-          {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-          },
-        ],
 
-        // Recurrence rules
-        recurring: {
-          enabled: { type: Boolean, default: false },
-          type: {
-            type: String,
-            enum: ["fixed", "dynamic", "mixed"],
-          },
-          patterns: [
-            {
-              frequency: {
-                type: String,
-                enum: ["daily", "weekly", "monthly", "custom"],
-              },
-              interval: { type: Number, default: 1 },
-              days: [Number],
-              weekOfMonth: {
-                type: String,
-                enum: ["first", "second", "third", "fourth", "last"],
-              },
-              dayOfWeek: Number,
-            },
-          ],
-          startDate: { type: Date, default: () => Date.now() },
-          dueDate: Date,
+        swapType: {
+          type: String,
+          enum: ["temporary", "permanent"],
+          required: true,
         },
-
-        // Swap-turn requests for a specific occurrence
-        swapRequests: [
-          {
-            _id: {
-              type: Schema.Types.ObjectId,
-              default: () => new mongoose.Types.ObjectId(),
-            },
-            occurrenceDate: { type: Date, required: true },
-            from: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-            to: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-            status: {
-              type: String,
-              enum: ["pending", "approved", "rejected"],
-              default: "pending",
-            },
-            requestedAt: { type: Date, default: Date.now },
-            respondedAt: Date,
-            resolver: { type: Schema.Types.ObjectId, ref: "User" },
-          },
-        ],
 
         status: {
           type: String,
-          enum: ["pending", "completed", "skipped"],
+          enum: ["pending", "approved", "rejected"],
           default: "pending",
         },
       },
     ],
+  },
+];
+,
     polls: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vote" }],
-   currency: {
+    currency: {
       type: String,
       default: "INR",
       match: /^[A-Z]{3}$/,
@@ -209,6 +244,5 @@ roomSchema.index({ "tasks.currentAssignee": 1 });
 roomSchema.index({ "tasks.createdBy": 1 });
 roomSchema.index({ "tasks.participants": 1 });
 roomSchema.index({ "tasks.recurring": 1, "tasks.recurrencePattern": 1 });
-
 
 export const Room = mongoose.model("Room", roomSchema);
