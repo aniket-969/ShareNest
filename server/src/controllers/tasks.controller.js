@@ -9,13 +9,8 @@ const createRoomTask = asyncHandler(async (req, res) => {
   const createdBy = req.user?._id;
   const { roomId } = req.params;
 
-  const {
-    title,
-    description,
-    assignmentMode,
-    participants,
-    recurrence, 
-  } = req.body;
+  const { title, description, assignmentMode, participants, recurrence } =
+    req.body;
 
   const room = await Room.findById(roomId);
   if (!room) {
@@ -27,8 +22,7 @@ const createRoomTask = asyncHandler(async (req, res) => {
   }
 
   const members = [
-    ...room.tenants.map((t) => t.toString()),
-    room.landlord.toString(),
+    ...room.tenants.map((t) => t.toString())
   ];
 
   const invalidParticipants = participants.filter(
@@ -36,19 +30,13 @@ const createRoomTask = asyncHandler(async (req, res) => {
   );
 
   if (invalidParticipants.length > 0) {
-    throw new ApiError(
-      400,
-      "Some participants are not members of this room"
-    );
+    throw new ApiError(400, "Some participants are not members of this room");
   }
 
   if (assignmentMode === "rotation" && participants.length === 0) {
     throw new ApiError(400, "Rotation task must have participants");
   }
 
-  // -------------------------
-  // 3. Validate recurrence rules
-  // -------------------------
   if (recurrence?.enabled) {
     const { frequency, selector } = recurrence;
 
@@ -58,38 +46,24 @@ const createRoomTask = asyncHandler(async (req, res) => {
 
     // daily → selector must be none
     if (frequency === "daily" && selector.type !== "none") {
-      throw new ApiError(
-        400,
-        "Daily recurrence must use selector type 'none'"
-      );
+      throw new ApiError(400, "Daily recurrence must use selector type 'none'");
     }
 
     // weekly → selector must be weekdays with at least one day
     if (frequency === "weekly") {
       if (selector.type !== "weekdays" || !selector.days?.length) {
-        throw new ApiError(
-          400,
-          "Weekly recurrence must specify weekdays"
-        );
+        throw new ApiError(400, "Weekly recurrence must specify weekdays");
       }
     }
 
     // monthly → selector must be ordinalWeekday or monthDay
     if (frequency === "monthly") {
-      if (
-        !["ordinalWeekday", "monthDay"].includes(selector.type)
-      ) {
-        throw new ApiError(
-          400,
-          "Monthly recurrence must use a valid selector"
-        );
+      if (!["ordinalWeekday", "monthDay"].includes(selector.type)) {
+        throw new ApiError(400, "Monthly recurrence must use a valid selector");
       }
     }
   }
 
-  // -------------------------
-  // 4. Create task (NO derived fields)
-  // -------------------------
   const task = {
     title,
     description,
@@ -100,32 +74,18 @@ const createRoomTask = asyncHandler(async (req, res) => {
     swapRequests: [],
   };
 
-  // -------------------------
-  // 5. Save
-  // -------------------------
   room.tasks.push(task);
   await room.save();
 
   const savedTask = room.tasks[room.tasks.length - 1];
 
-  // -------------------------
-  // 6. Emit socket event
-  // -------------------------
   const taskForSocket = savedTask.toObject();
   taskForSocket.actor = req.user.fullName;
 
-  emitSocketEvent(
-    req,
-    roomId,
-    TaskEventEnum.TASK_CREATE_EVENT,
-    taskForSocket
-  );
+  emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, taskForSocket);
 
-  return res.json(
-    new ApiResponse(200, savedTask, "Task created successfully")
-  );
+  return res.json(new ApiResponse(200, savedTask, "Task created successfully"));
 });
-
 
 const updateRoomTask = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;
@@ -157,9 +117,7 @@ const updateRoomTask = asyncHandler(async (req, res) => {
   );
 });
 
-const updateNonRecurringTask = asyncHandler(async(req,res)=>{
-
-})
+const updateNonRecurringTask = asyncHandler(async (req, res) => {});
 
 const deleteRoomTask = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;
@@ -256,5 +214,4 @@ export {
   createSwitchRequest,
   switchRequestResponse,
   updateNonRecurringTask,
-  
 };
