@@ -8,76 +8,124 @@ import { emitSocketEvent } from "../socket/index.js";
 const createRoomTask = asyncHandler(async (req, res) => {
   const createdBy = req.user?._id;
   const { roomId } = req.params;
+
   const {
     title,
     description,
     assignmentMode,
     participants,
-    dueDate,
-    recurring,
-    startDate,
+    recurrence, 
   } = req.body;
-  // Validate room exists and check task limit
+
   const room = await Room.findById(roomId);
   if (!room) {
     throw new ApiError(404, "Room not found");
   }
+
   if (room.tasks.length >= 40) {
     throw new ApiError(400, "Maximum tasks limit reached");
   }
+
   const members = [
     ...room.tenants.map((t) => t.toString()),
     room.landlord.toString(),
   ];
-  // Validate participants are in the room
+
   const invalidParticipants = participants.filter(
-    (participantId) => !members.includes(participantId)
+    (id) => !members.includes(id)
   );
+
   if (invalidParticipants.length > 0) {
-    throw new ApiError(400, "Some participants are not members of this room");
+    throw new ApiError(
+      400,
+      "Some participants are not members of this room"
+    );
   }
 
-  // type dynamically
-  let type = "fixed";
-  const pattern = recurring?.patterns?.[0] || {};
-  if (
-    assignmentMode === "rotation" &&
-    (pattern.dayOfWeek || pattern.weekOfMonth)
-  ) {
-    type = "mixed";
-  } else if (assignmentMode === "rotation") {
-    type = "dynamic";
-  } else if (pattern.dayOfWeek || pattern.weekOfMonth || pattern.days) {
-    type = "fixed";
+  if (assignmentMode === "rotation" && participants.length === 0) {
+    throw new ApiError(400, "Rotation task must have participants");
   }
-  // Create task object
+
+  // -------------------------
+  // 3. Validate recurrence rules
+  // -------------------------
+  if (recurrence?.enabled) {
+    const { frequency, selector } = recurrence;
+
+    if (!frequency || !selector) {
+      throw new ApiError(400, "Invalid recurrence configuration");
+    }
+
+    // daily → selector must be none
+    if (frequency === "daily" && selector.type !== "none") {
+      throw new ApiError(
+        400,
+        "Daily recurrence must use selector type 'none'"
+      );
+    }
+
+    // weekly → selector must be weekdays with at least one day
+    if (frequency === "weekly") {
+      if (selector.type !== "weekdays" || !selector.days?.length) {
+        throw new ApiError(
+          400,
+          "Weekly recurrence must specify weekdays"
+        );
+      }
+    }
+
+    // monthly → selector must be ordinalWeekday or monthDay
+    if (frequency === "monthly") {
+      if (
+        !["ordinalWeekday", "monthDay"].includes(selector.type)
+      ) {
+        throw new ApiError(
+          400,
+          "Monthly recurrence must use a valid selector"
+        );
+      }
+    }
+  }
+
+  // -------------------------
+  // 4. Create task (NO derived fields)
+  // -------------------------
   const task = {
     title,
     description,
     assignmentMode,
-    currentAssignee: participants[0],
     participants,
-    rotationOrder: assignmentMode === "rotation" ? [...participants] : null,
-    dueDate,
-    recurring: { ...recurring, type },
     createdBy,
-    lastCompletedDate: null,
+    recurrence,
+    swapRequests: [],
   };
 
-  // Add task to room
+  // -------------------------
+  // 5. Save
+  // -------------------------
   room.tasks.push(task);
   await room.save();
 
-  const savedTaskDoc = room.tasks[room.tasks.length - 1];
-  const taskForSocket = savedTaskDoc.toObject();
+  const savedTask = room.tasks[room.tasks.length - 1];
 
-  // add actor
+  // -------------------------
+  // 6. Emit socket event
+  // -------------------------
+  const taskForSocket = savedTask.toObject();
   taskForSocket.actor = req.user.fullName;
 
-  emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, taskForSocket);
+  emitSocketEvent(
+    req,
+    roomId,
+    TaskEventEnum.TASK_CREATE_EVENT,
+    taskForSocket
+  );
 
-  return res.json(new ApiResponse(200, savedTaskDoc, "Task created successfully"));
+  return res.json(
+    new ApiResponse(200, savedTask, "Task created successfully")
+  );
 });
+
 
 const updateRoomTask = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;

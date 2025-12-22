@@ -1,118 +1,121 @@
 import { objectIdValidation, stringValidation } from "./customValidator.js";
 import { z } from "zod";
 
-const completionHistorySchema = z.object({
-  date: z.coerce.date(),
-  completedBy: objectIdValidation,
-  status: z.enum(["completed", "skipped", "reassigned"]),
-  notes: z.string().optional(),
-});
 
-const recurrencePatternSchema = z.object({
-  frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
-  interval: z.coerce.number().int().positive().default(1),
-  days: z.array(z.number().min(0).max(31)).optional(),
-  weekOfMonth: z
+const selectorSchema = z.object({
+  type: z.enum(["none", "weekdays", "ordinalWeekday", "monthDay"]),
+
+  // weekly selector
+  days: z
+    .array(z.number().int().min(0).max(6))
+    .min(1)
+    .optional(),
+
+  // monthly ordinal selector
+  weekday: z.number().int().min(0).max(6).optional(),
+
+  ordinal: z
     .enum(["first", "second", "third", "fourth", "last"])
     .optional(),
-  dayOfWeek: z.number().min(0).max(6).optional(),
+
+  // monthly date selector
+  day: z
+    .union([
+      z.number().int().min(1).max(31),
+      z.literal("last"),
+    ])
+    .optional(),
 });
 
-const recurringSchema = z.object({
-  enabled: z.boolean(), 
-  patterns: z.array(recurrencePatternSchema).optional(),
+const recurrenceSchema = z.object({
+  enabled: z.boolean(),
+
+  frequency: z.enum(["daily", "weekly", "monthly"]),
+
+  interval: z.coerce.number().int().min(1).default(1),
+
+  startDate: z.coerce.date(),
+
+  selector: selectorSchema,
 });
 
-const baseTaskValidation = {
+const baseTaskSchema = {
   title: stringValidation(1, 40, "title"),
   description: stringValidation(1, 100, "description").optional(),
-  assignmentMode: z.enum(["single", "rotation"]).default("single"),
-  participants: z.array(objectIdValidation),
-  recurring: recurringSchema,
-  startDate: z.coerce.date().optional(),
-  dueDate: z.coerce.date().optional(),
+
+  assignmentMode: z.enum(["single", "rotation"]),
+
+  participants: z.array(objectIdValidation).min(1),
+
+  recurrence: recurrenceSchema,
 };
 
-// Full task schema including all fields
 export const taskSchema = z
   .object({
     _id: objectIdValidation.optional(),
-    ...baseTaskValidation,
-    lastCompletedDate: z.coerce.date().optional(),
-    nextDueDate: z.coerce.date().optional(),
+    ...baseTaskSchema,
   })
   .superRefine((data, ctx) => {
-    // 🔄 Recurrence validation if enabled
-    if (data.recurring.enabled) {
-      const { type, patterns } = data.recurring;
+    const { recurrence } = data;
+    if (!recurrence.enabled) return;
 
-      // ✅ patterns must exist when type is specified
-      if (type && (!patterns || patterns.length === 0)) {
+    const { frequency, selector } = recurrence;
+
+    // DAILY → selector must be none
+    if (frequency === "daily" && selector.type !== "none") {
+      ctx.addIssue({
+        path: ["recurrence", "selector", "type"],
+        message: "Daily recurrence must use selector type 'none'",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    // WEEKLY → selector must be weekdays with days
+    if (frequency === "weekly") {
+      if (selector.type !== "weekdays" || !selector.days?.length) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          path: ["recurrence", "selector"],
           message:
-            "patterns are required when recurring is enabled with a type",
-          path: ["recurring", "patterns"],
+            "Weekly recurrence must use selector type 'weekdays' with at least one day",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+    }
+
+    // MONTHLY → selector must be ordinalWeekday or monthDay
+    if (frequency === "monthly") {
+      if (!["ordinalWeekday", "monthDay"].includes(selector.type)) {
+        ctx.addIssue({
+          path: ["recurrence", "selector", "type"],
+          message:
+            "Monthly recurrence must use 'ordinalWeekday' or 'monthDay' selector",
+          code: z.ZodIssueCode.custom,
         });
       }
 
-      // 🔄 Loop through each recurrence pattern for advanced validation
-      patterns?.forEach((pattern, index) => {
-        const { frequency, dayOfWeek, days, weekOfMonth } = pattern;
+      if (
+        selector.type === "ordinalWeekday" &&
+        (!selector.weekday || !selector.ordinal)
+      ) {
+        ctx.addIssue({
+          path: ["recurrence", "selector"],
+          message:
+            "ordinalWeekday selector requires both weekday and ordinal",
+          code: z.ZodIssueCode.custom,
+        });
+      }
 
-        // 🚫 dayOfWeek + days not allowed
-        if (dayOfWeek && days?.length) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              "'dayOfWeek' cannot be used with 'days' in the same recurrence pattern.",
-            path: ["recurring", "patterns", index, "dayOfWeek"],
-          });
-        }
-
-        // 🚫 dayOfWeek + weekOfMonth (with multiple days)
-        if (
-          dayOfWeek &&
-          weekOfMonth &&
-          Array.isArray(dayOfWeek) &&
-          dayOfWeek.length > 1
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message:
-              "'weekOfMonth' cannot be combined with multiple 'dayOfWeek' values.",
-            path: ["recurring", "patterns", index, "weekOfMonth"],
-          });
-        }
-
-        // 🚫 weekOfMonth without monthly frequency
-        if (weekOfMonth && frequency !== "monthly") {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "'weekOfMonth' can only be used with 'monthly' frequency.",
-            path: ["recurring", "patterns", index, "weekOfMonth"],
-          });
-        }
-
-        // 🚫 days + weekOfMonth not allowed
-        if (days?.length && weekOfMonth) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "'days' and 'weekOfMonth' cannot be used together.",
-            path: ["recurring", "patterns", index, "days"],
-          });
-        }
-      });
-    }
-    if (data.startDate && data.dueDate && data.startDate > data.dueDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "dueDate must be after or equal to startDate",
-        path: ["dueDate"],
-      });
+      if (selector.type === "monthDay" && selector.day === undefined) {
+        ctx.addIssue({
+          path: ["recurrence", "selector", "day"],
+          message: "monthDay selector requires day (1–31 or 'last')",
+          code: z.ZodIssueCode.custom,
+        });
+      }
     }
   });
 
-export const createRoomTaskSchema = z.object(baseTaskValidation);
 
-export const updateRoomTaskSchema = z.object(baseTaskValidation).partial();
+export const createRoomTaskSchema = z.object(baseTaskSchema);
+
+export const updateRoomTaskSchema = z.object(baseTaskSchema).partial();

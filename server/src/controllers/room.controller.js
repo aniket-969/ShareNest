@@ -49,9 +49,7 @@ const getRoomData = asyncHandler(async (req, res) => {
     { path: "admin", select: "username fullName avatar _id" },
     { path: "tenants", select: "username fullName avatar _id" },
     { path: "awards" },
-    { path: "tasks.currentAssignee", select: "username fullName" },
     { path: "tasks.participants", select: "username fullName avatar _id" },
-    { path: "tasks.rotationOrder", select: "username fullName avatar _id" },
     { path: "polls" },
     ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []),
   ];
