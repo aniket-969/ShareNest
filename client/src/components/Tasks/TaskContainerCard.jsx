@@ -1,20 +1,36 @@
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Ellipsis } from "lucide-react";
 
-const TaskContainerCard = ({ expense, userId }) => {
+const TaskContainerCard = ({ task, userId }) => {
+  // console.log(userId)
   return (
     <Card className="rounded-xl bg-card-muted shadow-lg border-none w-[300px] max-w-full">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
         <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex justify-between ">
-          <p>Do the damn task</p>
+          <p>{task?.title}</p>
 
           {/* Menu */}
-          <DropdownMenu>
+          {userId==task?.createdBy?._id &&  <DropdownMenu>
             <DropdownMenuTrigger>
               <Ellipsis />
             </DropdownMenuTrigger>
@@ -23,64 +39,34 @@ const TaskContainerCard = ({ expense, userId }) => {
               <DropdownMenuItem>Delete</DropdownMenuItem>
               <DropdownMenuItem>Swap your Turn</DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>}
+         
         </CardTitle>
       </CardHeader>
 
       {/* ───── Card Content ───── */}
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-2 ">
         {/* Grouped avatars */}
-        <div className="flex -space-x-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Avatar className="w-7 h-7 rounded-full overflow-visible">
-                <AvatarImage
-                  className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-                  src="https://avatar.iran.liara.run/public/10"
-                />
-                <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
-                  CN
-                </AvatarFallback>
-              </Avatar>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Srina Singh</p>
-            </TooltipContent>
-          </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Avatar className="w-7 h-7 rounded-full overflow-visible">
-                <AvatarImage
-                  className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-                  src="https://avatar.iran.liara.run/public/8"
-                />
-                <AvatarFallback className="ring-2 ring-card-muted ring-offset-2 ring-offset-card-muted rounded-full">
-                  LR
-                </AvatarFallback>
-              </Avatar>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Maria G</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Avatar className="w-7 h-7 rounded-full overflow-visible">
-                <AvatarImage
-                  className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-                  src="https://avatar.iran.liara.run/public/9"
-                />
-                <AvatarFallback className="ring-2 ring-card-muted ring-offset-2 ring-offset-card-muted rounded-full">
-                  ER
-                </AvatarFallback>
-              </Avatar>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>John Dough</p>
-            </TooltipContent>
-          </Tooltip>
+        <div className="flex -space-x-2 ">
+          {task.participants.map((participant) => (
+            <Tooltip className="">
+              <TooltipTrigger asChild>
+                 <Avatar  className="w-7 h-7 rounded-full overflow-visible">
+              <AvatarImage
+                className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+                src={participant?.avatar}
+              />
+              <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
+                <img src="/altAvatar1.jpg" alt="fallback"  className="w-full h-full object-cover rounded-full"/>
+              </AvatarFallback>
+            </Avatar>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{participant?.fullName}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
         </div>
       </CardContent>
 
@@ -88,7 +74,7 @@ const TaskContainerCard = ({ expense, userId }) => {
         <p className="text-xs">
           Created by:
           <Badge className="mx-2 font-normal border-white" variant="outlined">
-            Eti Shree
+            {task?.createdBy?.fullName}
           </Badge>
         </p>
       </CardFooter>

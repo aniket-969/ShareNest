@@ -41,16 +41,16 @@ const Tasks = () => {
   if (roomQuery.isLoading) return <Spinner />;
   if (roomQuery.isError) return <>Something went wrong. Please refresh</>;
 
+const tasks = roomQuery?.data?.tasks
   const participants = [
-    ...(roomQuery.data.tenants || []),
-    ...(roomQuery.data.landlord ? [roomQuery.data.landlord] : []),
+    ...(roomQuery.data?.tenants),
   ];
 
   return (
     <div className="flex flex-col gap-6 w-full items-center ">
       <h2 className="font-bold text-xl">Tasks</h2>
 
-            <TaskContainer participants={participants}/>
+            <TaskContainer tasks={tasks} participants={participants}/>
    
     </div>
   );

@@ -11,351 +11,37 @@ import TaskForm from "@/components/form/tasks/TaskForm";
 const RecurringTaskForm = lazy(
   () => import("@/components/form/tasks/RecurringTaskForm")
 );
-import TaskContainerCard from './TaskContainerCard';
+import TaskContainerCard from "./TaskContainerCard";
 
+const TaskContainer = ({ participants, tasks }) => {
 
-export const fakeExpenses = [
-  {
-    _id: "66c8a01f2f1b9b500df20101",
-    title: "Groceries",
-    paidBy: {
-      id: "66c89f6d2f1b9b500df20011",
-      fullName: "Atharv Agrawal",
-      avatar: "/avatars/atharv.png",
-    },
-    roomId: "66c88c9d2f1b9b500df10001",
-    totalAmount: 1200,
-    currency: "INR",
-    participants: [
-      {
-        user: { _id: "66c89f6d2f1b9b500df20011" },
-        fullName: "Atharv Agrawal",
-        avatar: "/avatars/atharv.png",
-        baseAmount: 400,
-        additionalCharges: [],
-        totalAmountOwed: 400,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c8a02e2f1b9b500df20102" },
-        fullName: "Aniket Baranwal",
-        avatar: "/avatars/aniket.png",
-        baseAmount: 400,
-        additionalCharges: [],
-        totalAmountOwed: 400,
-        isSettled: false,
-      },
-      {
-        user: { _id: "66c8a03f2f1b9b500df20103" },
-        fullName: "Rohan Mishra",
-        avatar: "/avatars/rohan.png",
-        baseAmount: 400,
-        additionalCharges: [],
-        totalAmountOwed: 400,
-        isSettled: false,
-      },
-    ],
-    paymentHistory: [
-      {
-        user: "66c89f6d2f1b9b500df20011",
-        amount: 400,
-        paymentDate: "2025-11-10T09:14:00.000Z",
-        description: "Self payment",
-      },
-    ],
-    createdAt: "2025-11-09T10:00:00.000Z",
-    updatedAt: "2025-11-10T09:14:00.000Z",
-  },
-  {
-    _id: "66c8a04a2f1b9b500df20104",
-    title: "Milk & Eggs",
-    paidBy: {
-      id: "66c8a02e2f1b9b500df20102",
-      fullName: "Aniket Baranwal",
-      avatar: "/avatars/aniket.png",
-    },
-    roomId: "66c88c9d2f1b9b500df10001",
-    totalAmount: 360,
-    currency: "INR",
-    participants: [
-      {
-        user: { _id: "66c8a02e2f1b9b500df20102" },
-        fullName: "Aniket Baranwal",
-        avatar: "/avatars/aniket.png",
-        baseAmount: 120,
-        additionalCharges: [],
-        totalAmountOwed: 120,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c89f6d2f1b9b500df20011" },
-        fullName: "Atharv Agrawal",
-        avatar: "/avatars/atharv.png",
-        baseAmount: 120,
-        additionalCharges: [],
-        totalAmountOwed: 120,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c8a03f2f1b9b500df20103" },
-        fullName: "Rohan Mishra",
-        avatar: "/avatars/rohan.png",
-        baseAmount: 120,
-        additionalCharges: [],
-        totalAmountOwed: 120,
-        isSettled: false,
-      },
-    ],
-    paymentHistory: [
-      {
-        user: "66c8a02e2f1b9b500df20102",
-        amount: 120,
-        paymentDate: "2025-11-10T08:50:00.000Z",
-        description: "Paid share",
-      },
-      {
-        user: "66c89f6d2f1b9b500df20011",
-        amount: 120,
-        paymentDate: "2025-11-10T09:00:00.000Z",
-        description: "Paid share",
-      },
-    ],
-    createdAt: "2025-11-08T18:25:00.000Z",
-    updatedAt: "2025-11-10T09:00:00.000Z",
-  },
-  {
-    _id: "66c8a06d2f1b9b500df20105",
-    title: "Pizza Night",
-    paidBy: {
-      id: "66c8a03f2f1b9b500df20103",
-      fullName: "Rohan Mishra",
-      avatar: "/avatars/rohan.png",
-    },
-    roomId: "66c88c9d2f1b9b500df10001",
-    totalAmount: 900,
-    currency: "USD",
-    participants: [
-      {
-        user: { _id: "66c8a03f2f1b9b500df20103" },
-        fullName: "Rohan Mishra",
-        avatar: "/avatars/rohan.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c8a02e2f1b9b500df20102" },
-        fullName: "Aniket Baranwal",
-        avatar: "/avatars/aniket.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-      {
-        user: { _id: "66c89f6d2f1b9b500df20011" },
-        fullName: "Atharv Agrawal",
-        avatar: "/avatars/atharv.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-    ],
-    paymentHistory: [
-      {
-        user: "66c8a03f2f1b9b500df20103",
-        amount: 300,
-        paymentDate: "2025-11-10T09:35:00.000Z",
-        description: "Self payment",
-      },
-    ],
-    createdAt: "2025-11-10T09:30:00.000Z",
-    updatedAt: "2025-11-10T09:35:00.000Z",
-  },
-  {
-    _id: "66c8a06d2f1b9b500df20122",
-    title: "Pizza Night",
-    paidBy: {
-      id: "66c8a03f2f1b9b500df20103",
-      fullName: "Rohan Mishra",
-      avatar: "/avatars/rohan.png",
-    },
-    roomId: "66c88c9d2f1b9b500df10001",
-    totalAmount: 900,
-    currency: "USD",
-    participants: [
-      {
-        user: { _id: "66c8a03f2f1b9b500df20103" },
-        fullName: "Rohan Mishra",
-        avatar: "/avatars/rohan.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c8a02e2f1b9b500df20102" },
-        fullName: "Aniket Baranwal",
-        avatar: "/avatars/aniket.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-      {
-        user: { _id: "66c89f6d2f1b9b500df20011" },
-        fullName: "Atharv Agrawal",
-        avatar: "/avatars/atharv.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-    ],
-    paymentHistory: [
-      {
-        user: "66c8a03f2f1b9b500df20103",
-        amount: 300,
-        paymentDate: "2025-11-10T09:35:00.000Z",
-        description: "Self payment",
-      },
-    ],
-    createdAt: "2025-11-10T09:30:00.000Z",
-    updatedAt: "2025-11-10T09:35:00.000Z",
-  },
-  {
-    _id: "66c8a06d2f1b0b500df20103",
-    title: "Pizza Night",
-    paidBy: {
-      id: "66c8a03f2f1b9b500df20103",
-      fullName: "Rohan Mishra",
-      avatar: "/avatars/rohan.png",
-    },
-    roomId: "66c88c9d2f1b9b500df10001",
-    totalAmount: 900,
-    currency: "USD",
-    participants: [
-      {
-        user: { _id: "66c8a03f2f1b9b500df20103" },
-        fullName: "Rohan Mishra",
-        avatar: "/avatars/rohan.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c8a02e2f1b9b500df20102" },
-        fullName: "Aniket Baranwal",
-        avatar: "/avatars/aniket.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-      {
-        user: { _id: "66c89f6d2f1b9b500df20011" },
-        fullName: "Atharv Agrawal",
-        avatar: "/avatars/atharv.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-    ],
-    paymentHistory: [
-      {
-        user: "66c8a03f2f1b9b500df20103",
-        amount: 300,
-        paymentDate: "2025-11-10T09:35:00.000Z",
-        description: "Self payment",
-      },
-    ],
-    createdAt: "2025-11-10T09:30:00.000Z",
-    updatedAt: "2025-11-10T09:35:00.000Z",
-  },
-  {
-    _id: "66c8a06d2f1b9b500df20108",
-    title: "Pizza Night",
-    paidBy: {
-      id: "66c8a03f2f1b9b500df20103",
-      fullName: "Rohan Mishra",
-      avatar: "/avatars/rohan.png",
-    },
-    roomId: "66c88c9d2f1b9b500df10001",
-    totalAmount: 900,
-    currency: "USD",
-    participants: [
-      {
-        user: { _id: "66c8a03f2f1b9b500df20103" },
-        fullName: "Rohan Mishra",
-        avatar: "/avatars/rohan.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: true,
-      },
-      {
-        user: { _id: "66c8a02e2f1b9b500df20102" },
-        fullName: "Aniket Baranwal",
-        avatar: "/avatars/aniket.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-      {
-        user: { _id: "66c89f6d2f1b9b500df20011" },
-        fullName: "Atharv Agrawal",
-        avatar: "/avatars/atharv.png",
-        baseAmount: 300,
-        additionalCharges: [],
-        totalAmountOwed: 300,
-        isSettled: false,
-      },
-    ],
-    paymentHistory: [
-      {
-        user: "66c8a03f2f1b9b500df20103",
-        amount: 300,
-        paymentDate: "2025-11-10T09:35:00.000Z",
-        description: "Self payment",
-      },
-    ],
-    createdAt: "2025-11-10T09:30:00.000Z",
-    updatedAt: "2025-11-10T09:35:00.000Z",
-  },
-];
-
-const TaskContainer = ({ participants }) => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
+
   const { _id } = JSON.parse(localStorage.getItem("session"));
+  
   const [taskType, setTaskType] = useState("one-time");
+
+console.log(tasks[0])
+
   return (
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
       {/* Scrollable task history */}
       <Card className="w-full max-w-[25rem] border-none p-5">
-
         <ScrollArea className=" h-[32rem] ">
           <Card className="flex flex-col gap-6  items-center max-h-[90%] border-none rounded-none ">
-            {fakeExpenses.map((fake) => (
+            {tasks.map((fake) => (
               <>
                 {Number(fake._id.slice(-1)) % 2 == 0 && (
                   <p className=" text-center text-xs">6 nov, 7:13 pm</p>
                 )}
 
-
-                  {/* expense cards */}
-                  <TaskContainerCard key={fake._id} userId={_id} expense={fake} />
-              
+                {/* expense cards */}
+                <TaskContainerCard key={fake._id} userId={_id} task={fake} />
               </>
             ))}
           </Card>
         </ScrollArea>
-
       </Card>
 
       {/* task form */}
@@ -386,7 +72,6 @@ const TaskContainer = ({ participants }) => {
           </Suspense>
         </ScrollArea>
       </Card>
-
     </div>
   );
 };

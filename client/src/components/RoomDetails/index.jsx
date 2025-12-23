@@ -19,7 +19,7 @@ const RoomDetailsIndex = () => {
   // console.log(data);
   const [date, setDate] = useState(new Date());
   const [scheduledTasks, setScheduledTasks] = useState([]);
-// console.log(data?.tasks)
+console.log(data?.tasks)
 
   useEffect(() => {
     if (data?.tasks) {
