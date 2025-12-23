@@ -9,7 +9,7 @@ import { Expense } from "../models/expense.model.js";
 import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { mongoose } from "mongoose";
-import { ChatMessage } from './../models/chatMessage.model.js';
+import { ChatMessage } from "./../models/chatMessage.model.js";
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -39,23 +39,39 @@ const getRoomData = asyncHandler(async (req, res) => {
   console.log("getting room Data");
 
   let roomQuery = Room.findById(roomId).select("-groupCode");
-  const isAdmin = await Room.exists({ _id: roomId, admin: userId });
-
-  if (!isAdmin) {
-    roomQuery = roomQuery.select("-pendingRequests");
-  }
 
   const populateArr = [
-    { path: "admin", select: "username fullName avatar _id" },
     { path: "tenants", select: "username fullName avatar _id" },
+    { path: "admin", select: "username fullName avatar _id" },
+
+    // Tasks
+    {
+      path: "tasks.createdBy",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.participants",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.swapRequests.from",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.swapRequests.to",
+      select: "username fullName avatar _id",
+    },
+
     { path: "awards" },
-    { path: "tasks.participants", select: "username fullName avatar _id" },
     { path: "polls" },
-    ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []),
+
+    { path: "pendingRequests.userId", select: "username fullName avatar _id" },
   ];
 
   const room = await roomQuery.populate(populateArr);
   if (!room) throw new ApiError(404, "Room not found");
+  const isAdmin = room.admin?._id.equals(userId);
+  if (!isAdmin) room.pendingRequests = undefined;
 
   // Fetch latest messages
   const LIMIT = 50;
@@ -85,7 +101,6 @@ const getRoomData = asyncHandler(async (req, res) => {
   );
 });
 
-
 const createRoom = asyncHandler(async (req, res) => {
   const admin = req.user?._id;
   const { name, description, role } = req.body;
@@ -98,9 +113,7 @@ const createRoom = asyncHandler(async (req, res) => {
     groupCode,
   };
 
-  if (role === "landlord") {
-    roomData.landlord = admin;
-  } else if (role === "tenant") {
+  if (role === "tenant") {
     roomData.tenants = [admin];
   }
 
@@ -209,12 +222,7 @@ const adminResponse = asyncHandler(async (req, res) => {
     const { userId, role } = room.pendingRequests[requestIndex];
 
     if (action === "approved") {
-      if (role === "landlord") {
-        if (room.landlord) {
-          throw new ApiError(400, "Room already has a landlord");
-        }
-        room.landlord = userId;
-      } else if (role === "tenant") {
+      if (role === "tenant") {
         room.tenants.push(userId);
       }
 
