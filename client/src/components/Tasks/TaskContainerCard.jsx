@@ -22,7 +22,7 @@ import { Ellipsis } from "lucide-react";
 
 const TaskContainerCard = ({ task, userId, time }) => {
   return (
-    <Card className="rounded-xl bg-card-muted shadow-lg border-none w-[300px] max-w-full">
+    <Card className="rounded-xl bg-card-muted shadow-lg border-none w-[300px] max-w-full mt-3 ">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center">
         <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex justify-between">

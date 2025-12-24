@@ -49,18 +49,18 @@ console.log(tasks)
   return (
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3">
       {/* Scrollable task history */}
-      <Card className="w-full max-w-[25rem] border-none p-5">
+      <Card className="w-full max-w-[25rem] border-none p-5 ">
         <ScrollArea className="h-[32rem]">
-          <Card className="flex flex-col gap-6 items-center max-h-[90%] border-none rounded-none">
+          <Card className="flex flex-col items-center max-h-[90%] border-none rounded-none gap- ">
             {orderedTasks.map((task) => {
               const taskDate = formatDate(task.createdAt);
               const showDate = taskDate !== lastRenderedDate;
               lastRenderedDate = taskDate;
 
               return (
-                <div key={task._id} className="flex flex-col items-center gap-2">
+                <div key={task._id} className="flex flex-col items-center  ">
                   {showDate && (
-                    <p className="text-center text-xs opacity-70">
+                    <p className="text-center text-xs opacity-70 mt-2">
                       {taskDate}
                     </p>
                   )}
@@ -75,7 +75,7 @@ console.log(tasks)
             })}
 
             {/* Scroll anchor */}
-            <div ref={scrollRef} />
+            <div ref={scrollRef} className=""/>
           </Card>
         </ScrollArea>
       </Card>
