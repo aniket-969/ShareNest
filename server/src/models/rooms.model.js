@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Poll } from "./poll.model.js";
 import { Expense } from "./expense.model.js";
+import { TaskSchema } from "./taskSchema.js";
 
 const roomSchema = new Schema(
   {
@@ -66,143 +67,7 @@ const roomSchema = new Schema(
         ],
       },
     ],
-    tasks: [
-      {
-        title: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-
-        description: {
-          type: String,
-          trim: true,
-        },
-
-        createdBy: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-
-        assignmentMode: {
-          type: String,
-          enum: ["single", "rotation"],
-          required: true,
-        },
-
-        // Rotation order (authoritative)
-        participants: [
-          {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-          },
-        ],
-        recurrence: {
-          enabled: {
-            type: Boolean,
-            default: false,
-          },
-
-          frequency: {
-            type: String,
-            enum: ["daily", "weekly", "monthly"],
-            required: true,
-          },
-
-          interval: {
-            type: Number,
-            min: 1,
-            default: 1,
-          },
-
-          startDate: {
-            type: Date,
-            required: true,
-          },
-
-          selector: {
-            type: {
-              type: String,
-              enum: ["none", "weekdays", "ordinalWeekday", "monthDay"],
-              required: true,
-            },
-
-            // Weekly selector (0 = Sun, 6 = Sat)
-            days: [
-              {
-                type: Number,
-                min: 0,
-                max: 6,
-              },
-            ],
-
-            // Monthly ordinal selector
-            weekday: {
-              type: Number,
-              min: 0,
-              max: 6,
-            },
-
-            ordinal: {
-              type: String,
-              enum: ["first", "second", "third", "fourth", "last"],
-            },
-
-            // Monthly day selector
-            day: {
-              type: Schema.Types.Mixed,
-              validate: {
-                validator: function (value) {
-                  if (typeof value === "number") {
-                    return value >= 1 && value <= 31;
-                  }
-                  if (typeof value === "string") {
-                    return value === "last";
-                  }
-                  return false;
-                },
-                message: "day must be a number (1–31) or 'last'",
-              },
-            },
-          },
-        },
-
-        swapRequests: [
-          {
-            occurrenceDate: {
-              type: Date,
-              required: true,
-            },
-
-            from: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-
-            to: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              required: true,
-            },
-
-            swapType: {
-              type: String,
-              enum: ["temporary", "permanent"],
-              required: true,
-            },
-
-            status: {
-              type: String,
-              enum: ["pending", "approved", "rejected"],
-              default: "pending",
-            },
-          },
-        ],
-      },
-    ],
+    tasks: [TaskSchema],
     polls: [{ type: mongoose.Schema.Types.ObjectId, ref: "Vote" }],
     currency: {
       type: String,
