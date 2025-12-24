@@ -1,32 +1,32 @@
 import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { useParams } from "react-router-dom";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/socket";
-import { Button } from "@/components/ui/button";
 import TaskContainer from "@/components/Tasks/TaskContainer";
-
 
 const Tasks = () => {
   const { roomId } = useParams();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [taskType, setTaskType] = useState("one-time");
+
+  const session = JSON.parse(localStorage.getItem("session"));
+  const userId = session?._id;
 
   const { roomQuery } = useRoom(roomId);
   const queryClient = useQueryClient();
   const socket = getSocket();
 
+  // ─────────────────────────────────────────────
+  // Socket: handle task creation
+  // ─────────────────────────────────────────────
   useEffect(() => {
     const handleCreateTask = (newTask) => {
-      console.log("New task received:", newTask);
-
       queryClient.setQueryData(["room", roomId], (oldData) => {
         if (!oldData) return oldData;
 
         return {
           ...oldData,
-          tasks: [...(oldData?.tasks ?? []), newTask],
+          tasks: [...(oldData.tasks ?? []), newTask],
         };
       });
     };
@@ -36,22 +36,44 @@ const Tasks = () => {
     return () => {
       socket.off("createdTask", handleCreateTask);
     };
-  }, [socket, roomId]);
+  }, [socket, roomId, queryClient]);
 
+  // ─────────────────────────────────────────────
+  // Derived data
+  // ─────────────────────────────────────────────
+  const participants = roomQuery.data?.tenants ?? [];
+  const allTasks = roomQuery.data?.tasks ?? [];
+
+  // Only tasks user is involved in
+  const visibleTasks = useMemo(() => {
+    return allTasks.filter(
+      (task) =>
+        task.createdBy?._id === userId ||
+        task.participants?.some((p) => p._id === userId)
+    );
+  }, [allTasks, userId]);
+
+  // Enforce ordering (newest first)
+  const sortedTasks = useMemo(() => {
+    return [...visibleTasks].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+  }, [visibleTasks]);
+
+  // ─────────────────────────────────────────────
+  // UI states
+  // ─────────────────────────────────────────────
   if (roomQuery.isLoading) return <Spinner />;
-  if (roomQuery.isError) return <>Something went wrong. Please refresh</>;
-
-const tasks = roomQuery?.data?.tasks
-  const participants = [
-    ...(roomQuery.data?.tenants),
-  ];
+  if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
 
   return (
-    <div className="flex flex-col gap-6 w-full items-center ">
+    <div className="flex flex-col gap-6 w-full items-center">
       <h2 className="font-bold text-xl">Tasks</h2>
 
-            <TaskContainer tasks={tasks} participants={participants}/>
-   
+      <TaskContainer
+        tasks={sortedTasks}
+        participants={participants}
+      />
     </div>
   );
 };
