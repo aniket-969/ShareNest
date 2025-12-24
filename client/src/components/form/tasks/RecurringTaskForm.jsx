@@ -60,11 +60,11 @@ const RecurringTaskForm = ({ participants }) => {
               : 1,
 
             days: values.recurring.patterns[0].days.map((day) => {
-              // ✅ Check if the value is a weekday string
+              //  Check if the value is a weekday string
               if (typeof day === "string" && dayMapping.includes(day)) {
                 return dayMapping.indexOf(day);
               }
-              // ✅ If it's a number or numeric string (like "1"), convert to int
+              //  If it's a number or numeric string (like "1"), convert to int
               return parseInt(day, 10);
             }),
           },
@@ -101,7 +101,6 @@ const RecurringTaskForm = ({ participants }) => {
         ],
 
         startDate: undefined,
-        dueDate: undefined,
       },
     },
   });
@@ -327,20 +326,6 @@ const RecurringTaskForm = ({ participants }) => {
           )}
         />
 
-        {/* End Date */}
-        <FormField
-          control={form.control}
-          name="dueDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Due Date</FormLabel>
-              <FormControl>
-                <DatePicker name="dueDate" field={field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         {/* Action Buttons */}
         <div className="flex gap-3 justify-end">

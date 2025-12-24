@@ -43,7 +43,6 @@ const TaskForm = ({ participants }) => {
         enabled: false,
       },
       startDate: undefined,
-      dueDate: undefined,
     },
   });
 
@@ -135,20 +134,7 @@ const TaskForm = ({ participants }) => {
           )}
         />
 
-        {/* Due Date */}
-        <FormField
-          control={form.control}
-          name="dueDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Due Date</FormLabel>
-              <FormControl>
-                <DatePicker name="dueDate" field={field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+       
 
         <div className="flex gap-3 justify-end">
           <Button type="button" variant="outline" onClick={() => form.reset()}>
