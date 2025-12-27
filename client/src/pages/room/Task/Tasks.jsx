@@ -1,7 +1,7 @@
 import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { useParams } from "react-router-dom";
-import { lazy, Suspense, useState, useEffect, useRef , useMemo } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import { Search, CirclePlus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,9 +10,10 @@ import TaskContainer from "@/components/Tasks/TaskContainer";
 import SearchOverlay from "@/components/Tasks/searchOverlay";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import TaskForm from "@/components/form/tasks/TaskForm";
 import { Card } from "@/components/ui/card";
+import FormWrapper from "@/components/ui/formWrapper";
 const RecurringTaskForm = lazy(
   () => import("@/components/form/tasks/RecurringTaskForm")
 );
@@ -22,7 +23,7 @@ const Tasks = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const [taskType, setTaskType] = useState("one-time");
-  
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const session = JSON.parse(localStorage.getItem("session"));
   const userId = session?._id;
@@ -91,7 +92,6 @@ const Tasks = () => {
           >
             <Search />
           </Button>
-
         </div>
       </div>
       {isSearchOpen && (
@@ -103,41 +103,40 @@ const Tasks = () => {
       )}
 
       <TaskContainer tasks={sortedTasks} participants={participants} />
-       {/* Task form */}
-       {isFormOpen && (
-        <Card className="w-full max-w-[25rem] py-8 rounded-xl bg-card border-none md:block hidden space-y-5">
-        <div className="flex flex-col gap-3 px-8">
-          <RadioGroup
-            value={taskType}
-            onValueChange={setTaskType}
-            className="flex flex-col gap-3"
-          >
-            <Label className="flex items-center gap-2 cursor-pointer">
-              <RadioGroupItem value="one-time" />
-              One-Time Task
-            </Label>
-            <Label className="flex items-center gap-2 cursor-pointer">
-              <RadioGroupItem value="recurring" />
-              Recurring Task
-            </Label>
-          </RadioGroup>
-        </div>
+      {/* Task form */}
+      {isFormOpen && (
+        <Suspense fallback={<Spinner />}>
+          <FormWrapper onClose={() => setIsFormOpen(false)}>
+            <div className="flex flex-col gap-3">
+              <RadioGroup
+                value={taskType}
+                onValueChange={setTaskType}
+                className="flex flex-col gap-3"
+              >
+                <Label className="flex items-center gap-2 cursor-pointer">
+                  <RadioGroupItem value="one-time" />
+                  One-Time Task
+                </Label>
+                <Label className="flex items-center gap-2 cursor-pointer">
+                  <RadioGroupItem value="recurring" />
+                  Recurring Task
+                </Label>
+              </RadioGroup>
+            </div>
 
-        <ScrollArea className="h-[27rem] px-8">
-          <Suspense fallback={<Spinner />}>
-            {taskType === "recurring" ? (
-              <RecurringTaskForm participants={participants} />
-            ) : (
-              <TaskForm participants={participants} />
-            )}
-          </Suspense>
-        </ScrollArea>
-      </Card>
-       )}
-      
+            <ScrollArea className="h-[27rem] mt-2">
+              <Suspense fallback={<Spinner />}>
+                {taskType === "recurring" ? (
+                  <RecurringTaskForm participants={participants} />
+                ) : (
+                  <TaskForm participants={participants} />
+                )}
+              </Suspense>
+            </ScrollArea>
+          </FormWrapper>
+        </Suspense>
+      )}
     </div>
-
-   
   );
 };
 
