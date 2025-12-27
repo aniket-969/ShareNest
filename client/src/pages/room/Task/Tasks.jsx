@@ -1,14 +1,29 @@
 import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { useParams } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { lazy, Suspense, useState, useEffect, useRef , useMemo } from "react";
+import { Label } from "@/components/ui/label";
+import { Search, CirclePlus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/socket";
 import TaskContainer from "@/components/Tasks/TaskContainer";
+import SearchOverlay from "@/components/Tasks/searchOverlay";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from '@/components/ui/button';
+import TaskForm from "@/components/form/tasks/TaskForm";
+import { Card } from "@/components/ui/card";
+const RecurringTaskForm = lazy(
+  () => import("@/components/form/tasks/RecurringTaskForm")
+);
 
 const Tasks = () => {
   const { roomId } = useParams();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const [taskType, setTaskType] = useState("one-time");
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const session = JSON.parse(localStorage.getItem("session"));
   const userId = session?._id;
 
@@ -16,9 +31,6 @@ const Tasks = () => {
   const queryClient = useQueryClient();
   const socket = getSocket();
 
-  // ─────────────────────────────────────────────
-  // Socket: handle task creation
-  // ─────────────────────────────────────────────
   useEffect(() => {
     const handleCreateTask = (newTask) => {
       queryClient.setQueryData(["room", roomId], (oldData) => {
@@ -38,13 +50,9 @@ const Tasks = () => {
     };
   }, [socket, roomId, queryClient]);
 
-  // ─────────────────────────────────────────────
-  // Derived data
-  // ─────────────────────────────────────────────
   const participants = roomQuery.data?.tenants ?? [];
   const allTasks = roomQuery.data?.tasks ?? [];
 
-  // Only tasks user is involved in
   const visibleTasks = useMemo(() => {
     return allTasks.filter(
       (task) =>
@@ -53,28 +61,83 @@ const Tasks = () => {
     );
   }, [allTasks, userId]);
 
-  // Enforce ordering (newest first)
   const sortedTasks = useMemo(() => {
     return [...visibleTasks].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
   }, [visibleTasks]);
 
-  // ─────────────────────────────────────────────
-  // UI states
-  // ─────────────────────────────────────────────
   if (roomQuery.isLoading) return <Spinner />;
   if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
 
   return (
-    <div className="flex flex-col gap-6 w-full items-center">
-      <h2 className="font-bold text-xl">Tasks</h2>
+    <div className="flex flex-col gap-6 w-full items-center ">
+      <div className="flex items-center justify-around w-full ">
+        <h2 className="font-bold text-2xl">Tasks</h2>
+        {/* icons */}
+        <div className="flex gap-3">
+          <Button
+            className="md:hidden"
+            size="icon"
+            variant="primary"
+            onClick={() => setIsFormOpen(true)}
+          >
+            <CirclePlus />
+          </Button>
+          <Button
+            size="icon"
+            variant="primary"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Search />
+          </Button>
 
-      <TaskContainer
-        tasks={sortedTasks}
-        participants={participants}
-      />
+        </div>
+      </div>
+      {isSearchOpen && (
+        <SearchOverlay
+          tasks={sortedTasks}
+          userId={userId}
+          onClose={() => setIsSearchOpen(false)}
+        />
+      )}
+
+      <TaskContainer tasks={sortedTasks} participants={participants} />
+       {/* Task form */}
+       {isFormOpen && (
+        <Card className="w-full max-w-[25rem] py-8 rounded-xl bg-card border-none md:block hidden space-y-5">
+        <div className="flex flex-col gap-3 px-8">
+          <RadioGroup
+            value={taskType}
+            onValueChange={setTaskType}
+            className="flex flex-col gap-3"
+          >
+            <Label className="flex items-center gap-2 cursor-pointer">
+              <RadioGroupItem value="one-time" />
+              One-Time Task
+            </Label>
+            <Label className="flex items-center gap-2 cursor-pointer">
+              <RadioGroupItem value="recurring" />
+              Recurring Task
+            </Label>
+          </RadioGroup>
+        </div>
+
+        <ScrollArea className="h-[27rem] px-8">
+          <Suspense fallback={<Spinner />}>
+            {taskType === "recurring" ? (
+              <RecurringTaskForm participants={participants} />
+            ) : (
+              <TaskForm participants={participants} />
+            )}
+          </Suspense>
+        </ScrollArea>
+      </Card>
+       )}
+      
     </div>
+
+   
   );
 };
 

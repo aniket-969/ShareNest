@@ -81,7 +81,7 @@ console.log(tasks)
       </Card>
 
       {/* Task form */}
-      <Card className="w-full max-w-[25rem] py-8 rounded-xl bg-card border-none md:block hidden space-y-5">
+      <Card className="w-full max-w-[25rem] py-8 rounded-xl bg-card border-none md:block hidden space-y-5 ">
         <div className="flex flex-col gap-3 px-8">
           <RadioGroup
             value={taskType}

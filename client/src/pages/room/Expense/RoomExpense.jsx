@@ -26,7 +26,7 @@ const RoomExpense = () => {
   const participants = [...(data?.tenants || [])];
 
   return (
-    <div className="flex flex-col gap-6 items-center">
+    <div className="flex flex-col gap-6 items-center ">
       {/* Heading and icons*/}
       <div className="flex items-center justify-around w-full ">
         <h2 className="font-bold text-2xl">Expense</h2>
