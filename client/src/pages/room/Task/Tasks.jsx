@@ -85,9 +85,9 @@ const Tasks = () => {
           >
             <CirclePlus />
           </Button>
-          <Button
+          <Button 
             size="icon"
-            variant="primary"
+            variant="outline"
             onClick={() => setIsSearchOpen(true)}
           >
             <Search />

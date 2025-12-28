@@ -155,8 +155,10 @@ const ExpenseParticipantSelector = ({
             <div
               key={participant._id}
               onClick={() => handleParticipantSelect(participant)}
-              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-neutral-800/20 mb-2 ${
-                isSelected ? "bg-card-muted text-card-foreground" : "shadow-xl"
+              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-neutral-800/20 mb-2 
+                ${
+                isSelected ? "bg-card-muted text-card-foreground" : 
+                "shadow-xl"
               }`}
             >
               <div className="flex-1">

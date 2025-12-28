@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { useTask } from "@/hooks/useTask";
 import { useState } from "react";
-import ParticipantSelector from "../../ParticipantsSelector";
+import ParticipantSelector from "../../Tasks/ParticipantsSelector";
 import {
   Select,
   SelectTrigger,

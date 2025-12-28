@@ -1,71 +1,62 @@
 import { useForm } from "react-hook-form";
-import { createRoomTaskSchema } from "@/schema/taskSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createNormalTaskSchema } from "@/schema/taskSchema";
+
 import {
   Form,
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
   FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "../../ui/button";
-import { toast } from "react-toastify";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import DatePicker from "@/components/ui/datePicker";
+import ParticipantSelector from "@/components/Tasks/ParticipantsSelector";
+
 import { useParams } from "react-router-dom";
 import { useTask } from "@/hooks/useTask";
-import { useState } from "react";
-import ParticipantSelector from "../../ParticipantsSelector";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "../../ui/select";
-import DatePicker from "@/components/ui/datePicker";
-import { Textarea } from "@/components/ui/textarea";
-import { zodResolver } from '@hookform/resolvers/zod';
-
+import { toast } from "react-toastify";
 
 const TaskForm = ({ participants }) => {
   const { roomId } = useParams();
   const { createTaskMutation } = useTask(roomId);
 
   const form = useForm({
-    resolver: zodResolver(createRoomTaskSchema),
+    resolver: zodResolver(createNormalTaskSchema),
     defaultValues: {
       title: "",
       description: "",
       assignmentMode: "single",
       participants: [],
-      recurring: {
-        enabled: false,
-      },
       startDate: undefined,
     },
   });
 
   const onSubmit = async (values) => {
     try {
-      const taskData = {
+      const payload = {
         ...values,
-        // Set the first participant as currentAssignee for single mode
-        currentAssignee: values.participants[0],
+        recurrence: {
+          enabled: false,
+        },
       };
+console.log(payload)
+return
+      await createTaskMutation.mutateAsync(payload);
 
-      const response = await createTaskMutation.mutateAsync(taskData);
-      toast.success("Task created successfully!");
+      toast.success("Task created successfully");
       form.reset();
-    } catch (error) {
-      toast.error(error.message || "Failed to create task");
-      console.error("Error creating task:", error);
+    } catch (err) {
+      toast.error(err.message || "Failed to create task");
     }
   };
 
   return (
-    <Form {...form} >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2 ">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2">
         {/* Title */}
         <FormField
           control={form.control}
@@ -111,7 +102,7 @@ const TaskForm = ({ participants }) => {
                 <ParticipantSelector
                   participants={participants}
                   onChange={field.onChange}
-                  selectionTransform={(participant) => participant._id}
+                  selectionTransform={(p) => p._id}
                 />
               </FormControl>
               <FormMessage />
@@ -119,24 +110,22 @@ const TaskForm = ({ participants }) => {
           )}
         />
 
-        {/* Start Date */}
+        {/* Task Date */}
         <FormField
           control={form.control}
           name="startDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Start Date</FormLabel>
+              <FormLabel>Date</FormLabel>
               <FormControl>
-                <DatePicker name="startDate" field={field} />
+                <DatePicker field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-       
-
-        <div className="flex gap-3 justify-end">
+        <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={() => form.reset()}>
             Cancel
           </Button>

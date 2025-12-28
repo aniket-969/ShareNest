@@ -20,7 +20,7 @@ const recurrencePatternSchema = z.object({
           "Friday",
           "Saturday",
         ]),
-        z.string().regex(/^(?:[1-9]|[12][0-9]|3[01])$/), // 1-31 as string
+        z.string().regex(/^(?:[1-9]|[12][0-9]|3[01])$/),
       ])
     )
     .optional(),
@@ -128,4 +128,29 @@ export const updateRoomTaskSchema = z.object({
       message: "Invalid date format",
     })
     .optional(),
+});
+
+export const createNormalTaskSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(40, "Title too long"),
+
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(100, "Description too long")
+    .optional(),
+
+  assignmentMode: z.enum(["single", "rotation"]),
+
+  participants: z
+    .array(z.string()) // ObjectId
+    .min(1, "At least one participant is required")
+    .max(20, "Maximum 20 participants allowed"),
+
+  // Single occurrence date
+  startDate: z.date({
+    required_error: "Task date is required",
+  }),
 });

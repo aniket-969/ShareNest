@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "react-toastify";
 import FormWrapper from "@/components/ui/formWrapper";
-import ParticipantSelector from "@/components/ParticipantsSelector"; 
+import ParticipantSelector from "@/components/Tasks/ParticipantsSelector"; 
 import { useRoom } from "@/hooks/useRoom";
 
 const AdminTransfer = ({ roomId, participants }) => {
