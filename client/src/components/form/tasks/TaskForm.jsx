@@ -38,13 +38,21 @@ const TaskForm = ({ participants }) => {
   const onSubmit = async (values) => {
     try {
       const payload = {
-        ...values,
+        title: values.title,
+        description: values.description,
+        assignmentMode: values.assignmentMode,
+        participants: values.participants,
         recurrence: {
           enabled: false,
+          frequency: "daily",
+          interval: 1,
+          startDate: values.startDate,
+          selector: {
+            type: "none",
+          },
         },
       };
-console.log(payload)
-return
+
       await createTaskMutation.mutateAsync(payload);
 
       toast.success("Task created successfully");

@@ -29,7 +29,7 @@ const recurrencePatternSchema = z.object({
     .optional(),
   dayOfWeek: z.number().min(0).max(6).optional(),
 });
- 
+
 const recurringSchema = z.object({
   enabled: z.boolean(),
   patterns: z.array(recurrencePatternSchema).optional(),
@@ -50,7 +50,6 @@ export const createRoomTaskSchema = z
     startDate: z.date().optional(),
   })
   .superRefine((data, ctx) => {
-
     // Validate recurring task requirements
     if (data.recurring.enabled) {
       if (!data.recurring.patterns) {
@@ -131,16 +130,8 @@ export const updateRoomTaskSchema = z.object({
 });
 
 export const createNormalTaskSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(40, "Title too long"),
-
-  description: z
-    .string()
-    .min(1, "Description is required")
-    .max(100, "Description too long")
-    .optional(),
+  title: stringValidation(1, 40, "title"),
+  description: optionalStringValidation(1, 100, "description"),
 
   assignmentMode: z.enum(["single", "rotation"]),
 

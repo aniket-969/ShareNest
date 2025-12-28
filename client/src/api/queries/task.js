@@ -3,6 +3,8 @@ import axiosClient from "../axiosClient";
 const baseTask = "tasks"
 
 export const createRoomTask = async(roomId,data)=>{
+    console.log(data)
+    
     return axiosClient.post(`/${baseTask}/${roomId}`,data)
 }
   
