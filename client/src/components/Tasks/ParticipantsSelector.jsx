@@ -1,18 +1,13 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ParticipantSelector = ({ participants, onChange, single = false }) => {
- 
   const [selected, setSelected] = useState(single ? null : []);
   const [selectionOrder, setSelectionOrder] = useState({});
 
   const getSortedParticipants = () => {
-   
-    const selectedIds = single
-      ? selected
-        ? [selected]
-        : []
-      : selected;
+    const selectedIds = single ? (selected ? [selected] : []) : selected;
 
     const selectedParticipants = participants.filter((u) =>
       selectedIds.includes(u._id)
@@ -32,9 +27,7 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
 
   const handleClick = (user) => {
     if (single) {
-    
       if (selected === user._id) {
-      
         setSelected(null);
         onChange(null);
       } else {
@@ -79,20 +72,25 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
               key={user._id}
               onClick={() => handleClick(user)}
               className={`flex items-center space-x-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-neutral-800/20 ${
-                isSelected ? "bg-card-muted text-card-foreground" : 
-                "shadow-xl"
-              }`}
+                isSelected ? "bg-card-muted text-card-foreground" : "shadow-xl"
+              } `}
             >
-              <img
-                src={user.avatar}
-                alt={`${user.fullName} avatar`}
-                className="w-8 h-8 rounded-full"
-              />
+              <Avatar className="w-8 h-8 rounded-[2.4rem]">
+                <AvatarImage
+                  src={user?.avatar}
+                  alt={user?.fullName}
+                />
+                <AvatarFallback>
+                  <img src="/altAvatar1.jpg" alt="fallback avatar" />
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <p className="font-semibold">{user.username}</p>
                 <p
                   className={`text-sm ${
-                    isSelected ? "bg-card text-card-foreground" : "text-gray-500"
+                    isSelected
+                      ? "bg-card text-card-foreground"
+                      : "text-gray-500"
                   }`}
                 >
                   {user.fullName}

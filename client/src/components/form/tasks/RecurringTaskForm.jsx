@@ -29,6 +29,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import MultiSelect from "@/components/ui/multiSelect";
 import DatePicker from "@/components/ui/datePicker";
+import { Textarea } from "@/components/ui/textarea";
 
 const RecurringTaskForm = ({ participants }) => {
   const { roomId } = useParams();
@@ -149,19 +150,23 @@ const RecurringTaskForm = ({ participants }) => {
         />
 
         {/* Description */}
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input placeholder="Add description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Task description"
+                          className="resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
         {/* Recurrence Pattern Toggle */}
         <div className="flex items-center gap-4">
