@@ -1,42 +1,31 @@
 import { Spinner } from "@/components/ui/spinner";
-import { useRoom, useRoomMutation } from "@/hooks/useRoom";
+import { useRoom } from "@/hooks/useRoom";
 import { useParams } from "react-router-dom";
-import { getSocket } from "@/socket";
-import { useEffect, useState } from "react";
-import RoomCalendar from "@/pages/room/Calendar/RoomCalendar";
-import Chat from "@/pages/room/Chat/Chat";
-import PollCard from "@/components/Poll";
-import { getTasksForDate } from "@/utils/helper";
-import TaskCard from "@/components/Tasks/TaskCard";
+import { useMemo, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
+import PollCard from "@/components/Poll";
+import TaskCard from "@/components/Tasks/TaskCard";
+import Chat from "@/pages/room/Chat/Chat";
 import RoomDetailsLoader from "@/components/skeleton/RoomDetails";
+import { getTasksForDate } from "@/utils/taskHelper";
 
 const RoomDetailsIndex = () => {
   const { roomId } = useParams();
-
   const { roomQuery } = useRoom(roomId);
   const { data, isLoading, isError } = roomQuery;
-  // console.log(data);
+
   const [date, setDate] = useState(new Date());
-  const [scheduledTasks, setScheduledTasks] = useState([]);
-console.log(data?.tasks)
 
-  useEffect(() => {
-    if (data?.tasks) {
-    setScheduledTasks(getTasksForDate(data.tasks, date));
-  }
-  }, [data, date]);
+  const scheduledTasks = useMemo(() => {
+    if (!data?.tasks || !date) return [];
+    return getTasksForDate(data.tasks, date);
+  }, [data?.tasks, date]);
 
-  if (isLoading) {
-    return <RoomDetailsLoader />;
-  }
+  if (isLoading) return <RoomDetailsLoader />;
+  if (isError) return <>Something went wrong. Please refresh</>;
 
-  if (isError) {
-    return <>Something went wrong . Please refresh</>;
-  }
-// console.log(data)
   return (
-    <div className=" flex  w-full items-center justify-center  gap-10 my-5 ">
+   <div className=" flex  w-full items-center justify-center  gap-10 my-5 ">
 
       {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">

@@ -3,7 +3,7 @@ import { Bell } from "lucide-react";
 import NotificationBell from "../NotificationBell";
 
 const TaskCard = ({ scheduledTasks }) => {
-  //  console.log(scheduledTasks)
+   console.log(scheduledTasks)
   return (
     <div className="relative ">
       <NotificationBell />
@@ -20,17 +20,17 @@ const TaskCard = ({ scheduledTasks }) => {
             <ul className="space-y-3 ">
               {scheduledTasks.map((task) => (
                 <li
-                  key={task._id}
+                  key={task?._id}
                   className="p-3 rounded-xl bg-card-muted transition "
                 >
                   <p className="font-semibold text-primary text-sm">
-                    {task.title}
+                    {task?.title}
                   </p>
-                  <p className="text-xs truncate">{task.description}</p>
+                  <p className="text-xs truncate">{task?.description}</p>
                   <p className="text-xs mt-1 text-foregroun">
                     Assignee:{" "}
                     <span className="font-medium text-primary">
-                      {task.assignee?.fullName}
+                      {task?.assignees[0]?.fullName}
                     </span>
                   </p>
                 </li>
