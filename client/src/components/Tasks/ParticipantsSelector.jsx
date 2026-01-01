@@ -71,7 +71,7 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
             <div
               key={user._id}
               onClick={() => handleClick(user)}
-              className={`flex items-center space-x-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-neutral-800/20 ${
+              className={`flex items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg hover:bg-neutral-800/20 ${
                 isSelected ? "bg-card-muted text-card-foreground" : "shadow-xl"
               } `}
             >
@@ -85,15 +85,15 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold">{user.username}</p>
+                <p className="font-semibold">{user?.username}</p>
                 <p
                   className={`text-sm ${
                     isSelected
-                      ? "bg-card text-card-foreground"
+                      ? " text-card-foreground"
                       : "text-gray-500"
                   }`}
                 >
-                  {user.fullName}
+                  {user?.fullName}
                 </p>
               </div>
             </div>

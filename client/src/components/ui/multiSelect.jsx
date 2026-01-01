@@ -7,6 +7,7 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils"; 
+import { ScrollArea } from "./scroll-area";
 
 const MultiSelect = ({ options, value, onChange, placeholder = "Select options" }) => {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,8 @@ const MultiSelect = ({ options, value, onChange, placeholder = "Select options" 
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-2">
-        <div className="flex justify-between mb-2">
+        {/* select all clear all divs */}
+        <div className="flex justify-between mb-2 ">
           <Button size="sm" variant="outline" onClick={handleClearAll}>
             Clear All
           </Button>
@@ -48,7 +50,9 @@ const MultiSelect = ({ options, value, onChange, placeholder = "Select options" 
             Select All
           </Button>
         </div>
-        <div className="grid gap-2">
+        {/* scrolling options */}
+        <ScrollArea className="max-h-[100%] h-[15rem]">
+          <div className="grid gap-2 ">
           {options.map((option) => (
             <div key={option} className="flex items-center gap-2">
               <Checkbox
@@ -67,6 +71,8 @@ const MultiSelect = ({ options, value, onChange, placeholder = "Select options" 
             </div>
           ))}
         </div>
+        </ScrollArea>
+        
       </PopoverContent>
     </Popover>
   );
