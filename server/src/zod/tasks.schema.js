@@ -25,7 +25,7 @@ const selectorSchema = z.object({
       z.literal("last"),
     ])
     .optional(),
-});
+}); 
 
 const recurrenceSchema = z.object({
   enabled: z.boolean(),
