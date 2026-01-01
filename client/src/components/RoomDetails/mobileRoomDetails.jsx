@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
-
 import { useRoom } from "@/hooks/useRoom"
-import { getTasksForDate } from "@/utils/helper"
-
 import RoomDetailsLoader from "@/components/skeleton/RoomDetails"
 import TaskCard from "@/components/Tasks/TaskCard"
-// import PollCard from "@/components/Poll"
-// import Chat from "@/pages/room/Chat/Chat"
-
+import { getTasksForDate } from "@/utils/taskHelper"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import {
@@ -33,16 +28,14 @@ const MobileRoomDetails = () => {
   const { data, isLoading, isError } = roomQuery
 
   const [date, setDate] = useState(new Date())
-  const [scheduledTasks, setScheduledTasks] = useState([])
 
   const [isPollOpen, setIsPollOpen] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(false)
-
-  useEffect(() => {
-    if (data?.tasks) {
-      setScheduledTasks(getTasksForDate(data.tasks, date))
-    }
-  }, [data, date])
+  
+    const scheduledTasks = useMemo(() => {
+      if (!data?.tasks || !date) return [];
+      return getTasksForDate(data.tasks, date);
+    }, [data?.tasks, date]);
 
   if (isLoading) return <MobileRoomDetailsLoader />
   if (isError)   return <>Something went wrong. Please refresh.</>
