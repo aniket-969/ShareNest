@@ -24,7 +24,7 @@ const MultiSelect = ({ options, value, onChange, placeholder = "Select options" 
   const handleClearAll = () => onChange([]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -42,16 +42,16 @@ const MultiSelect = ({ options, value, onChange, placeholder = "Select options" 
       </PopoverTrigger>
       <PopoverContent className="w-full p-2">
         {/* select all clear all divs */}
-        <div className="flex justify-between mb-2 ">
-          <Button size="sm" variant="outline" onClick={handleClearAll}>
+        <div className="flex justify-between mb-2 gap-1">
+          <Button className="p-2 " variant="outline" onClick={handleClearAll}>
             Clear All
           </Button>
-          <Button size="sm" variant="outline" onClick={handleSelectAll}>
+          <Button className="p-2 " variant="outline" onClick={handleSelectAll}>
             Select All
           </Button>
         </div>
         {/* scrolling options */}
-        <ScrollArea className="max-h-[100%] h-[15rem]">
+        <ScrollArea className="max-h-[100%] sm:h-[15rem] h-[12rem]">
           <div className="grid gap-2 ">
           {options.map((option) => (
             <div key={option} className="flex items-center gap-2">
