@@ -4,108 +4,134 @@ import {
   optionalStringValidation,
 } from "@/utils/validation";
 import { z } from "zod";
+import { z } from "zod";
 
-const recurrencePatternSchema = z.object({
-  frequency: z.enum(["daily", "weekly", "monthly", "custom"]),
-  interval: z.coerce.number().int().positive().default(1),
+export const selectorSchema = z.object({
+  type: z.enum(["none", "weekdays", "ordinalWeekday", "monthDay"]),
+
+  // Weekly selector
   days: z
-    .array(
-      z.union([
-        z.enum([
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ]),
-        z.string().regex(/^(?:[1-9]|[12][0-9]|3[01])$/),
-      ])
-    )
+    .array(z.number().int().min(0).max(6))
+    .min(1)
     .optional(),
-  weekOfMonth: z
+
+  // Monthly ordinal selector
+  weekday: z.number().int().min(0).max(6).optional(),
+  ordinal: z
     .enum(["first", "second", "third", "fourth", "last"])
     .optional(),
-  dayOfWeek: z.number().min(0).max(6).optional(),
+
+  // Monthly date selector
+  day: z
+    .union([z.number().int().min(1).max(31), z.literal("last")])
+    .optional(),
 });
 
-const recurringSchema = z.object({
+export const recurrenceSchema = z.object({
   enabled: z.boolean(),
-  patterns: z.array(recurrencePatternSchema).optional(),
+
+  frequency: z.enum(["daily", "weekly", "monthly"]),
+
+  interval: z.coerce.number().int().min(1).default(1),
+
+  startDate: z.coerce.date(),
+
+  selector: selectorSchema,
 });
 
-export const createRoomTaskSchema = z
-  .object({
-    title: stringValidation(1, 40, "title"),
-    description: optionalStringValidation(1, 100, "description"),
-    assignmentMode: z.enum(["single", "rotation"]),
-    participants: z
-      .array(objectIdValidation)
-      .min(1, "At least one participant is required")
-      .max(20, "Maximum 20 participants allowed"),
+export const createTaskSchema = z.object({
+  title: z.string().min(1).max(40),
+  description: z.string().min(1).max(100).optional(),
 
-    // Recurring task fields
-    recurring: recurringSchema,
-    startDate: z.date().optional(),
-  })
-  .superRefine((data, ctx) => {
-    // Validate recurring task requirements
-    if (data.recurring.enabled) {
-      if (!data.recurring.patterns) {
+  assignmentMode: z.enum(["single", "rotation"]),
+
+  participants: z
+    .array(z.string()) // ObjectId as string
+    .min(1, "At least one participant is required"),
+
+  recurrence: recurrenceSchema,
+});
+
+export const createTaskSchemaWithRules = createTaskSchema.superRefine(
+  (data, ctx) => {
+    const { recurrence } = data;
+
+    if (!recurrence.enabled) return;
+
+    const { frequency, selector } = recurrence;
+
+    // DAILY → selector must be none
+    if (frequency === "daily" && selector.type !== "none") {
+      ctx.addIssue({
+        path: ["recurrence", "selector", "type"],
+        message: "Daily recurrence must not have a selector",
+        code: z.ZodIssueCode.custom,
+      });
+    }
+
+    // WEEKLY → selector must be weekdays with days
+    if (frequency === "weekly") {
+      if (selector.type !== "weekdays" || !selector.days?.length) {
         ctx.addIssue({
+          path: ["recurrence", "selector"],
+          message:
+            "Weekly recurrence requires weekday selection",
           code: z.ZodIssueCode.custom,
-          message: "Recurrence pattern is required for recurring tasks",
-          path: ["pattern"],
         });
-        return;
-      }
-
-      const pattern = data.recurring.patterns;
-      // Validate pattern based on frequency
-      switch (pattern.frequency) {
-        case "weekly":
-          if (!pattern.selectedDays?.length) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: "Select at least one day for weekly recurrence",
-              path: ["pattern", "selectedDays"],
-            });
-          }
-          break;
-
-        case "monthly":
-          if (pattern.monthlyOption === "dayOfMonth" && !pattern.dayOfMonth) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: "Day of month is required",
-              path: ["pattern", "dayOfMonth"],
-            });
-          }
-          if (
-            pattern.monthlyOption === "dayOfWeek" &&
-            (!pattern.weekOfMonth || typeof pattern.dayOfWeek !== "number")
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: "Week of month and day of week are required",
-              path: ["pattern", "weekOfMonth"],
-            });
-          }
-          break;
-
-        case "custom":
-          if (!pattern.customDays) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: "Number of days is required for custom recurrence",
-              path: ["pattern", "customDays"],
-            });
-          }
-          break;
       }
     }
-  });
+
+    // MONTHLY → selector must be ordinalWeekday or monthDay
+    if (frequency === "monthly") {
+      if (!["ordinalWeekday", "monthDay"].includes(selector.type)) {
+        ctx.addIssue({
+          path: ["recurrence", "selector", "type"],
+          message:
+            "Monthly recurrence must be day-of-month or ordinal weekday",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
+      if (
+        selector.type === "ordinalWeekday" &&
+        (!selector.weekday || !selector.ordinal)
+      ) {
+        ctx.addIssue({
+          path: ["recurrence", "selector"],
+          message:
+            "Ordinal weekday requires both weekday and ordinal",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+
+      if (selector.type === "monthDay" && selector.day === undefined) {
+        ctx.addIssue({
+          path: ["recurrence", "selector", "day"],
+          message:
+            "Day-of-month requires a day (1–31 or 'last')",
+          code: z.ZodIssueCode.custom,
+        });
+      }
+    }
+  }
+);
+
+export const createNormalTaskSchema = z.object({
+  title: stringValidation(1, 40, "title"),
+  description: optionalStringValidation(1, 100, "description"),
+
+  assignmentMode: z.enum(["single", "rotation"]),
+
+  participants: z
+    .array(z.string()) // ObjectId
+    .min(1, "At least one participant is required")
+    .max(20, "Maximum 20 participants allowed"),
+
+  // Single occurrence date
+  startDate: z.date({
+    required_error: "Task date is required",
+  }),
+});
 
 export const updateRoomTaskSchema = z.object({
   roomId: objectIdValidation,
@@ -127,21 +153,4 @@ export const updateRoomTaskSchema = z.object({
       message: "Invalid date format",
     })
     .optional(),
-});
-
-export const createNormalTaskSchema = z.object({
-  title: stringValidation(1, 40, "title"),
-  description: optionalStringValidation(1, 100, "description"),
-
-  assignmentMode: z.enum(["single", "rotation"]),
-
-  participants: z
-    .array(z.string()) // ObjectId
-    .min(1, "At least one participant is required")
-    .max(20, "Maximum 20 participants allowed"),
-
-  // Single occurrence date
-  startDate: z.date({
-    required_error: "Task date is required",
-  }),
 });
