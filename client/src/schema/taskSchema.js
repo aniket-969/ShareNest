@@ -4,9 +4,8 @@ import {
   optionalStringValidation,
 } from "@/utils/validation";
 import { z } from "zod";
-import { z } from "zod";
 
-export const selectorSchema = z.object({
+const selectorSchema = z.object({
   type: z.enum(["none", "weekdays", "ordinalWeekday", "monthDay"]),
 
   // Weekly selector
@@ -27,7 +26,7 @@ export const selectorSchema = z.object({
     .optional(),
 });
 
-export const recurrenceSchema = z.object({
+const recurrenceSchema = z.object({
   enabled: z.boolean(),
 
   frequency: z.enum(["daily", "weekly", "monthly"]),
@@ -39,9 +38,9 @@ export const recurrenceSchema = z.object({
   selector: selectorSchema,
 });
 
-export const createTaskSchema = z.object({
+const createTaskSchema = z.object({
   title: z.string().min(1).max(40),
-  description: z.string().min(1).max(100).optional(),
+  description: optionalStringValidation(1, 100, "description"),
 
   assignmentMode: z.enum(["single", "rotation"]),
 
