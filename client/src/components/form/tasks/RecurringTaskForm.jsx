@@ -50,7 +50,7 @@ const RecurringTaskForm = ({ participants }) => {
       assignmentMode: "rotation",
       participants: [],
       recurrence: {
-        enabled:true,
+        enabled: true,
         frequency: "daily",
         interval: 1,
         startDate: undefined,
@@ -58,7 +58,7 @@ const RecurringTaskForm = ({ participants }) => {
       },
     },
   });
- console.log("Form Errors:", form.formState.errors);
+  console.log("Form Errors:", form.formState.errors);
   const frequency = form.watch("recurrence.frequency");
   const selectorType = form.watch("recurrence.selector.type");
 
@@ -70,8 +70,8 @@ const RecurringTaskForm = ({ participants }) => {
         enabled: true,
       },
     };
-console.log(payload)
-return
+    console.log(payload);
+    // return
     try {
       await createTaskMutation.mutateAsync(payload);
       toast.success("Task created");
@@ -115,52 +115,51 @@ return
         />
 
         {/* Frequency */}
-       <FormField
-  control={form.control}
-  name="recurrence.frequency"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Frequency</FormLabel>
-      <FormControl>
-        <Select
-          value={field.value}
-          onValueChange={(value) => {
-            field.onChange(value);
+        <FormField
+          control={form.control}
+          name="recurrence.frequency"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Frequency</FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
 
-            // IMPORTANT: selector must match frequency
-            if (value === "daily") {
-              form.setValue("recurrence.selector", { type: "none" });
-            }
+                    // IMPORTANT: selector must match frequency
+                    if (value === "daily") {
+                      form.setValue("recurrence.selector", { type: "none" });
+                    }
 
-            if (value === "weekly") {
-              form.setValue("recurrence.selector", {
-                type: "weekdays",
-                days: [],
-              });
-            }
+                    if (value === "weekly") {
+                      form.setValue("recurrence.selector", {
+                        type: "weekdays",
+                        days: [],
+                      });
+                    }
 
-            if (value === "monthly") {
-              form.setValue("recurrence.selector", {
-                type: "monthDay",
-              });
-            }
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select frequency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="monthly">Monthly</SelectItem>
-          </SelectContent>
-        </Select>
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )}
-/>
-
+                    if (value === "monthly") {
+                      form.setValue("recurrence.selector", {
+                        type: "monthDay",
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Interval */}
         <FormField
@@ -216,12 +215,33 @@ return
                 <FormItem>
                   <FormLabel>Monthly pattern</FormLabel>
                   <FormControl>
-                    <Select {...field}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+
+                        // IMPORTANT: reset selector when switching pattern
+                        if (value === "monthDay") {
+                          form.setValue("recurrence.selector", {
+                            type: "monthDay",
+                            day: undefined,
+                          });
+                        }
+
+                        if (value === "ordinalWeekday") {
+                          form.setValue("recurrence.selector", {
+                            type: "ordinalWeekday",
+                            ordinal: undefined,
+                            weekday: undefined,
+                          });
+                        }
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select pattern" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="monthDay">Day of month</SelectItem>
+                        <SelectItem value="monthDay">Date of month</SelectItem>
                         <SelectItem value="ordinalWeekday">
                           Ordinal weekday
                         </SelectItem>
@@ -239,9 +259,28 @@ return
                 name="recurrence.selector.day"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Day</FormLabel>
+                    <FormLabel>Date of month</FormLabel>
                     <FormControl>
-                      <Input type="number" min={1} max={31} {...field} />
+                      <Select
+                        value={field.value?.toString()}
+                        onValueChange={(v) =>
+                          field.onChange(v === "last" ? "last" : Number(v))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select date" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[...Array(31)].map((_, i) => (
+                            <SelectItem key={i + 1} value={String(i + 1)}>
+                              {i + 1}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="last">
+                            Last day of month
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -251,6 +290,7 @@ return
 
             {selectorType === "ordinalWeekday" && (
               <>
+                {/* Ordinal */}
                 <FormField
                   control={form.control}
                   name="recurrence.selector.ordinal"
@@ -258,9 +298,12 @@ return
                     <FormItem>
                       <FormLabel>Ordinal</FormLabel>
                       <FormControl>
-                        <Select {...field}>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Select ordinal" />
                           </SelectTrigger>
                           <SelectContent>
                             {ORDINALS.map((o) => (
@@ -275,6 +318,7 @@ return
                   )}
                 />
 
+                {/* Weekday */}
                 <FormField
                   control={form.control}
                   name="recurrence.selector.weekday"
@@ -283,18 +327,19 @@ return
                       <FormLabel>Weekday</FormLabel>
                       <FormControl>
                         <Select
-                          value={String(field.value)}
+                          value={
+                            field.value !== undefined
+                              ? String(field.value)
+                              : undefined
+                          }
                           onValueChange={(v) => field.onChange(Number(v))}
                         >
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue placeholder="Select weekday" />
                           </SelectTrigger>
                           <SelectContent>
                             {WEEKDAYS.map((d) => (
-                              <SelectItem
-                                key={d.value}
-                                value={String(d.value)}
-                              >
+                              <SelectItem key={d.value} value={String(d.value)}>
                                 {d.label}
                               </SelectItem>
                             ))}
