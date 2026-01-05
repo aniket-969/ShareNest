@@ -11,22 +11,22 @@ const TaskCard = ({ scheduledTasks }) => {
         <h3 className="font-semibold text-base mx-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>
-        <ScrollArea className=" h-[13rem] p-3 ">
+        <ScrollArea className=" h-[13rem] px-3 py-2 mt-1">
           {scheduledTasks.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               No tasks for this date.
             </p>
           ) : (
-            <ul className="space-y-3 ">
+            <ul className="space-y-2 ">
               {scheduledTasks.map((task) => (
                 <li
                   key={task?._id}
-                  className="p-3 rounded-xl bg-card-muted transition "
+                  className="p-3 rounded-xl bg-card-muted transition"
                 >
                   <p className="font-semibold text-primary text-sm">
                     {task?.title}
                   </p>
-                  <p className="text-xs truncate">{task?.description}</p>
+                  {task?.description && <p className="text-xs truncate my-1">{task.description}</p>}
                   <p className="text-xs mt-1 text-foregroun">
                     Assignee:{" "}
                     <span className="font-medium text-primary">
