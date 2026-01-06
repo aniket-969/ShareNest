@@ -34,7 +34,6 @@ const TaskContainerCard = ({ task, userId, time }) => {
                 <Ellipsis />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="border-none">
-                <DropdownMenuItem>Edit</DropdownMenuItem>
                 <DropdownMenuItem>Delete</DropdownMenuItem>
                 <DropdownMenuItem>Swap your Turn</DropdownMenuItem>
               </DropdownMenuContent>
