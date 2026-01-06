@@ -111,7 +111,9 @@ function getBaseAssignee(task, occurrenceIndex) {
 }
 
 function resolveSwap(task, D, baseAssignee) {
-  const swap = task.swapRequests?.find((s) => s.status === "approved");
+  const swap = task.swapRequests?.find(
+    (s) => s.status === "approved"
+  );
 
   if (!swap) return baseAssignee;
 
