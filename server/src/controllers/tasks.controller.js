@@ -175,50 +175,51 @@ const createSwitchRequest = asyncHandler(async (req, res) => {
 });
 
 const switchRequestResponse = asyncHandler(async (req, res) => {
-  const { taskId, roomId } = req.params;
-  const { requestedBy } = req.body;
-  console.log(taskId, roomId, requestedBy);
-  const updatedSwitchResponse = await Room.findOneAndUpdate(
-    {
-      _id: roomId,
-      "tasks._id": taskId,
-      "tasks.switches.requestedBy": requestedBy,
-      "tasks.switches.requestedTo.userId": req.user?._id,
-    },
-    {
-      $pull: {
-        "tasks.$.switches": {
-          requestedBy,
-          "requestedTo.userId": req.user?._id,
-        },
-      },
-      $inc: {
-        "tasks.$.switchCountPerUser.$[requestingUser].requestCount": 1,
-        "tasks.$.switchCountPerUser.$[acceptingUser].acceptCount": 1,
-      },
-    },
-    {
-      arrayFilters: [
-        { "requestingUser.user": requestedBy },
-        { "acceptingUser.user": req.user?._id },
-      ],
-      new: true,
-      runValidators: true,
-    }
+  const { roomId, taskId } = req.params;
+  const { action } = req.body; // "approved" | "rejected"
+  const responderId = req.user._id;
+
+  if (!["approved", "rejected"].includes(action)) {
+    throw new ApiError(400, "Invalid action");
+  }
+
+  const room = await Room.findById(roomId);
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  const task = room.tasks.id(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  const swap = task.swapRequests?.find(
+    (s) => s.status === "pending"
   );
 
-  if (!updatedSwitchResponse) {
-    throw new ApiError(400, "Task, room or switch request not found");
+  if (!swap) {
+    throw new ApiError(400, "No pending swap request found");
   }
+
+  if (swap.to.toString() !== responderId.toString()) {
+    throw new ApiError(403, "You are not allowed to respond to this swap request");
+  }
+
+  swap.status = action;
+
+  await room.save();
 
   return res.json(
     new ApiResponse(
       200,
       {},
-      "Switch request accepted and task updated successfully"
+      action === "approved"
+        ? "Swap request approved"
+        : "Swap request rejected"
     )
   );
 });
+
 
 export {
   createRoomTask,
