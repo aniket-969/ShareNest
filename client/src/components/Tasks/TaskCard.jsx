@@ -11,7 +11,7 @@ const TaskCard = ({ scheduledTasks }) => {
         <h3 className="font-semibold text-base mx-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>
-        <ScrollArea className=" h-[13rem] px-3 pt-3 pb-1 mt-1">
+        <ScrollArea className=" h-[13rem] px-3 py-3 mt-1">
           {scheduledTasks.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               No tasks for this date.
@@ -21,7 +21,7 @@ const TaskCard = ({ scheduledTasks }) => {
               {scheduledTasks.map((task) => (
                 <li
                   key={task?._id}
-                  className="p-3 rounded-xl bg-card-muted transition"
+                  className="p-3 rounded-xl bg-card-muted transition "
                 >
                   <p className="font-semibold text-primary text-sm">
                     {task?.title}

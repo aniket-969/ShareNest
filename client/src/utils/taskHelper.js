@@ -4,12 +4,10 @@ const startOfDay = (date) => {
   return d;
 };
 
-const isSameDay = (a, b) =>
-  startOfDay(a).getTime() === startOfDay(b).getTime();
+const isSameDay = (a, b) => startOfDay(a).getTime() === startOfDay(b).getTime();
 
 const daysBetween = (start, end) =>
   Math.floor((startOfDay(end) - startOfDay(start)) / (1000 * 60 * 60 * 24));
-
 
 function doesTaskOccurOnDate(task, D) {
   const date = startOfDay(D);
@@ -117,18 +115,15 @@ function resolveSwap(task, D, baseAssignee) {
 
   if (!swap) return baseAssignee;
 
-  const A = startOfDay(swap.occurrenceDate);
-
-  //  next occurrence after A
-  let B = new Date(A);
-  do {
-    B.setDate(B.getDate() + 1);
-  } while (!doesTaskOccurOnDate(task, B));
-
   const date = startOfDay(D);
 
-  if (isSameDay(date, A)) return swap.to;
-  if (isSameDay(date, B)) return swap.from;
+  if (isSameDay(date, swap.dateFrom)) {
+    return swap.to;
+  }
+
+  if (isSameDay(date, swap.dateTo)) {
+    return swap.from;
+  }
 
   return baseAssignee;
 }
@@ -141,7 +136,7 @@ export function getTasksForDate(tasks, selectedDate) {
   for (const task of tasks) {
     if (!doesTaskOccurOnDate(task, D)) continue;
 
-    // One-time task 
+    // One-time task
     if (!task.recurrence.enabled) {
       scheduled.push({
         id: task._id,
@@ -164,6 +159,6 @@ export function getTasksForDate(tasks, selectedDate) {
       assignees: [finalAssignee],
     });
   }
-console.log(scheduled)
+  console.log(scheduled);
   return scheduled;
 }
