@@ -87,38 +87,6 @@ const createRoomTask = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, savedTask, "Task created successfully"));
 });
 
-const updateRoomTask = asyncHandler(async (req, res) => {
-  const { taskId, roomId } = req.params;
-  const updates = req.body;
-
-  const updatedRoom = await Room.findOneAndUpdate(
-    { _id: roomId, "tasks._id": taskId },
-    {
-      $set: {
-        "tasks.$.title": updates.title,
-        "tasks.$.description": updates.description,
-        "tasks.$.dueDate": updates.dueDate,
-        "tasks.$.priority": updates.priority,
-        "tasks.$.completed": updates.completed,
-        "tasks.$.completedBy": req.user?._id,
-      },
-    },
-    { new: true, runValidators: true }
-  );
-
-  if (!updatedRoom) {
-    throw new ApiError(404, "Task or Room not found");
-  }
-
-  const updatedTask = updatedRoom.tasks.id(taskId);
-  emitSocketEvent(req, roomId, TaskEventEnum.TASK_UPDATED_EVENT, updatedTask);
-  return res.json(
-    new ApiResponse(200, updatedTask, "Task updated successfully")
-  );
-});
-
-const updateNonRecurringTask = asyncHandler(async (req, res) => {});
-
 const deleteRoomTask = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;
   const room = await Room.findById(roomId);
@@ -206,7 +174,6 @@ const createSwitchRequest = asyncHandler(async (req, res) => {
   );
 });
 
-
 const switchRequestResponse = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;
   const { requestedBy } = req.body;
@@ -255,9 +222,7 @@ const switchRequestResponse = asyncHandler(async (req, res) => {
 
 export {
   createRoomTask,
-  updateRoomTask,
   deleteRoomTask,
   createSwitchRequest,
   switchRequestResponse,
-  updateNonRecurringTask,
 };
