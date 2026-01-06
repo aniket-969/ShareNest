@@ -139,27 +139,73 @@ const deleteRoomTask = asyncHandler(async (req, res) => {
 });
 
 const createSwitchRequest = asyncHandler(async (req, res) => {
-  const { taskId, roomId } = req.params;
+  const { roomId, taskId } = req.params;
   const { requestedTo } = req.body;
+  const requesterId = req.user._id;
 
-  const updatedRoomTask = await Room.findOneAndUpdate(
-    { _id: roomId, "tasks._id": taskId },
-    {
-      $push: {
-        "tasks.$.switches": {
-          requestedBy: req.user?._id,
-          requestedTo: { userId: requestedTo, accepted: false },
-        },
-      },
-    },
-    { new: true }
+  const room = await Room.findById(roomId);
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  const task = room.tasks.id(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  if (!task.recurrence?.enabled) {
+    throw new ApiError(400, "Only recurring tasks can be swapped");
+  }
+
+  if (task.assignmentMode !== "rotation") {
+    throw new ApiError(400, "Only rotation-based tasks can be swapped");
+  }
+
+  const participantIds = task.participants.map((id) => id.toString());
+
+  if (!participantIds.includes(requestedTo)) {
+    throw new ApiError(400, "Requested user is not a participant of this task");
+  }
+
+  if (requestedTo === requesterId.toString()) {
+    throw new ApiError(400, "You cannot swap with yourself");
+  }
+
+  const hasActiveSwap = task.swapRequests?.some(
+    (s) => s.status === "pending" || s.status === "approved"
   );
 
-  if (!updateRoomTask) {
-    throw new ApiError(400, "Task or room not found");
+  if (hasActiveSwap) {
+    throw new ApiError(400, "An active swap already exists for this task");
   }
-  return res.json(new ApiResponse(200, {}, "Switch request sent successfully"));
+
+  const today = new Date();
+
+  const dateFrom = getNextOccurrenceForUser(task, requesterId, today);
+  if (!dateFrom) {
+    throw new ApiError(400, "You have no upcoming turn to swap");
+  }
+
+  const dateTo = getNextOccurrenceForUser(task, requestedTo, today);
+  if (!dateTo) {
+    throw new ApiError(400, "Requested user has no upcoming turn to swap");
+  }
+
+  task.swapRequests.push({
+    from: requesterId,
+    to: requestedTo,
+    dateFrom,
+    dateTo,
+    status: "pending",
+  });
+
+  await room.save();
+
+  return res.json(
+    new ApiResponse(200, {}, "Swap request sent successfully")
+  );
 });
+
 
 const switchRequestResponse = asyncHandler(async (req, res) => {
   const { taskId, roomId } = req.params;

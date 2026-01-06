@@ -82,16 +82,33 @@ export const TaskSchema = new Schema(
       },
     },
 
-    swapRequests: [
+   swapRequests: [
   {
-    from: ObjectId,
-    to: ObjectId,
-    dateFrom: Date,
-    dateTo: Date,
-    status: "pending" | "approved" | "rejected"
-  }
-]
-,
+    from: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    to: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    dateFrom: {
+      type: Date,
+      required: true,
+    },
+    dateTo: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+  },
+],
   },
   { timestamps: true }
 );
