@@ -28,6 +28,7 @@ const TaskContainerCard = ({ task, userId, time }) => {
 
   const isCreator = userId === task?.createdBy?._id;
   const isParticipant = task?.participants?.some((p) => p._id === userId);
+  const isRecurringTask = task?.recurrence?.enabled === true;
 
   const showActions = isCreator || isParticipant;
 
@@ -48,7 +49,7 @@ const TaskContainerCard = ({ task, userId, time }) => {
                 <DropdownMenuContent className="border-none">
                   {isCreator && <DropdownMenuItem>Delete</DropdownMenuItem>}
 
-                  {isParticipant && (
+                  {isRecurringTask && isParticipant && (
                     <DropdownMenuItem
                       onSelect={() => {
                         setMenuOpen(false);
