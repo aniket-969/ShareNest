@@ -23,12 +23,11 @@ import { Ellipsis } from "lucide-react";
 import SwapTurnModal from "./SwapTurnModal";
 
 const TaskContainerCard = ({ task, userId, time }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [openSwapModal, setOpenSwapModal] = useState(false);
 
   const isCreator = userId === task?.createdBy?._id;
-  const isParticipant = task?.participants?.some(
-    (p) => p._id === userId
-  );
+  const isParticipant = task?.participants?.some((p) => p._id === userId);
 
   const showActions = isCreator || isParticipant;
 
@@ -41,21 +40,22 @@ const TaskContainerCard = ({ task, userId, time }) => {
             <p>{task?.title}</p>
 
             {showActions && (
-              <DropdownMenu>
+              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger>
                   <Ellipsis />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="border-none">
-                  {isCreator && (
-                    <DropdownMenuItem>
-                      Delete
-                    </DropdownMenuItem>
-                  )}
+                  {isCreator && <DropdownMenuItem>Delete</DropdownMenuItem>}
 
                   {isParticipant && (
                     <DropdownMenuItem
-                      onClick={() => setOpenSwapModal(true)}
+                      onSelect={() => {
+                        setMenuOpen(false);
+                        setTimeout(() => {
+                          setOpenSwapModal(true);
+                        }, 0);
+                      }}
                     >
                       Swap your Turn
                     </DropdownMenuItem>
