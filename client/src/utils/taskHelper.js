@@ -1,4 +1,4 @@
-const startOfDay = (date) => {
+export const startOfDay = (date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
@@ -9,7 +9,7 @@ const isSameDay = (a, b) => startOfDay(a).getTime() === startOfDay(b).getTime();
 const daysBetween = (start, end) =>
   Math.floor((startOfDay(end) - startOfDay(start)) / (1000 * 60 * 60 * 24));
 
-function doesTaskOccurOnDate(task, D) {
+export function doesTaskOccurOnDate(task, D) {
   const date = startOfDay(D);
   const startDate = startOfDay(task.recurrence.startDate);
 
@@ -83,9 +83,9 @@ function doesTaskOccurOnDate(task, D) {
   }
 
   return true;
-}
+} 
 
-function getOccurrenceIndex(task, D) {
+export function getOccurrenceIndex(task, D) {
   let count = 0;
   let cursor = startOfDay(task.recurrence.startDate);
   const end = startOfDay(D);
@@ -101,7 +101,7 @@ function getOccurrenceIndex(task, D) {
   return -1;
 }
 
-function getBaseAssignee(task, occurrenceIndex) {
+export function getBaseAssignee(task, occurrenceIndex) {
   if (task.assignmentMode === "single") {
     return task.participants[0];
   }
@@ -110,10 +110,8 @@ function getBaseAssignee(task, occurrenceIndex) {
   return task.participants[idx];
 }
 
-function resolveSwap(task, D, baseAssignee) {
-  const swap = task.swapRequests?.find(
-    (s) => s.status === "approved"
-  );
+export function resolveSwap(task, D, baseAssignee) {
+  const swap = task.swapRequests?.find((s) => s.status === "approved");
 
   if (!swap) return baseAssignee;
 
@@ -164,3 +162,5 @@ export function getTasksForDate(tasks, selectedDate) {
   console.log(scheduled);
   return scheduled;
 }
+
+
