@@ -16,10 +16,6 @@ export const deleteRoomTask = async(roomId,taskId)=>{
     return res
 }
 
-export const updateRoomTask = async(roomId,taskId,data)=>{
-    return axiosClient.patch(`/${baseTask}/${taskId}/${roomId}`,data)
-}
-
 export const createSwitchRequest = async(roomId,taskId,data)=>{
     return axiosClient.post(`/${baseTask}/taskSwitch/${taskId}/${roomId}`,data)
 }

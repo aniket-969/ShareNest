@@ -24,6 +24,29 @@ export const useTask = (roomId) => {
       queryClient.invalidateQueries(["auth", "session"]);
     },
   });
+  const createSwitchRequestMutation = useMutation({
+    mutationFn: ({ taskId, data }) => createSwitchRequest(roomId, taskId, data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries(["room", roomId]);
+    },
+
+    onError: (err) => {
+      console.error("Failed to create swap request", err);
+    },
+  });
+  const createSwitchResponseMutation = useMutation({
+    mutationFn: ({ taskId, data }) =>
+      createSwitchResponse(roomId, taskId, data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries(["room", roomId]);
+    },
+
+    onError: (err) => {
+      console.error("Failed to respond to swap request", err);
+    },
+  });
 
   return {
     createTaskMutation,
