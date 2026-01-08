@@ -9,7 +9,11 @@ export const createRoomTask = async(roomId,data)=>{
 }
   
 export const deleteRoomTask = async(roomId,taskId)=>{
-    return axiosClient.delete(`/${baseTask}/${taskId}/${roomId}`)
+    console.log(roomId,taskId)
+    // return
+    const res = await axiosClient.delete(`/${baseTask}/${taskId}/${roomId}`)
+    console.log(res)
+    return res
 }
 
 export const updateRoomTask = async(roomId,taskId,data)=>{

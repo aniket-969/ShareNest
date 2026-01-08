@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Ellipsis } from "lucide-react";
 import SwapTurnModal from "./SwapTurnModal";
+import { useParams } from "react-router-dom";
+import { useTask } from "@/hooks/useTask";
 
 const TaskContainerCard = ({ task, userId, time }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -29,8 +31,12 @@ const TaskContainerCard = ({ task, userId, time }) => {
   const isCreator = userId === task?.createdBy?._id;
   const isParticipant = task?.participants?.some((p) => p._id === userId);
   const isRecurringTask = task?.recurrence?.enabled === true;
-
+  const { roomId } = useParams();
   const showActions = isCreator || isParticipant;
+  const { deleteTaskMutation } = useTask(roomId);
+  const handleDelete = () => {
+     deleteTaskMutation.mutate(task._id);;
+  };
 
   return (
     <>
@@ -47,15 +53,22 @@ const TaskContainerCard = ({ task, userId, time }) => {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent className="border-none">
-                  {isCreator && <DropdownMenuItem>Delete</DropdownMenuItem>}
+                  {isCreator && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        handleDelete();
+                      }}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  )}
 
                   {isRecurringTask && isParticipant && (
                     <DropdownMenuItem
                       onSelect={() => {
                         setMenuOpen(false);
-                        setTimeout(() => {
-                          setOpenSwapModal(true);
-                        }, 0);
+
+                        setOpenSwapModal(true);
                       }}
                     >
                       Swap your Turn

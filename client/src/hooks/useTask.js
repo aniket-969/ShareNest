@@ -1,41 +1,32 @@
-import { createRoomTask, deleteRoomTask, updateRoomTask } from "@/api/queries/task";
-  import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-  import { useNavigate } from "react-router-dom";
-  
-  export const useTask = (roomId) => {
-    const queryClient = useQueryClient();
-    const navigate = useNavigate();
-  
+import {
+  createRoomTask,
+  deleteRoomTask,
+  updateRoomTask,
+} from "@/api/queries/task";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+
+export const useTask = (roomId) => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const createTaskMutation = useMutation({
-    mutationFn: (newTaskData) =>
-      createRoomTask(roomId, newTaskData),
+    mutationFn: (newTaskData) => createRoomTask(roomId, newTaskData),
     onSuccess: () => {
       queryClient.invalidateQueries(["room", roomId]);
     },
   });
-  
-    const updateTaskMutation = useMutation({
-      queryFn: updateRoomTask,
-      onSuccess: (taskId) => {
-        queryClient.invalidateQueries(["Task", taskId]);
-      },
-    });
-  
-    const deleteTaskMutation = useMutation({
-      queryFn: deleteRoomTask,
-      onSuccess: () => {
-        console.log("Task deleted successfully");
-        queryClient.invalidateQueries(["auth", "session"]);
-        navigate("/Task");
-      },
-    });
-  
-  
-    return {
-      createTaskMutation,
-      updateTaskMutation,
-      deleteTaskMutation,
-    };
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: (taskId) => deleteRoomTask(roomId, taskId),
+    onSuccess: () => {
+      console.log("Task deleted successfully");
+      queryClient.invalidateQueries(["auth", "session"]);
+    },
+  });
+
+  return {
+    createTaskMutation,
+    deleteTaskMutation,
   };
-   
- 
+};
