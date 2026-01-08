@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Room } from "../models/rooms.model.js";
 import { TaskEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+import { getNextOccurrenceForUser } from "./../utils/taskHelper.js";
 
 const createRoomTask = asyncHandler(async (req, res) => {
   const createdBy = req.user?._id;
@@ -21,9 +22,7 @@ const createRoomTask = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Maximum tasks limit reached");
   }
 
-  const members = [
-    ...room.tenants.map((t) => t.toString())
-  ];
+  const members = [...room.tenants.map((t) => t.toString())];
 
   const invalidParticipants = participants.filter(
     (id) => !members.includes(id)
@@ -109,7 +108,8 @@ const deleteRoomTask = asyncHandler(async (req, res) => {
 const createSwitchRequest = asyncHandler(async (req, res) => {
   const { roomId, taskId } = req.params;
   const { requestedTo } = req.body;
-  const requesterId = req.user._id;
+
+  const requesterId = req.user?._id;
 
   const room = await Room.findById(roomId);
   if (!room) {
@@ -138,7 +138,6 @@ const createSwitchRequest = asyncHandler(async (req, res) => {
   if (requestedTo === requesterId.toString()) {
     throw new ApiError(400, "You cannot swap with yourself");
   }
-
   const hasActiveSwap = task.swapRequests?.some(
     (s) => s.status === "pending" || s.status === "approved"
   );
@@ -153,7 +152,6 @@ const createSwitchRequest = asyncHandler(async (req, res) => {
   if (!dateFrom) {
     throw new ApiError(400, "You have no upcoming turn to swap");
   }
-
   const dateTo = getNextOccurrenceForUser(task, requestedTo, today);
   if (!dateTo) {
     throw new ApiError(400, "Requested user has no upcoming turn to swap");
@@ -168,10 +166,7 @@ const createSwitchRequest = asyncHandler(async (req, res) => {
   });
 
   await room.save();
-
-  return res.json(
-    new ApiResponse(200, {}, "Swap request sent successfully")
-  );
+  return res.json(new ApiResponse(200, {}, "Swap request sent successfully"));
 });
 
 const switchRequestResponse = asyncHandler(async (req, res) => {
@@ -193,16 +188,17 @@ const switchRequestResponse = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Task not found");
   }
 
-  const swap = task.swapRequests?.find(
-    (s) => s.status === "pending"
-  );
+  const swap = task.swapRequests?.find((s) => s.status === "pending");
 
   if (!swap) {
     throw new ApiError(400, "No pending swap request found");
   }
 
   if (swap.to.toString() !== responderId.toString()) {
-    throw new ApiError(403, "You are not allowed to respond to this swap request");
+    throw new ApiError(
+      403,
+      "You are not allowed to respond to this swap request"
+    );
   }
 
   swap.status = action;
@@ -213,13 +209,10 @@ const switchRequestResponse = asyncHandler(async (req, res) => {
     new ApiResponse(
       200,
       {},
-      action === "approved"
-        ? "Swap request approved"
-        : "Swap request rejected"
+      action === "approved" ? "Swap request approved" : "Swap request rejected"
     )
   );
 });
-
 
 export {
   createRoomTask,
