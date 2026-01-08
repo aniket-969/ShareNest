@@ -21,21 +21,48 @@ import {
 } from "@/components/ui/tooltip";
 import { Ellipsis } from "lucide-react";
 import SwapTurnModal from "./SwapTurnModal";
+import ViewTurnsModal from "@/components/Tasks/viewTurnModal";
 import { useParams } from "react-router-dom";
 import { useTask } from "@/hooks/useTask";
 
 const TaskContainerCard = ({ task, userId, time }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openSwapModal, setOpenSwapModal] = useState(false);
+  const [openTurnsModal, setOpenTurnsModal] = useState(false);
+
+  const { roomId } = useParams();
 
   const isCreator = userId === task?.createdBy?._id;
-  const isParticipant = task?.participants?.some((p) => p._id === userId);
+  const isParticipant = task?.participants?.some(
+    (p) => p._id === userId
+  );
   const isRecurringTask = task?.recurrence?.enabled === true;
-  const { roomId } = useParams();
+
   const showActions = isCreator || isParticipant;
-  const { deleteTaskMutation } = useTask(roomId);
+
+  const {
+    deleteTaskMutation,
+    createSwitchRequestMutation,
+  } = useTask(roomId);
+
   const handleDelete = () => {
-     deleteTaskMutation.mutate(task._id);;
+    deleteTaskMutation.mutate(task._id);
+  };
+
+  const handleSwapSubmit = (requestedToUserId) => {
+    createSwitchRequestMutation.mutate(
+      {
+        taskId: task._id,
+        data: {
+          requestedTo: requestedToUserId,
+        },
+      },
+      {
+        onSuccess: () => {
+          setOpenSwapModal(false);
+        },
+      }
+    );
   };
 
   return (
@@ -67,11 +94,21 @@ const TaskContainerCard = ({ task, userId, time }) => {
                     <DropdownMenuItem
                       onSelect={() => {
                         setMenuOpen(false);
-
                         setOpenSwapModal(true);
                       }}
                     >
                       Swap your Turn
+                    </DropdownMenuItem>
+                  )}
+
+                  {isRecurringTask && (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setMenuOpen(false);
+                        setOpenTurnsModal(true);
+                      }}
+                    >
+                      View turns
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -126,6 +163,15 @@ const TaskContainerCard = ({ task, userId, time }) => {
           task={task}
           userId={userId}
           onClose={() => setOpenSwapModal(false)}
+          onSubmit={handleSwapSubmit}
+        />
+      )}
+
+      {openTurnsModal && (
+        <ViewTurnsModal
+          task={task}
+          userId={userId}
+          onClose={() => setOpenTurnsModal(false)}
         />
       )}
     </>
