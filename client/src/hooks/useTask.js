@@ -1,7 +1,6 @@
 import {
   createRoomTask,
   deleteRoomTask,
-  updateRoomTask,
 } from "@/api/queries/task";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
