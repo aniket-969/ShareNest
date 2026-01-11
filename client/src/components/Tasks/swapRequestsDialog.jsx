@@ -17,14 +17,13 @@ const SwapRequestsDialog = ({
   tasks,
   userId,
   onClose,
-  onRespond, 
 }) => {
 
   const pendingRequests = [];
 
   tasks.forEach((task) => {
     task.swapRequests?.forEach((swap) => {
-      if (swap.status === "pending" && swap.to === userId) {
+      if (swap.status === "pending" && swap.to._id === userId) {
         pendingRequests.push({
           taskId: task._id,
           taskTitle: task.title,
@@ -35,10 +34,10 @@ const SwapRequestsDialog = ({
       }
     });
   });
-
+console.log(pendingRequests)
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg bg-card">
         <DialogHeader>
           <DialogTitle>Swap requests</DialogTitle>
         </DialogHeader>
@@ -65,17 +64,18 @@ const SwapRequestsDialog = ({
                   </AccordionTrigger>
 
                   <AccordionContent>
-                    <div className="mt-2 space-y-2 text-sm">
+                    <p className="px-2 text-muted-foreground">Updated turns if you approve -</p>
+                    <div className="mt-2 space-y-2 text-sm ">
                       <p>
-                        • {req.from.fullName} skips:{" "}
+                        • {req.from.fullName} turn:{" "}
                         <strong>
-                          {new Date(req.dateFrom).toDateString()}
+                          {new Date(req.dateTo).toDateString()}
                         </strong>
                       </p>
                       <p>
-                        • You take:{" "}
+                        • Your turn:{" "}
                         <strong>
-                          {new Date(req.dateTo).toDateString()}
+                          {new Date(req.dateFrom).toDateString()}
                         </strong>
                       </p>
                     </div>
@@ -84,15 +84,14 @@ const SwapRequestsDialog = ({
                       <Button
                         variant="secondary"
                         onClick={() =>
-                          onRespond(req.taskId, "rejected")
+                         {}
                         }
                       >
                         Reject
                       </Button>
 
                       <Button
-                        onClick={() =>
-                          onRespond(req.taskId, "approved")
+                        onClick={() =>{}
                         }
                       >
                         Approve

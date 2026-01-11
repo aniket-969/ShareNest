@@ -3,7 +3,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useParams } from "react-router-dom";
 import { lazy, Suspense, useState, useEffect, useRef, useMemo } from "react";
 import { Label } from "@/components/ui/label";
-import { Search, CirclePlus } from "lucide-react";
+import { Search, CirclePlus, GitPullRequest } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getSocket } from "@/socket";
 import TaskContainer from "@/components/Tasks/TaskContainer";
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import TaskForm from "@/components/form/tasks/TaskForm";
 import { Card } from "@/components/ui/card";
 import FormWrapper from "@/components/ui/formWrapper";
+import SwapRequestsDialog from "@/components/Tasks/swapRequestsDialog";
 const RecurringTaskForm = lazy(
   () => import("@/components/form/tasks/RecurringTaskForm")
 );
@@ -21,6 +22,7 @@ const RecurringTaskForm = lazy(
 const Tasks = () => {
   const { roomId } = useParams();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSwapRequestsOpen, setIsSwapRequestOpen] = useState(false);
 
   const [taskType, setTaskType] = useState("one-time");
 
@@ -67,7 +69,17 @@ const Tasks = () => {
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
   }, [visibleTasks]);
+  // console.log(sortedTasks);
 
+  const swapRequestCount = sortedTasks.reduce((count, task) => {
+    const hasIncomingPendingRequest = task.swapRequests?.some(
+      (req) => req.status === "pending" && req.to?._id === userId
+    );
+
+    return hasIncomingPendingRequest ? count + 1 : count;
+  }, 0);
+
+  // console.log(swapRequestCount);
   if (roomQuery.isLoading) return <Spinner />;
   if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
 
@@ -77,6 +89,10 @@ const Tasks = () => {
         <h2 className="font-bold text-2xl">Tasks</h2>
         {/* icons */}
         <div className="flex gap-3">
+          {swapRequestCount>0 && <Button variant="outline" onClick={()=>setIsSwapRequestOpen(true)}>
+           <GitPullRequest/>
+          </Button>}
+          
           <Button
             className="md:hidden"
             size="icon"
@@ -85,7 +101,7 @@ const Tasks = () => {
           >
             <CirclePlus />
           </Button>
-          <Button 
+          <Button
             size="icon"
             variant="outline"
             onClick={() => setIsSearchOpen(true)}
@@ -101,7 +117,9 @@ const Tasks = () => {
           onClose={() => setIsSearchOpen(false)}
         />
       )}
-
+{isSwapRequestsOpen && (
+  <SwapRequestsDialog tasks={sortedTasks} userId={userId} onClose={()=>setIsSwapRequestOpen(false)}/>
+)}
       <TaskContainer tasks={sortedTasks} participants={participants} />
       {/* Task form */}
       {isFormOpen && (
