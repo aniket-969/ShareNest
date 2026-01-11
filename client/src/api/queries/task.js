@@ -23,5 +23,7 @@ export const createSwitchRequest = async(roomId,taskId,data)=>{
 }
 
 export const createSwitchResponse = async(roomId,taskId,data)=>{
+    console.log(roomId,taskId,data)
+    
     return axiosClient.patch(`/${baseTask}/taskSwitchResponse/${taskId}/${roomId}`,data)
 }
