@@ -15,19 +15,19 @@ import {
   getBaseAssignee,
   startOfDay,
 } from "@/utils/taskHelper";
+import { useTask } from "@/hooks/useTask";
+import { useParams } from "react-router-dom";
 
 const SwapTurnModal = ({ task, userId, onClose }) => {
   const [selectedUser, setSelectedUser] = useState(null);
+  const { roomId } = useParams();
+  const { createSwitchRequestMutation } = useTask(roomId);
+  const [disabledClickMessage, setDisabledClickMessage] = useState(null);
 
-  const today = startOfDay(new Date());
-
-  const blockedUserIds = useMemo(() => {
-    const set = new Set();
-
-    task.swapRequests?.forEach((s) => {
+  const getBlockedReasonMessage = (participantId) => {
+    const swap = task.swapRequests?.find((s) => {
       if (s.status === "pending") {
-        set.add(s.from);
-        set.add(s.to);
+        return s.from === participantId || s.to === participantId;
       }
 
       if (s.status === "approved") {
@@ -36,8 +36,45 @@ const SwapTurnModal = ({ task, userId, onClose }) => {
         );
 
         if (today <= lastDate) {
-          set.add(s.from);
-          set.add(s.to);
+          return s.from === participantId || s.to === participantId;
+        }
+      }
+
+      return false;
+    });
+
+    if (!swap) return null;
+
+    const otherUserId = swap.from === participantId ? swap.to : swap.from;
+
+    const otherUser = task.participants.find((p) => p._id === otherUserId);
+
+    const blockedUser = task.participants.find((p) => p._id === participantId);
+
+    if (!blockedUser || !otherUser) return null;
+
+    return `${blockedUser.fullName} is already involved in a swap with ${otherUser.fullName} for the next turn. Choose someone else.`;
+  };
+
+  const today = startOfDay(new Date());
+
+  const blockedUserIds = useMemo(() => {
+    const set = new Set();
+
+    task.swapRequests?.forEach((s) => {
+      if (s.status === "pending") {
+        set.add(s.from._id);
+        set.add(s.to._id);
+      }
+
+      if (s.status === "approved") {
+        const lastDate = startOfDay(
+          new Date(Math.max(new Date(s.dateFrom), new Date(s.dateTo)))
+        );
+
+        if (today <= lastDate) {
+          set.add(s.from._id);
+          set.add(s.to._id);
         }
       }
     });
@@ -72,12 +109,30 @@ const SwapTurnModal = ({ task, userId, onClose }) => {
   }, [selectedUser, task, today, userId]);
 
   const handleSubmit = () => {
-    console.log("submitting");
-    onClose();
+    if (!selectedUser) return;
+   
+    createSwitchRequestMutation.mutate(
+      {
+        taskId: task._id,
+        data: {
+          requestedTo: selectedUser._id,
+        },
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      }
+    );
   };
 
   const isCurrentUserBlocked = blockedUserIds.has(userId);
 
+if(task._id ==="695a49b552b7e903ea3ace25"){
+  console.log(isCurrentUserBlocked)
+  console.log(blockedUserIds)
+  console.log('sdd')
+}
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -95,7 +150,7 @@ const SwapTurnModal = ({ task, userId, onClose }) => {
         </DialogHeader>
 
         {/* Participants */}
-        <ScrollArea className="w-full rounded-md">
+        <ScrollArea className="w-full rounded-md ">
           <div className="flex w-max gap-4 py-3 px-1">
             {participants.map((p) => {
               const disabled = blockedUserIds.has(p._id);
@@ -103,7 +158,16 @@ const SwapTurnModal = ({ task, userId, onClose }) => {
               return (
                 <div
                   key={p._id}
-                  onClick={() => !disabled && setSelectedUser(p)}
+                  onClick={() => {
+                    if (disabled) {
+                      const msg = getBlockedReasonMessage(p._id);
+                      setDisabledClickMessage(msg);
+                      return;
+                    }
+
+                    setDisabledClickMessage(null);
+                    setSelectedUser(p);
+                  }}
                   className={`shrink-0 flex flex-col items-center ${
                     disabled
                       ? "opacity-40 cursor-not-allowed"
@@ -133,6 +197,11 @@ const SwapTurnModal = ({ task, userId, onClose }) => {
 
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
+        {disabledClickMessage && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {disabledClickMessage}
+          </p>
+        )}
 
         {/* Preview */}
         {preview?.dateFrom && preview?.dateTo && (

@@ -52,5 +52,7 @@ export const useTask = (roomId) => {
   return {
     createTaskMutation,
     deleteTaskMutation,
+    createSwitchRequestMutation,
+    createSwitchResponseMutation
   };
 };

@@ -49,22 +49,7 @@ const TaskContainerCard = ({ task, userId, time }) => {
     deleteTaskMutation.mutate(task._id);
   };
 
-  const handleSwapSubmit = (requestedToUserId) => {
-    createSwitchRequestMutation.mutate(
-      {
-        taskId: task._id,
-        data: {
-          requestedTo: requestedToUserId,
-        },
-      },
-      {
-        onSuccess: () => {
-          setOpenSwapModal(false);
-        },
-      }
-    );
-  };
-
+ 
   return (
     <>
       <Card className="rounded-xl bg-card-muted shadow-lg border-none w-[300px] max-w-full mt-3 ">
@@ -163,7 +148,6 @@ const TaskContainerCard = ({ task, userId, time }) => {
           task={task}
           userId={userId}
           onClose={() => setOpenSwapModal(false)}
-          onSubmit={handleSwapSubmit}
         />
       )}
 
