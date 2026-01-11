@@ -33,7 +33,6 @@ export const JoinRoomForm = () => {
     resolver: zodResolver(addUserRequestSchema),
     defaultValues: {
       groupCode: "",
-      role: "",
     },
   });
 
@@ -55,38 +54,7 @@ export const JoinRoomForm = () => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Join as</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  className="flex gap-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="tenant" id="tenant" />
-                    <label htmlFor="tenant" className="text-sm">
-                      Tenant
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="landlord" id="landlord" />
-                    <label htmlFor="landlord" className="text-sm">
-                      Landlord
-                    </label>
-                  </div>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="">Submit</Button>
       </form>
     </Form>
   );
