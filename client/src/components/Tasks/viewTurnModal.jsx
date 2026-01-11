@@ -53,7 +53,7 @@ const ViewTurnsModal = ({ task, userId, onClose }) => {
           <DialogTitle>Upcoming turns</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[350px] pr-3">
+        <ScrollArea className="max-h-[350px] pr-4">
           <div className="flex flex-col gap-2">
             {upcomingTurns.map((turn, idx) => {
               const isYou = turn.assignee._id === userId;
@@ -80,10 +80,13 @@ const ViewTurnsModal = ({ task, userId, onClose }) => {
                       </AvatarFallback>
                     </Avatar>
                     {/* name */}
-                    <p className="text-sm font-medium">
-                      {turn.assignee.fullName}
+                    <p className="text-sm font-medium flex items-center gap-1 max-w-[200px]">
+                      <span className="truncate ">
+                        {turn?.assignee?.fullName}
+                      </span>
+
                       {isYou && (
-                        <span className="text-xs text-muted-foreground ml-1">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
                           (You)
                         </span>
                       )}
