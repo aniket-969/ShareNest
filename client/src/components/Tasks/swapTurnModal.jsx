@@ -134,8 +134,8 @@ if(task._id ==="695a49b552b7e903ea3ace25"){
   console.log('sdd')
 }
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+    <Dialog open onOpenChange={onClose} >
+      <DialogContent className="max-w-md bg-card">
         <DialogHeader>
           <DialogTitle>Swap your turn</DialogTitle>
           <p className="text-sm text-muted-foreground">
@@ -169,7 +169,7 @@ if(task._id ==="695a49b552b7e903ea3ace25"){
                     setSelectedUser(p);
                   }}
                   className={`shrink-0 flex flex-col items-center ${
-                    disabled
+                    disabled || isCurrentUserBlocked
                       ? "opacity-80 cursor-not-allowed"
                       : "cursor-pointer"
                   } ${

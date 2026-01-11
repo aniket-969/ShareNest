@@ -53,7 +53,7 @@ const ViewTurnsModal = ({ task, userId, onClose }) => {
           <DialogTitle>Upcoming turns</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[350px] pr-4">
+        <ScrollArea className="max-h-[334px] sm:pr-4 pr-1">
           <div className="flex flex-col gap-2">
             {upcomingTurns.map((turn, idx) => {
               const isYou = turn.assignee._id === userId;
