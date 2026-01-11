@@ -48,30 +48,38 @@ const ViewTurnsModal = ({ task, userId, onClose }) => {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg bg-card">
         <DialogHeader>
           <DialogTitle>Upcoming turns</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[350px] pr-2">
-          <div className="flex flex-col gap-3">
+        <ScrollArea className="max-h-[350px] pr-3">
+          <div className="flex flex-col gap-2">
             {upcomingTurns.map((turn, idx) => {
               const isYou = turn.assignee._id === userId;
 
               return (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-4 p-2 rounded-md bg-muted"
+                  className="flex items-center justify-between px-3 py-2 rounded-md bg-card-muted"
                 >
                   {/*  avatar + name */}
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={turn.assignee.avatar} />
-                      <AvatarFallback>
-                        {turn.assignee.fullName[0]}
+                    {/* Avatar */}
+                    <Avatar className="w-8 h-8 rounded-full overflow-visible">
+                      <AvatarImage
+                        className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+                        src={turn.assignee.avatar}
+                      />
+                      <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
+                        <img
+                          src="/altAvatar1.jpg"
+                          alt="fallback"
+                          className="w-full h-full object-cover rounded-full"
+                        />
                       </AvatarFallback>
                     </Avatar>
-
+                    {/* name */}
                     <p className="text-sm font-medium">
                       {turn.assignee.fullName}
                       {isYou && (

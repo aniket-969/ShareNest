@@ -170,7 +170,7 @@ if(task._id ==="695a49b552b7e903ea3ace25"){
                   }}
                   className={`shrink-0 flex flex-col items-center ${
                     disabled
-                      ? "opacity-40 cursor-not-allowed"
+                      ? "opacity-80 cursor-not-allowed"
                       : "cursor-pointer"
                   } ${
                     selectedUser?._id === p._id
@@ -186,7 +186,7 @@ if(task._id ==="695a49b552b7e903ea3ace25"){
                   <p className="text-xs mt-1 whitespace-nowrap">{p.fullName}</p>
 
                   {disabled && (
-                    <p className="text-[10px] text-muted-foreground text-center whitespace-nowrap">
+                    <p className="text-[10px] font-semibold text-muted-foreground text-center whitespace-nowrap ">
                       Already in a swap
                     </p>
                   )}
