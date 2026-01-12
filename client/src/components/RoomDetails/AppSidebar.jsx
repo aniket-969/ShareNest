@@ -86,25 +86,19 @@ const AppSidebar = ({ roomData }) => {
           <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
             {roomData?.description || ""}
           </p>
-         
-            <div className="flex items-center justify-between rounded-md py-2">
-              <span className="text-sm font-mono tracking-wider">
-               Room Code: {roomData?.groupCode}
-              </span>
 
-              <button
-                onClick={() =>
-                  navigator.clipboard.writeText(roomData.groupCode)
-                }
-             className="p-1 rounded hover:bg-white/10 active:bg-white/20 transition"
+          <div className="flex items-center justify-between rounded-md py-2">
+            <span className="text-xs text-muted-foreground">Room Code:</span>
+            <span className="text-sm font-mono font-semibold tracking-widest">96EB99</span>
 
-
-                title="Copy room code"
-              >
-                <Copy size={16} />
-              </button>
-            </div>
-        
+            <button
+              onClick={() => navigator.clipboard.writeText(roomData.groupCode)}
+              className="p-1 rounded hover:bg-white/10 active:bg-white/20 transition"
+              title="Copy room code"
+            >
+              <Copy size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Room Members */}
