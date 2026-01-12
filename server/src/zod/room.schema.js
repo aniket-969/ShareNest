@@ -8,7 +8,6 @@ export const creatRoomSchema = z.object({
 
 export const updateRoomSchema = creatRoomSchema
   .partial()
-  .omit({ role: true });
 
 export const addUserRequestSchema = z.object({
   groupCode: z.string().length(6),

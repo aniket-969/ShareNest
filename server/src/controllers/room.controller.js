@@ -103,7 +103,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
 const createRoom = asyncHandler(async (req, res) => {
   const admin = req.user?._id;
-  const { name, description, role } = req.body;
+  const { name, description } = req.body;
 
   const groupCode = await generateUniqueGroupCode();
   let roomData = {
@@ -113,9 +113,7 @@ const createRoom = asyncHandler(async (req, res) => {
     groupCode,
   };
 
-  if (role === "tenant") {
-    roomData.tenants = [admin];
-  }
+  roomData.tenants = [admin];
 
   const room = await Room.create(roomData);
 
@@ -156,7 +154,7 @@ const updateRoom = asyncHandler(async (req, res) => {
 
 const addUserRequest = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  const { groupCode} = req.body;
+  const { groupCode } = req.body;
 
   const room = await Room.findOne({ groupCode });
 
@@ -177,7 +175,7 @@ const addUserRequest = asyncHandler(async (req, res) => {
       (request) => request.userId.toString() === userId.toString()
     )
   ) {
-    room.pendingRequests.push({ userId, role:"tenant" });
+    room.pendingRequests.push({ userId, role: "tenant" });
     await room.save();
   } else {
     return res.json(new ApiResponse(400, {}, "Request already sent"));

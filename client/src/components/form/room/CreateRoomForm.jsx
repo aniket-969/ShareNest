@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { createRoomSchema } from "@/schema/roomSchema";
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   Form,
@@ -20,18 +20,16 @@ import { useRoom, useRoomMutation } from "@/hooks/useRoom";
 import { toast } from "react-toastify";
 
 export const CreateRoomForm = () => {
-  const {createRoomMutation} = useRoomMutation()
-  const onSubmit = async(values) => {
+  const { createRoomMutation } = useRoomMutation();
+  const onSubmit = async (values) => {
     console.log(values);
     try {
-      const response = await createRoomMutation.mutateAsync(values)
-      console.log(response)
-      toast("Room created successfully")
-        
+      const response = await createRoomMutation.mutateAsync(values);
+      console.log(response);
+      toast("Room created successfully");
     } catch (error) {
-      console.error("Error during registration:", error); 
+      console.error("Error during registration:", error);
     }
-
   };
 
   const form = useForm({
@@ -39,7 +37,6 @@ export const CreateRoomForm = () => {
     defaultValues: {
       name: "",
       description: "",
-      role: "",
     },
   });
 
@@ -71,37 +68,6 @@ export const CreateRoomForm = () => {
                 <Textarea placeholder="Enter room description" {...field} />
               </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Role</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  className="flex gap-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="tenant" id="tenant" />
-                    <label htmlFor="tenant" className="text-sm">
-                      Tenant
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="landlord" id="landlord" />
-                    <label htmlFor="landlord" className="text-sm">
-                      Landlord
-                    </label>
-                  </div>
-                </RadioGroup>
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}
