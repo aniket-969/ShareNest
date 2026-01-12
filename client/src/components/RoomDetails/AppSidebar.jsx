@@ -3,6 +3,7 @@ import {
   Award,
   CalendarDays,
   ClipboardList,
+  Copy,
   Hammer,
   Home,
   Inbox,
@@ -19,29 +20,29 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useParams, Link,useLocation } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 
 const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
 const PendingRequests = lazy(
   () => import("@/components/Sidebar/PendingRequests")
 );
- 
-const AppSidebar = ({roomData})=> {
-  // console.log(roomData)
+
+const AppSidebar = ({ roomData }) => {
+  console.log(roomData);
   const { roomId } = useParams();
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
- const location = useLocation();
+  const location = useLocation();
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
   };
 
   const toggleRequests = () => {
-    console.log(roomData?.pendingRequests)
-    if(roomData?.pendingRequests?.length == 0){
-      setShowMembers(false)
-      return
+    console.log(roomData?.pendingRequests);
+    if (roomData?.pendingRequests?.length == 0) {
+      setShowMembers(false);
+      return;
     }
     setShowRequests(!showRequests);
     if (!showRequests) setShowMembers(false);
@@ -71,20 +72,39 @@ const AppSidebar = ({roomData})=> {
       icon: Settings,
     },
   ];
-  
+
   // console.log("sidebar rendered");
-  
+
   return (
-    <Sidebar >
+    <Sidebar>
       <SidebarContent className="">
         {/* Room Info */}
-        <div className="p-4 border-b ">
+        <div className="p-4 border-b space-y-1">
           <h2 className="text-lg font-bold line-clamp-1">
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
-            {roomData?.description|| ""}
+            {roomData?.description || ""}
           </p>
+         
+            <div className="flex items-center justify-between rounded-md py-2">
+              <span className="text-sm font-mono tracking-wider">
+               Room Code: {roomData?.groupCode}
+              </span>
+
+              <button
+                onClick={() =>
+                  navigator.clipboard.writeText(roomData.groupCode)
+                }
+             className="p-1 rounded hover:bg-white/10 active:bg-white/20 transition"
+
+
+                title="Copy room code"
+              >
+                <Copy size={16} />
+              </button>
+            </div>
+        
         </div>
 
         {/* Room Members */}
@@ -92,7 +112,7 @@ const AppSidebar = ({roomData})=> {
           toggleMembers={toggleMembers}
           showMembers={showMembers}
           tenants={roomData?.tenants}
-          admin = {roomData?.admin}
+          admin={roomData?.admin}
         />
 
         {/* Pending Requests */}
@@ -108,30 +128,36 @@ const AppSidebar = ({roomData})=> {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => 
-              {
-                 const isActive = location.pathname === item.url;
+              {items.map((item) => {
+                const isActive = location.pathname === item.url;
 
-                return(
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title} data-active={isActive}>
-                    <Link
-                      to={item.url}
-                      className="flex items-center space-x-3 px-3 py-2 hover:bg-accent rounded-lg"
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      data-active={isActive}
                     >
-                      <item.icon className="w-5 h-5" />
-                      <span className="text-sm font-medium">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )})}
+                      <Link
+                        to={item.url}
+                        className="flex items-center space-x-3 px-3 py-2 hover:bg-accent rounded-lg"
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span className="text-sm font-medium">
+                          {item.title}
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
-}
+};
 
 const MemoSidebar = React.memo(AppSidebar);
 export { MemoSidebar as AppSidebar };

@@ -38,7 +38,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
   console.log("getting room Data");
 
-  let roomQuery = Room.findById(roomId).select("-groupCode");
+  let roomQuery = Room.findById(roomId);
 
   const populateArr = [
     { path: "tenants", select: "username fullName avatar _id" },
@@ -64,7 +64,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
     { path: "awards" },
     { path: "polls" },
-
+    
     { path: "pendingRequests.userId", select: "username fullName avatar _id" },
   ];
 
