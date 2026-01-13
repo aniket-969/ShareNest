@@ -12,6 +12,7 @@ import SearchOverlay from "@/components/Expense/searchOverlay";
 
 const ExpenseForm = lazy(() => import("@/components/form/ExpenseForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
+const PaymentDetails = lazy(()=> import("@/components/Expense/paymentDetails"))
 
 const RoomExpense = () => {
   const { roomId } = useParams();
@@ -26,7 +27,8 @@ const RoomExpense = () => {
   const participants = [...(data?.tenants || [])];
 
   return (
-    <div className="flex flex-col gap-6 items-center ">
+    <div className="">
+      <div className="flex flex-col gap-6 items-center ">
       {/* Heading and icons*/}
       <div className="flex items-center justify-around w-full ">
         <h2 className="font-bold text-2xl">Expense</h2>
@@ -72,6 +74,9 @@ const RoomExpense = () => {
 
       <ExpenseContainer participants={participants} />
     </div>
+    <PaymentDetails participants={participants}/>
+    </div>
+    
   );
 };
 

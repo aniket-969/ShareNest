@@ -87,7 +87,7 @@ const AppSidebar = ({ roomData }) => {
             {roomData?.description || ""}
           </p>
 
-          <div className="flex items-center justify-between rounded-md py-2">
+          <div className="flex items-center justify-between rounded-md pt-4 ">
             <span className="text-xs text-muted-foreground">Room Code:</span>
             <span className="text-sm font-mono font-semibold tracking-widest">96EB99</span>
 
