@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { QRCarousel } from '@/components/QRCode';
+import { QRCarousel } from "../ui/QRCarousel";
 
 const PaymentDetails = ({ participants }) => {
   const [openUserId, setOpenUserId] = useState(null);
@@ -9,7 +9,10 @@ const PaymentDetails = ({ participants }) => {
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+   
+       
+    <div className="flex flex-col gap-3 justify-center w-full max-w-4xl px-4 mx-auto mb-10">
+       <h3 className="my-3 ml-1 tracking-wide font-semibold text-lg">Payment Details</h3>
       {participants.map((user) => {
         const isOpen = openUserId === user._id;
 
@@ -58,6 +61,8 @@ const PaymentDetails = ({ participants }) => {
         );
       })}
     </div>
+   
+  
   );
 };
 
