@@ -41,7 +41,7 @@ const getRoomData = asyncHandler(async (req, res) => {
   let roomQuery = Room.findById(roomId);
 
   const populateArr = [
-    { path: "tenants", select: "username fullName avatar _id" },
+    { path: "tenants", select: "username fullName avatar _id paymentMethod" },
     { path: "admin", select: "username fullName avatar _id" },
 
     // Tasks
