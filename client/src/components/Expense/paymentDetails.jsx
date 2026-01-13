@@ -1,68 +1,52 @@
-import { useState } from "react";
-import { QRCarousel } from "../ui/QRCarousel";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { QRCarousel } from './../ui/QRCarousel';
 
-const PaymentDetails = ({ participants }) => {
-  const [openUserId, setOpenUserId] = useState(null);
-
-  const toggleAccordion = (userId) => {
-    setOpenUserId((prev) => (prev === userId ? null : userId));
-  };
-
+const PaymentDetails = ({ participants = [] }) => {
   return (
-   
-       
-    <div className="flex flex-col gap-3 justify-center w-full max-w-4xl px-4 mx-auto mb-10">
-       <h3 className="my-3 ml-1 tracking-wide font-semibold text-lg">Payment Details</h3>
-      {participants.map((user) => {
-        const isOpen = openUserId === user._id;
+    <Accordion type="multiple" className="w-full">
+      {participants.map((user) => (
+        <AccordionItem key={user._id} value={user._id}>
+          {/* Accordion Header */}
+          <AccordionTrigger>
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>
+                  {user.fullName?.[0]}
+                </AvatarFallback>
+              </Avatar>
 
-        return (
-          <div
-            key={user._id}
-            className="rounded-lg bg-card border border-border"
-          >
-            {/* Accordion Header */}
-            <button
-              onClick={() => toggleAccordion(user._id)}
-              className="w-full flex items-center justify-between px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <img
-                  src={user.avatar}
-                  alt={user.username}
-                  className="w-8 h-8 rounded-full"
-                />
-                <div className="text-left">
-                  <p className="text-sm font-medium">{user.fullName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    @{user.username}
-                  </p>
-                </div>
+              <div className="text-left">
+                <p className="font-medium">{user.fullName}</p>
+                <p className="text-xs text-muted-foreground">
+                  {user.paymentMethod.length} payment method(s)
+                </p>
               </div>
+            </div>
+          </AccordionTrigger>
 
-              <span className="text-sm text-primary">
-                {isOpen ? "Hide" : "Pay ₹"}
-              </span>
-            </button>
-
-            {/* Accordion Content */}
-            {isOpen && (
-              <div className="px-4 pb-4">
-                {user.paymentMethod?.length > 0 ? (
-                  <QRCarousel paymentMethod={user.paymentMethod} />
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-6">
-                    No payment details added
-                  </p>
-                )}
-              </div>
+          {/* Accordion Content */}
+          <AccordionContent>
+            {user.paymentMethod.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4">
+                No payment methods shared
+              </p>
+            ) : (
+              <QRCarousel
+                paymentMethod={user.paymentMethod}
+                editable={false}   // 👈 read-only carousel
+              />
             )}
-          </div>
-        );
-      })}
-    </div>
-   
-  
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   );
 };
 

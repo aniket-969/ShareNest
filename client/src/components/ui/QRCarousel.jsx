@@ -1,103 +1,68 @@
-import { generateQRCode } from "@/utils/helper";
 import { useEffect, useState } from "react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent } from "./card";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import FormWrapper from "./formWrapper";
-import { PaymentMethodForm } from "../form/PaymentMethodForm";
-import { Spinner } from "./spinner";
-import { Trash2 } from "lucide-react"; // ✅ import the trash icon
+import PaymentMethodCard from "../Expense/paymentMethodCard";
+import FormWrapper from "@/components/ui/formWrapper";
+import PaymentMethodForm from "../form/PaymentMethodForm";
 import { useAuth } from "@/hooks/useAuth";
+import { generateQRCode } from '@/utils/helper';
 
-export const QRCarousel = ({ paymentMethod }) => {
+export const QRCarousel = ({
+  paymentMethod = [],
+  editable = false,
+}) => {
   const { deletePaymentMutation } = useAuth();
-  // console.log(deletePaymentMutation);
-
   const [qrImages, setQrImages] = useState({});
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    const generateAllQRImages = async () => {
+    const generate = async () => {
       const images = {};
-      for (const payment of paymentMethod) {
-        if (payment.qrCodeData) {
-          const qrImage = await generateQRCode(payment.qrCodeData);
-          images[payment._id] = qrImage;
+      for (const p of paymentMethod) {
+        if (p.qrCodeData) {
+          images[p._id] = await generateQRCode(p.qrCodeData);
         }
       }
       setQrImages(images);
     };
-
-    generateAllQRImages();
+    generate();
   }, [paymentMethod]);
 
-  // Delete handler
-  const handleDelete = async (paymentId) => {
-    console.log("Deleting...", paymentId);
-    await deletePaymentMutation.mutateAsync({ paymentId });
-  };
-
-  // Preparing items for carousel
-  const totalPaymentMethods = paymentMethod.length;
   const items = [...paymentMethod];
 
-  if (totalPaymentMethods < 3) {
-    const numAddButtons = 3 - totalPaymentMethods;
-    for (let i = 0; i < numAddButtons; i++) {
-      items.push({ _id: `add-${i}` }); // dummy ID
+  // 👉 Add button only for self
+  if (editable) {
+    while (items.length < 3) {
+      items.push({ _id: `add-${items.length}`, isAdd: true });
     }
   }
 
+  const handleDelete = async (paymentId) => {
+    if (!editable) return;
+    await deletePaymentMutation.mutateAsync({ paymentId });
+  };
+
   return (
     <div className="flex flex-col items-center">
-      <Carousel className="w-full max-w-[14rem] md:max-w-[20rem] sm:max-w-[15rem] ">
+      <Carousel className="w-full max-w-sm">
         <CarouselContent>
-          {items.map((payment, index) => (
-            <CarouselItem key={payment._id}>
-              <Card className="h-full bg-card relative group">
-                {payment.appName && (
-                  <button
-                    onClick={() => handleDelete(payment._id)}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-5 h-5 text-muted-foreground hover:text-destructive" />
-                  </button>
-                )}
-
-                <CardContent className="flex flex-col items-center justify-center h-full font-semibold text-sm md:text-xl sm:text-base sm:gap-2 pt-2 ">
-                  {payment.appName ? (
-                    <>
-                      <p className="font-semibold text-xl">{payment.appName}</p>
-                      <p className="text-gray-600 mb-2">{payment.type}</p>
-                      {qrImages[payment._id] ? (
-                        <img
-                          src={qrImages[payment._id]}
-                          alt={`QR Code for ${payment.appName}`}
-                          className="w-auto object-contain"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-32">
-                          <Spinner size="sm" />
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-lg mb-4">Add Payment Method</p>
-                      <Button onClick={() => setShowForm(true)}>
-                        Add Payment
-                      </Button>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+          {items.map((item) => (
+            <CarouselItem key={item._id}>
+              {item.isAdd ? (
+                <Button
+                  className="w-full h-full"
+                  onClick={() => setShowForm(true)}
+                >
+                  Add Payment Method
+                </Button>
+              ) : (
+                <PaymentMethodCard
+                  payment={item}
+                  qrImage={qrImages[item._id]}
+                  editable={editable}
+                  onDelete={handleDelete}
+                />
+              )}
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -106,8 +71,7 @@ export const QRCarousel = ({ paymentMethod }) => {
         <CarouselNext />
       </Carousel>
 
-      {/* Popup Form to Add Payment */}
-      {showForm && (
+      {editable && showForm && (
         <FormWrapper onClose={() => setShowForm(false)}>
           <PaymentMethodForm />
         </FormWrapper>
