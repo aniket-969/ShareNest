@@ -74,7 +74,7 @@ const RoomExpense = () => {
 
       <ExpenseContainer participants={participants} />
     </div>
-    <PaymentDetails participants={participants}/>
+    <PaymentDetails participants={participants} userId={userId}/>
     </div>
     
   );

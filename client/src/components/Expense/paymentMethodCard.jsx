@@ -1,3 +1,6 @@
+import { Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+
 const PaymentMethodCard = ({
   payment,
   qrImage,
@@ -30,11 +33,11 @@ const PaymentMethodCard = ({
             {payment.paymentId}
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground">
-            No payment details
-          </p>
+          <p className="text-xs text-muted-foreground">No payment details</p>
         )}
       </CardContent>
     </Card>
   );
 };
+
+export default PaymentMethodCard;

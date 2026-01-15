@@ -37,14 +37,14 @@ const ExpenseCard = ({ expense, userId,roomId }) => {
   return (
     <Card className="rounded-xl w-[280px] bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
-      <CardHeader className="px-6 text-center">
-        <CardTitle className="text-base tracking-wide font-semibold text-gray-100">
+      <CardHeader className="px-6 text-center py-4">
+        <CardTitle className="text-base tracking-wide font-semibold text-gray-100 ">
           Requested for - {title}
         </CardTitle>
       </CardHeader>
 
       {/* ───── Card Content ───── */}
-      <CardContent className="space-y-2">
+      <CardContent className="space-y-2 ">
         {/* amount owed */}
         <span className="text-2xl font-medium text-gray-100 ">
           {symbol}
@@ -52,7 +52,7 @@ const ExpenseCard = ({ expense, userId,roomId }) => {
         </span>
 
         {/* Grouped avatars */}
-        <div className="flex -space-x-2">
+        <div className="flex -space-x-2 ">
           {participantAvatars.slice(0, 3).map((img, idx) => (
             <Avatar key={idx} className="w-7 h-7 rounded-full overflow-visible">
               <AvatarImage

@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import PaymentMethodCard from "../Expense/paymentMethodCard";
 import FormWrapper from "@/components/ui/formWrapper";
 import PaymentMethodForm from "../form/PaymentMethodForm";
 import { useAuth } from "@/hooks/useAuth";
-import { generateQRCode } from '@/utils/helper';
+import { generateQRCode } from "@/utils/helper";
 
 export const QRCarousel = ({
   paymentMethod = [],
@@ -30,7 +36,7 @@ export const QRCarousel = ({
 
   const items = [...paymentMethod];
 
-  // 👉 Add button only for self
+  // 👇 only self gets add slides
   if (editable) {
     while (items.length < 3) {
       items.push({ _id: `add-${items.length}`, isAdd: true });
@@ -47,7 +53,7 @@ export const QRCarousel = ({
       <Carousel className="w-full max-w-sm">
         <CarouselContent>
           {items.map((item) => (
-            <CarouselItem key={item._id}>
+            <CarouselItem key={item._id} className="h-full">
               {item.isAdd ? (
                 <Button
                   className="w-full h-full"
