@@ -53,7 +53,7 @@ router
   .patch(verifyJWT,validate(changePasswordSchema), changePassword);
 router
   .route("/me/payments")
-  .patch(validate(paymentMethodSchema), verifyJWT, validateQRCodeData,addPaymentMethod);
+  .patch(validate(paymentMethodSchema), verifyJWT, addPaymentMethod);
   router
   .route("/me/payments/:paymentId")
   .delete(verifyJWT, deletePaymentMethod);

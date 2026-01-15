@@ -69,7 +69,6 @@ const userSchema = new Schema(
         },
         type: {
           type: String,
-          enum: ['UPI', 'PayPal', 'Stripe', 'BankTransfer', 'Other']
         },
         qrCodeData: {
           type: String, 

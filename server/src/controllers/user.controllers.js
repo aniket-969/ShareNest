@@ -327,22 +327,13 @@ const addPaymentMethod = asyncHandler(async (req, res) => {
   const user = await User.findById(userId);
   if (!user) throw new ApiError(400, "can't find the user");
 
-  const paymentMethodExists = user.paymentMethod.some(
-    (existingMethod) =>
-      existingMethod.appName === appName && existingMethod.type === type
-  );
-
-  if (paymentMethodExists) {
-    throw new ApiError(409, "Payment method already exists");
-  }
-
   const method = {
     appName: appName || null,
     type: type || null,
     qrCodeData: qrCodeData || null,
     paymentId: paymentId || null,
   };
-
+console.log(method,"Here ismethod")
   user.paymentMethod.push(method);
   await user.save();
   return res

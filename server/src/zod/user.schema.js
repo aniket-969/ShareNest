@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { objectIdValidation, stringValidation } from "./customValidator.js";
+import { objectIdValidation, stringValidation,optionalStringValidation } from "./customValidator.js";
 
 const passwordSchema = z
   .string()
@@ -49,25 +49,15 @@ export const updateUserSchema = z.object({
 
 export const paymentMethodSchema = z
   .object({
-    appName: stringValidation(1, 100, "App name is required").optional(),
-    paymentId: stringValidation(1, 100, "Payment ID is required").optional(),
-    type: z
-      .enum([
-        "UPI",
-        "PayPal",
-        "Stripe",
-        "BankTransfer",
-        "ApplePay",
-        "CashApp",
-        "WeChatPay",
-      ])
-      .optional(),
-    qrCodeData: z
-      .string()
-      .min(1, "qrCodeData should be at least 1 character long")
-      .optional(),
+    appName: optionalStringValidation(1, 100, "App name"),
+    paymentId: optionalStringValidation(1, 100, "Payment ID"),
+    type:optionalStringValidation(1,50,"Payment Type"),
+    qrCodeData: optionalStringValidation(1, 100, "QrCodeData"),
   })
-  .refine((data) => data.paymentId || data.qrCodeData, {
-    message: "Either paymentId or qrCodeData is required",
-    path: ["paymentId", "qrCodeData"],
-  });
+  .refine(
+    (data) => data.paymentId || data.qrCodeData,
+    {
+      message: "Either paymentId or qrCode is required",
+      path: ["paymentId"],
+    }
+  );

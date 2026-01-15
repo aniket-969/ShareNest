@@ -1,30 +1,5 @@
 import { z } from "zod";
-import { stringValidation } from "./../utils/validation";
-
-const MAX_IMAGE_SIZE = 1 * 1024 * 1024;
-
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png"];
-
-const imageValidation = z
-  .instanceof(File)
-  .refine(
-    (file) => {
-      return ALLOWED_IMAGE_TYPES.includes(file.type);
-    },
-    {
-      message: "Invalid file type. Only JPEG and PNG are allowed.",
-    }
-  )
-  .refine(
-    (file) => {
-      return file.size <= MAX_IMAGE_SIZE;
-    },
-    {
-      message: `File size should be less than ${
-        MAX_IMAGE_SIZE / 1024 / 1024
-      } MB.`,
-    }
-  );
+import { stringValidation,optionalStringValidation } from "./../utils/validation";
 
 const passwordSchema = z
   .string()
@@ -65,8 +40,8 @@ export const changePasswordSchema = z
   });
 
 export const updateUserSchema = z.object({
-  username: stringValidation(1, 20, "username").optional(),
-  fullName: stringValidation(1, 20, "fullName").optional(),
+  username: optionalStringValidation(1, 20, "username"),
+  fullName: optionalStringValidation(1, 20, "fullName"),
   avatar: z
     .string()
     .url("Avatar must be a valid URL")
@@ -79,22 +54,15 @@ export const updateUserSchema = z.object({
 
 export const paymentMethodSchema = z
   .object({
-    appName: stringValidation(1, 100, "App name is required").optional(),
-    paymentId: stringValidation(1, 100, "Payment ID is required").optional(),
-    type: z
-      .enum([
-        "UPI",
-        "PayPal",
-        "Stripe",
-        "BankTransfer",
-        "ApplePay",
-        "CashApp",
-        "WeChatPay",
-      ])
-      .optional(),
-      qrCodeData:  stringValidation(1, 100, "qrData is required").optional(),
+    appName: optionalStringValidation(1, 100, "App name"),
+    paymentId: optionalStringValidation(1, 100, "Payment ID"),
+    type:optionalStringValidation(1,50,"Payment Type"),
+    qrCodeData: optionalStringValidation(1, 100, "QrCodeData"),
   })
-  .refine((data) => data.paymentId || data.qrData, {
-    message: "Either paymentId or qrCode is required",
-    path: ["paymentId", "qrCodeData"],
-  });
+  .refine(
+    (data) => data.paymentId || data.qrCodeData,
+    {
+      message: "Either paymentId or qrCode is required",
+      path: ["paymentId"],
+    }
+  );
