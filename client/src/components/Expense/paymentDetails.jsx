@@ -9,7 +9,10 @@ import { QRCarousel } from "../ui/QRCarousel";
 
 const PaymentDetails = ({ participants = [], userId }) => {
   return (
-    <Accordion className="w-full max-w-4xl mx-auto px-5">
+    <div className="w-full max-w-4xl mx-auto px-5">
+      <h3 className="font-semibold tracking-wide text-xl my-8">Payment Details</h3>
+   
+    <Accordion >
       {participants.map((user) => {
         const isSelf = user._id === userId; 
 
@@ -17,12 +20,12 @@ const PaymentDetails = ({ participants = [], userId }) => {
           <AccordionItem key={user._id} className="" value={user._id}>
             <AccordionTrigger>
               <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback>
-                    {user.fullName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
+                 <Avatar className="w-[30px] h-[30px]">
+          <AvatarImage src={user?.avatar} alt={user?.fullName} />
+          <AvatarFallback>
+            <img src="/altAvatar1.jpg" alt="fallback avatar" />
+          </AvatarFallback>
+        </Avatar>
 
                 <div className="text-left">
                   <p className="font-medium">
@@ -56,7 +59,8 @@ const PaymentDetails = ({ participants = [], userId }) => {
           </AccordionItem>
         );
       })}
-    </Accordion>
+    </Accordion> 
+    </div>
   );
 };
 

@@ -20,7 +20,7 @@ export default function QRScanner() {
       {data?.paymentMethod?.length > 0 ? (
         <>
           {/* <PaymentMethod /> */}
-          <QRCarousel paymentMethod={data?.paymentMethod} />
+          <QRCarousel paymentMethod={data?.paymentMethod} editable={true}/>
         </>
       ) : (
         <PaymentMethod />
