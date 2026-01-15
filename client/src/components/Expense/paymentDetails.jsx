@@ -9,12 +9,12 @@ import { QRCarousel } from "../ui/QRCarousel";
 
 const PaymentDetails = ({ participants = [], userId }) => {
   return (
-    <Accordion className="w-full">
+    <Accordion className="w-full max-w-4xl mx-auto px-5">
       {participants.map((user) => {
         const isSelf = user._id === userId; 
 
         return (
-          <AccordionItem key={user._id} value={user._id}>
+          <AccordionItem key={user._id} className="" value={user._id}>
             <AccordionTrigger>
               <div className="flex items-center gap-3">
                 <Avatar>
@@ -41,10 +41,7 @@ const PaymentDetails = ({ participants = [], userId }) => {
             </AccordionTrigger>
 
             <AccordionContent>
-              {/* 
-                If NOT self AND no payments → show text
-                If self → always show carousel (so add slides appear)
-              */}
+             
               {!isSelf && user.paymentMethod.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4">
                   No payment methods shared
@@ -52,7 +49,7 @@ const PaymentDetails = ({ participants = [], userId }) => {
               ) : (
                 <QRCarousel
                   paymentMethod={user.paymentMethod}
-                  editable={isSelf}   // 👈 KEY LINE
+                  editable={isSelf}   
                 />
               )}
             </AccordionContent>
