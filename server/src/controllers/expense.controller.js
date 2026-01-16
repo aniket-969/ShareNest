@@ -201,7 +201,7 @@ const getExpenses = asyncHandler(async (req, res) => {
     const participantAvatars = participants
       .filter((p) => p.avatar)
       .map((p) => ({
-        _id: p._id ? String(p._id) : null,
+        _id: p._id ||p.id,
         fullName: p.fullName || "",
         avatar: p.avatar,
       }));
