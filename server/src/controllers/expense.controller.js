@@ -201,7 +201,7 @@ const getExpenses = asyncHandler(async (req, res) => {
     const participantAvatars = participants
       .filter((p) => p.avatar)
       .map((p) => ({
-        _id: p._id ||p.id,
+        _id: p._id || p.id,
         fullName: p.fullName || "",
         avatar: p.avatar,
       }));
@@ -244,6 +244,7 @@ const deleteExpense = asyncHandler(async (req, res) => {
   const userId = req.user._id.toString();
 
   const expense = await Expense.findById(expenseId);
+
   if (!expense || expense.isDeleted) {
     throw new ApiError(404, "Expense not found");
   }
@@ -252,11 +253,18 @@ const deleteExpense = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not allowed to delete this expense");
   }
 
-  const updated = await Expense.findByIdAndUpdate(
-    expenseId,
-    { isDeleted: true },
-    { new: true }
-  );
+  const someonePaid = expense.participants.some((p) => p.hasPaid === true);
+
+  if (someonePaid) {
+    throw new ApiError(
+      400,
+      "Cannot delete expense after payment has been made"
+    );
+  }
+
+  // Soft delete
+  expense.isDeleted = true;
+  await expense.save();
 
   emitSocketEvent(
     req,
