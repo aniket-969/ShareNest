@@ -92,20 +92,27 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
 
         {/* Grouped avatars */}
         <div className="flex -space-x-2 ">
-          {participantAvatars.slice(0, 3).map((img, idx) => (
-            <Avatar key={idx} className="w-7 h-7 rounded-full overflow-visible">
-              <AvatarImage
-                className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-                src={img}
-              />
-              <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
-                <img
-                  src="/altAvatar1.jpg"
-                  alt="fallback"
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </AvatarFallback>
-            </Avatar>
+          {participantAvatars.map((participant) => (
+           <Tooltip key={participant._id}>
+                <TooltipTrigger asChild>
+                  <Avatar className="w-7 h-7 rounded-full overflow-visible">
+                    <AvatarImage
+                      className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+                      src={participant?.avatar}
+                    />
+                    <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
+                      <img
+                        src="/altAvatar1.jpg"
+                        alt="fallback"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    </AvatarFallback>
+                  </Avatar>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{participant?.fullName}</p>
+                </TooltipContent>
+              </Tooltip>
           ))}
         </div>
 
