@@ -43,6 +43,8 @@ export const createExpense = async (data, roomId) => {
 };
 
 export const deleteExpense = async (expenseId) => {
+  console.log(expenseId)
+  // return
   return axiosClient.delete(`/${baseExpense}/${expenseId}`);
 };
 

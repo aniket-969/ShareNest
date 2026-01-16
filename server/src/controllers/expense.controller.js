@@ -244,7 +244,7 @@ const deleteExpense = asyncHandler(async (req, res) => {
   const userId = req.user._id.toString();
 
   const expense = await Expense.findById(expenseId);
-
+  console.log(expense);
   if (!expense || expense.isDeleted) {
     throw new ApiError(404, "Expense not found");
   }
@@ -252,10 +252,12 @@ const deleteExpense = asyncHandler(async (req, res) => {
   if (String(expense.paidBy.id) !== userId) {
     throw new ApiError(403, "You are not allowed to delete this expense");
   }
+  const participantPaid = expense.participants.some(
+    (p) => p.hasPaid === true && String(p.id) !== String(expense.paidBy.id)
+  );
 
-  const someonePaid = expense.participants.some((p) => p.hasPaid === true);
-
-  if (someonePaid) {
+  // console.log(someonePaid, "someone paid");
+  if (participantPaid) {
     throw new ApiError(
       400,
       "Cannot delete expense after payment has been made"

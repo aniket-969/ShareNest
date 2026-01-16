@@ -22,7 +22,7 @@ export const useExpense = (roomId) => {
     mutationFn: ({ owedToUserId, data }) =>
       settleAllExpense(roomId, owedToUserId, data),
   });
-
+ 
   const updateExpenseMutation = useMutation({
     mutationFn: ({ expenseId, updatedData }) =>
       updateExpense(expenseId, updatedData),

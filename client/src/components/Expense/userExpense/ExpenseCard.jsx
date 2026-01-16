@@ -21,6 +21,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import { useExpense } from "@/hooks/useExpense";
+import { useParams } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -38,6 +41,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
     currency = "INR",
     paidBy,
   } = expense;
+
   const [menuOpen, setMenuOpen] = useState(false);
   const totalParticipants = paidCount + unpaidCount;
   const progressValue = totalParticipants
@@ -46,13 +50,26 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
 
   const symbol = currency === "INR" ? "₹" : "";
   const showActions = paidBy.id == userId;
+  const { updateExpenseMutation, deleteExpenseMutation } = useExpense(roomId);
 
+  const handleDelete = () => {
+    
+    deleteExpenseMutation.mutate(expense._id);
+  };
+  const handleEdit = ()=>{
+    console.log(expense._id)
+    // updateExpenseMutation.mutate()
+  }
+  // console.log(participantAvatars)
   // console.log(paidBy, userId);
+  // console.log(expense)
   return (
     <Card className="rounded-xl w-[280px] bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-6 text-center py-4">
-        <CardTitle className={`text-base tracking-wide font-semibold text-gray-100 flex ${showActions?"justify-between":"justify-center"}`}>
+        <CardTitle
+          className={`text-base tracking-wide font-semibold text-gray-100 flex ${showActions ? "justify-between" : "justify-center"}`}
+        >
           <p>{title}</p>
 
           {showActions && (
@@ -71,7 +88,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={() => {
-                    handleDelete();
+                    handleEdit();
                   }}
                 >
                   Edit
@@ -93,26 +110,26 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
         {/* Grouped avatars */}
         <div className="flex -space-x-2 ">
           {participantAvatars.map((participant) => (
-           <Tooltip key={participant._id}>
-                <TooltipTrigger asChild>
-                  <Avatar className="w-7 h-7 rounded-full overflow-visible">
-                    <AvatarImage
-                      className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
-                      src={participant?.avatar}
+            <Tooltip key={participant._id}>
+              <TooltipTrigger asChild>
+                <Avatar className="w-7 h-7 rounded-full overflow-visible">
+                  <AvatarImage
+                    className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full"
+                    src={participant?.avatar}
+                  />
+                  <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
+                    <img
+                      src="/altAvatar1.jpg"
+                      alt="fallback"
+                      className="w-full h-full object-cover rounded-full"
                     />
-                    <AvatarFallback className="ring-2 ring-card-muted ring-offset-1 ring-offset-card-muted rounded-full">
-                      <img
-                        src="/altAvatar1.jpg"
-                        alt="fallback"
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    </AvatarFallback>
-                  </Avatar>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{participant?.fullName}</p>
-                </TooltipContent>
-              </Tooltip>
+                  </AvatarFallback>
+                </Avatar>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{participant?.fullName}</p>
+              </TooltipContent>
+            </Tooltip>
           ))}
         </div>
 
