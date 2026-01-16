@@ -59,6 +59,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
     deleteExpenseMutation.mutate(expense._id);
   };
   const handleEdit = () => {
+    setMenuOpen(false)
     setEditOpen(true);
   };
   const handleSaveTitle = (newTitle) => {
@@ -171,6 +172,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
           </div>
         )}
       </CardFooter>
+      
       <EditExpenseTitleDialog
   open={editOpen}
   onClose={setEditOpen}

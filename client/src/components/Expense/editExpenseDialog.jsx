@@ -24,7 +24,7 @@ const EditExpenseTitleDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(value) => onClose(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit expense title</DialogTitle>
@@ -38,9 +38,10 @@ const EditExpenseTitleDialog = ({
         />
 
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={() => onClose(false)}>
             Cancel
           </Button>
+
           <Button onClick={handleSubmit} disabled={isLoading}>
             Save
           </Button>
