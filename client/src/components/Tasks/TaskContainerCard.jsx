@@ -37,7 +37,7 @@ const TaskContainerCard = ({ task, userId, time }) => {
     (p) => p._id === userId
   );
   const isRecurringTask = task?.recurrence?.enabled === true;
-
+ 
   const showActions = isCreator || isParticipant;
 
   const {
