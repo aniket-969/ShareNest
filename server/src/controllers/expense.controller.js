@@ -199,8 +199,12 @@ const getExpenses = asyncHandler(async (req, res) => {
     const participants = exp.participants || [];
 
     const participantAvatars = participants
-      .map((p) => p.avatar)
-      .filter(Boolean);
+      .filter((p) => p.avatar)
+      .map((p) => ({
+        _id: p._id ? String(p._id) : null,
+        fullName: p.fullName || "",
+        avatar: p.avatar,
+      }));
 
     const paidCount = participants.filter((p) => p.hasPaid).length;
     const unpaidCount = participants.length - paidCount;
@@ -298,8 +302,8 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
         paidBy: 1,
         participants: 1,
         updatedAt: 1,
-        currency: 1
-      }
+        currency: 1,
+      },
     },
 
     {
@@ -309,8 +313,8 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
             $match: {
               "paidBy.id": currentUserObjId,
               "participants.id": { $ne: currentUserObjId },
-              "participants.hasPaid": false
-            }
+              "participants.hasPaid": false,
+            },
           },
           {
             $group: {
@@ -319,9 +323,9 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
               lastActivityAt: { $max: "$updatedAt" },
               fullName: { $first: "$participants.fullName" },
               username: { $first: "$participants.username" },
-              avatar: { $first: "$participants.avatar" }
-            }
-          }
+              avatar: { $first: "$participants.avatar" },
+            },
+          },
         ],
 
         youOweThem: [
@@ -329,8 +333,8 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
             $match: {
               "participants.id": currentUserObjId,
               "paidBy.id": { $ne: currentUserObjId },
-              "participants.hasPaid": false
-            }
+              "participants.hasPaid": false,
+            },
           },
           {
             $group: {
@@ -339,14 +343,14 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
               lastActivityAt: { $max: "$updatedAt" },
               fullName: { $first: "$paidBy.fullName" },
               username: { $first: "$paidBy.username" },
-              avatar: { $first: "$paidBy.avatar" }
-            }
-          }
+              avatar: { $first: "$paidBy.avatar" },
+            },
+          },
         ],
 
-        currency: [{ $limit: 1 }, { $project: { currency: 1 } }]
-      }
-    }
+        currency: [{ $limit: 1 }, { $project: { currency: 1 } }],
+      },
+    },
   ];
 
   const agg = await coll.aggregate(pipeline).toArray();
@@ -365,10 +369,10 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
         id,
         fullName: row.fullName,
         username: row.username,
-        avatar: row.avatar
+        avatar: row.avatar,
       },
       netAmount: (map.get(id)?.netAmount || 0) + Number(row.amount || 0),
-      lastActivityAt: row.lastActivityAt
+      lastActivityAt: row.lastActivityAt,
     });
   }
 
@@ -382,45 +386,40 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
         id,
         fullName: row.fullName,
         username: row.username,
-        avatar: row.avatar
+        avatar: row.avatar,
       },
       netAmount: (prev?.netAmount || 0) - Number(row.amount || 0),
-      lastActivityAt: prev?.lastActivityAt || row.lastActivityAt
+      lastActivityAt: prev?.lastActivityAt || row.lastActivityAt,
     });
   }
 
-  const balances = Array.from(map.values()).filter(b => b.netAmount !== 0);
+  const balances = Array.from(map.values()).filter((b) => b.netAmount !== 0);
 
   const owedToYou = balances
-    .filter(b => b.netAmount > 0)
-    .map(b => ({
+    .filter((b) => b.netAmount > 0)
+    .map((b) => ({
       participantId: b.participantId,
       amount: Number(b.netAmount.toFixed(2)),
       lastActivityAt: b.lastActivityAt,
-      user: b.user
+      user: b.user,
     }));
 
   const youOwed = balances
-    .filter(b => b.netAmount < 0)
-    .map(b => ({
+    .filter((b) => b.netAmount < 0)
+    .map((b) => ({
       participantId: b.participantId,
       amount: Number(Math.abs(b.netAmount).toFixed(2)),
       lastActivityAt: b.lastActivityAt,
-      user: b.user
+      user: b.user,
     }));
 
   const totalOwedToMe = Number(
     owedToYou.reduce((s, r) => s + r.amount, 0).toFixed(2)
   );
 
-  const totalOwe = Number(
-    youOwed.reduce((s, r) => s + r.amount, 0).toFixed(2)
-  );
+  const totalOwe = Number(youOwed.reduce((s, r) => s + r.amount, 0).toFixed(2));
 
-  const currency =
-    room.currency ||
-    (result.currency?.[0]?.currency) ||
-    "INR";
+  const currency = room.currency || result.currency?.[0]?.currency || "INR";
 
   const payload = {
     roomId,
@@ -428,14 +427,13 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
     youOwed,
     owedToYou,
     totalOwedToMe,
-    totalOwe
+    totalOwe,
   };
 
   return res.json(
     new ApiResponse(200, payload, "settle-up drawer data fetched successfully")
   );
 });
-
 
 const updatePayment = asyncHandler(async (req, res) => {
   const userId = req.user._id;
