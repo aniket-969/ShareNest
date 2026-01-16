@@ -29,6 +29,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import EditExpenseTitleDialog from "../editExpenseDialog";
 
 const ExpenseCard = ({ expense, userId, roomId }) => {
   const {
@@ -43,6 +44,8 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   } = expense;
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
   const totalParticipants = paidCount + unpaidCount;
   const progressValue = totalParticipants
     ? (paidCount / totalParticipants) * 100
@@ -53,13 +56,25 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   const { updateExpenseMutation, deleteExpenseMutation } = useExpense(roomId);
 
   const handleDelete = () => {
-    
     deleteExpenseMutation.mutate(expense._id);
   };
-  const handleEdit = ()=>{
-    console.log(expense._id)
-    // updateExpenseMutation.mutate()
-  }
+  const handleEdit = () => {
+    setEditOpen(true);
+  };
+  const handleSaveTitle = (newTitle) => {
+    updateExpenseMutation.mutate(
+      {
+        expenseId: expense._id,
+        updatedData: { title: newTitle },
+      },
+      {
+        onSuccess: () => {
+          setEditOpen(false);
+        },
+      }
+    );
+  };
+
   // console.log(participantAvatars)
   // console.log(paidBy, userId);
   // console.log(expense)
@@ -156,6 +171,14 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
           </div>
         )}
       </CardFooter>
+      <EditExpenseTitleDialog
+  open={editOpen}
+  onClose={setEditOpen}
+  expense={expense}
+  onSave={handleSaveTitle}
+  isLoading={updateExpenseMutation.isLoading}
+/>
+
     </Card>
   );
 };

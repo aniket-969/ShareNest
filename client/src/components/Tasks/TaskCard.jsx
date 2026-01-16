@@ -20,7 +20,7 @@ const TaskCard = ({ scheduledTasks }) => {
             <ul className="space-y-2 ">
               {scheduledTasks.map((task) => (
                 <li
-                  key={task?._id}
+                  key={task?.id}
                   className="p-3 rounded-xl bg-card-muted transition "
                 >
                   <p className="font-semibold text-primary text-sm">
