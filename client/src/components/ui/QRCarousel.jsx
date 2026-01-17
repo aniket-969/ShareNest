@@ -49,12 +49,13 @@ export const QRCarousel = ({
 
   return (
     <div className="flex flex-col items-center ">
-      <Carousel className="w-full max-w-sm ">
+      <Carousel className="w-full max-w-[12rem] md:max-w-[20rem] sm:max-w-[15rem] ">
         <CarouselContent className="">
           {items.map((item) => (
-            <CarouselItem key={item._id} className="h-full">
+            <CarouselItem key={item._id} className="h-full ">
+              {/* add payment method */}
               {item.isAdd ? (
-                <div className=" h-[270px] flex items-center justify-center bg-card">
+                <div className=" h-[270px] flex items-center justify-center bg-card ">
                    <Button variant=""
                   className=""
                   onClick={() => setShowForm(true)}
