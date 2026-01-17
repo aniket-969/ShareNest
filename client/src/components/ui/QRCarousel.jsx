@@ -36,7 +36,6 @@ export const QRCarousel = ({
 
   const items = [...paymentMethod];
 
-  // 👇 only self gets add slides
   if (editable) {
     while (items.length < 3) {
       items.push({ _id: `add-${items.length}`, isAdd: true });
