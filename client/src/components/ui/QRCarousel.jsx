@@ -52,7 +52,7 @@ export const QRCarousel = ({
       <Carousel className="w-full max-w-[12rem] md:max-w-[20rem] sm:max-w-[15rem] ">
         <CarouselContent className="">
           {items.map((item) => (
-            <CarouselItem key={item._id} className="h-full ">
+            <CarouselItem key={item._id} className="">
               {/* add payment method */}
               {item.isAdd ? (
                 <div className=" h-[270px] flex items-center justify-center bg-card ">

@@ -8,7 +8,7 @@ const PaymentMethodCard = ({
   onDelete,
 }) => {
   return (
-    <Card className="relative group bg-card w-full h-full ">
+    <Card className="relative group bg-card w-full h-[270px]">
       {editable && (
         <button
           onClick={() => onDelete(payment._id)}
@@ -29,7 +29,7 @@ const PaymentMethodCard = ({
             className="w-40 h-40 object-contain"
           />
         ) : payment.paymentId ? (
-          <p className="text-xs break-all text-center mt-2">
+          <p className="text-xs break-all text-center">
             {payment.paymentId}
           </p>
         ) : (
