@@ -53,15 +53,25 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
 
   const symbol = currency === "INR" ? "₹" : "";
   const showActions = paidBy.id == userId;
+  const isCreator = paidBy.id === userId;
+
+  const someoneElsePaid = expense.participants?.some(
+    (p) => p.hasPaid === true && String(p.id) !== String(paidBy.id)
+  );
+
+  const canDelete = isCreator && !someoneElsePaid;
+
   const { updateExpenseMutation, deleteExpenseMutation } = useExpense(roomId);
 
   const handleDelete = () => {
     deleteExpenseMutation.mutate(expense._id);
   };
+
   const handleEdit = () => {
-    setMenuOpen(false)
+    setMenuOpen(false);
     setEditOpen(true);
   };
+  
   const handleSaveTitle = (newTitle) => {
     updateExpenseMutation.mutate(
       {
@@ -95,13 +105,30 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="border-none">
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleDelete();
-                  }}
-                >
-                  Delete
-                </DropdownMenuItem>
+                {canDelete ? (
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      setMenuOpen(false);
+                      handleDelete();
+                    }}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                     
+                      <span className="block cursor-not-allowed">
+                        <DropdownMenuItem disabled>Delete</DropdownMenuItem>
+                      </span>
+                    </TooltipTrigger>
+
+                    <TooltipContent>
+                      Can’t delete after someone has paid
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+
                 <DropdownMenuItem
                   onSelect={() => {
                     handleEdit();
@@ -172,15 +199,14 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
           </div>
         )}
       </CardFooter>
-      
-      <EditExpenseTitleDialog
-  open={editOpen}
-  onClose={setEditOpen}
-  expense={expense}
-  onSave={handleSaveTitle}
-  isLoading={updateExpenseMutation.isLoading}
-/>
 
+      <EditExpenseTitleDialog
+        open={editOpen}
+        onClose={setEditOpen}
+        expense={expense}
+        onSave={handleSaveTitle}
+        isLoading={updateExpenseMutation.isLoading}
+      />
     </Card>
   );
 };
