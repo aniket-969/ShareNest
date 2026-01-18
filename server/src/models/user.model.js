@@ -32,6 +32,7 @@ const userSchema = new Schema(
       required: function(){
         return this.provider === "local"
       },
+      select:false
     },
     provider:{
       type:String,
