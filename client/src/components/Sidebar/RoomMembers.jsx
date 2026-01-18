@@ -3,7 +3,8 @@ import { Users } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-const RoomMembers = ({ tenants, showMembers, toggleMembers, admin }) => {
+const RoomMembers = ({ tenants, showMembers, toggleMembers, admin, onlineMembers }) => {
+  console.log(onlineMembers)
   return (
     <div className="p-4 border-b">
       {/* Header row */}
@@ -12,7 +13,7 @@ const RoomMembers = ({ tenants, showMembers, toggleMembers, admin }) => {
         onClick={toggleMembers}
       >
         <Users className="w-5 h-5" />
-        <span className="flex-1 font-medium">Members [🟢 2 ]</span>
+        <span className="flex-1 font-medium">Members [🟢 {onlineMembers.length} ]</span>
         
         <span className="text-xs bg-secondary px-2 text-black font-semibold py-1 rounded-full">
           {tenants?.length || 0}

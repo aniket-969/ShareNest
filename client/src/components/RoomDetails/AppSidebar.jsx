@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { getSocket } from "@/socket";
+import { useRoomSocket } from "@/context/RoomSocket";
 
 const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
 const PendingRequests = lazy(
@@ -35,6 +36,7 @@ const AppSidebar = ({ roomData }) => {
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const location = useLocation();
+  const [users,setUsers] = useState([])
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
@@ -74,21 +76,9 @@ const AppSidebar = ({ roomData }) => {
       icon: Settings,
     },
   ];
-  useEffect(() => {
-    const handleOnlineUsersUpdate = ({ users, count }) => {
-      console.log("🟢 Online users updated");
-      console.log("Users:", users); // array of userIds
-      console.log("Count:", count);
-    };
+const {onlineUsers} = useRoomSocket()
 
-    socket.on("onlineUsersUpdated", handleOnlineUsersUpdate);
-
-    return () => {
-      socket.off("onlineUsersUpdated", handleOnlineUsersUpdate);
-    };
-  }, [socket]);
-
-  // console.log("sidebar rendered");
+  console.log("sidebar rendered",onlineUsers);
 
   return (
     <Sidebar>
@@ -119,7 +109,7 @@ const AppSidebar = ({ roomData }) => {
         </div>
 
         {/* Room Members */}
-        <RoomMembers
+        <RoomMembers onlineMembers = {onlineUsers}
           toggleMembers={toggleMembers}
           showMembers={showMembers}
           tenants={roomData?.tenants}

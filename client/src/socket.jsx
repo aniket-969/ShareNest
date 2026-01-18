@@ -13,9 +13,9 @@ export const getSocket = () => {
       import.meta.env.REACT_APP_SOCKET_SERVER || "http://localhost:3000",
       {
         withCredentials: true,
-        transports: ["polling", "websocket"], // still keep this
+        transports: ["polling", "websocket"],
         auth: {
-          roomId: currentRoomId, // 👈 pass roomId in handshake
+          roomId: currentRoomId, 
         },
       }
     );
