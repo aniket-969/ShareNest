@@ -10,6 +10,7 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
       index: true,
+      sparse: true,
     },
     email: {
       type: String,
@@ -27,18 +28,20 @@ const userSchema = new Schema(
     avatar: {
       type: String,
     },
+    googleId: {
+      type: String,
+    },
     password: {
       type: String,
-      required: function(){
-        return this.provider === "local"
+      required: function () {
+        return this.provider === "local";
       },
-      select:false
+      select: false,
     },
-    provider:{
-      type:String,
-      enum:["local","google"],
-      default:"local",
-      
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
     firebaseUid: {
       type: String,
@@ -58,7 +61,7 @@ const userSchema = new Schema(
         },
       },
     ],
-    paymentMethod:[
+    paymentMethod: [
       {
         appName: {
           type: String,
@@ -72,12 +75,12 @@ const userSchema = new Schema(
           type: String,
         },
         qrCodeData: {
-          type: String, 
+          type: String,
         },
-      }
+      },
     ],
-    notificationToken:{
-      type:String,
+    notificationToken: {
+      type: String,
     },
     refreshToken: {
       type: String,
@@ -98,9 +101,9 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.path('paymentMethod').validate(function (value) {
+userSchema.path("paymentMethod").validate(function (value) {
   return value.length <= 3;
-}, 'You can only have up to 3 payment methods.');
+}, "You can only have up to 3 payment methods.");
 
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(

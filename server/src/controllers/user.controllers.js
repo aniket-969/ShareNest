@@ -88,8 +88,12 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const googleLogin = asyncHandler(async (req, res) => {
-  const { idToken } = req.body;
+  const authHeader = req.headers.authorization || "";
+  const idToken = authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
 
+  console.log(idToken, req.body, "this is body");
   if (!idToken) {
     throw new ApiError(400, "Missing Google ID token");
   }
@@ -98,9 +102,9 @@ const googleLogin = asyncHandler(async (req, res) => {
     idToken,
     audience: process.env.GOOGLE_CLIENT_ID,
   });
-
+  console.log("ticket 9s e", ticket);
   const payload = ticket.getPayload();
-
+  console.log(payload);
   if (!payload) {
     throw new ApiError(401, "Invalid Google token");
   }
