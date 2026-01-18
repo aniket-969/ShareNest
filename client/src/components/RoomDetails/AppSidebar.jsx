@@ -1,4 +1,4 @@
-import React, { useState, lazy } from "react";
+import React, { useState, lazy, useEffect } from "react";
 import {
   Award,
   CalendarDays,
@@ -21,6 +21,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useParams, Link, useLocation } from "react-router-dom";
+import { getSocket } from "@/socket";
 
 const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
 const PendingRequests = lazy(
@@ -28,7 +29,8 @@ const PendingRequests = lazy(
 );
 
 const AppSidebar = ({ roomData }) => {
-  console.log(roomData);
+  // console.log(roomData);
+  const socket = getSocket();
   const { roomId } = useParams();
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
@@ -72,6 +74,19 @@ const AppSidebar = ({ roomData }) => {
       icon: Settings,
     },
   ];
+  useEffect(() => {
+    const handleOnlineUsersUpdate = ({ users, count }) => {
+      console.log("🟢 Online users updated");
+      console.log("Users:", users); // array of userIds
+      console.log("Count:", count);
+    };
+
+    socket.on("onlineUsersUpdated", handleOnlineUsersUpdate);
+
+    return () => {
+      socket.off("onlineUsersUpdated", handleOnlineUsersUpdate);
+    };
+  }, [socket]);
 
   // console.log("sidebar rendered");
 
@@ -89,7 +104,9 @@ const AppSidebar = ({ roomData }) => {
 
           <div className="flex items-center justify-between rounded-md pt-4 ">
             <span className="text-xs text-muted-foreground">Room Code:</span>
-            <span className="text-sm font-mono font-semibold tracking-widest">96EB99</span>
+            <span className="text-sm font-mono font-semibold tracking-widest">
+              96EB99
+            </span>
 
             <button
               onClick={() => navigator.clipboard.writeText(roomData.groupCode)}

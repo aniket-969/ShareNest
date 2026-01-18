@@ -15,7 +15,7 @@ const Chat = ({ messages,chatMessagesMeta }) => {
     data: userData,
   } = sessionQuery;
 // console.log(messages)
-console.log(chatMessagesMeta)
+// console.log(chatMessagesMeta)
 
   return (
     <div className="flex flex-col items-center h-[480px] bs:h-[370px] w-full max-w-[25rem] rounded-lg shadow-md  bg-[#1c1f26 bg-card borde border-[#2a2a2a] pt-4 bs:px-2 ">
