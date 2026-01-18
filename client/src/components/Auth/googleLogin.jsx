@@ -2,9 +2,10 @@ import React from "react";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { GoogleLogin } from '@react-oauth/google';
 
-
-const GoogleLogin = () => {
+ 
+const LoginGoogle = () => {
   const provider = new GoogleAuthProvider();
   const auth = getAuth();
 const {loginWithGoogleMutation} = useAuth()
@@ -31,14 +32,16 @@ const {loginWithGoogleMutation} = useAuth()
   };
 
   return (
-    <Button
-      onClick={handleGoogleLogin}
-      className="flex items-center gap-2  border"
-    >
-      <span className="font-bold text-lg ">G</span>
-      <span className="text-sm">Sign in with Google</span>
-    </Button>
+   
+      <GoogleLogin
+  onSuccess={credentialResponse => {
+    console.log(credentialResponse);
+  }}
+  onError={() => {
+    console.log('Login Failed');
+  }}
+/>
   );
 };
 
-export default GoogleLogin;
+export default LoginGoogle;
