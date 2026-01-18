@@ -28,6 +28,7 @@
     "express": "^4.21.0",
     "express-rate-limit": "^7.4.1",
     "firebase-admin": "^13.4.0",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
     "node-cron": "^3.0.3",

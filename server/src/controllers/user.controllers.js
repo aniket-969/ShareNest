@@ -4,6 +4,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import admin, { fcm } from "../firebase/config.js";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateTokens = async (userId) => {
   const user = await User.findById(userId);
@@ -13,7 +16,7 @@ const generateTokens = async (userId) => {
   await user.save({ validateBeforeSave: false });
   //   console.log(accessToken, refreshToken);
   return { accessToken, refreshToken };
-}; 
+};
 
 const registerUser = asyncHandler(async (req, res) => {
   console.log("this is body", req.body);
@@ -76,68 +79,68 @@ const loginUser = asyncHandler(async (req, res) => {
     secure: true,
   };
   return res
-  .cookie("accessToken", accessToken, { ...options, path: "/" }) 
-  .cookie("refreshToken", refreshToken, { ...options, path: "/api/v1/users/refreshTokens" }) 
-  .json(new ApiResponse(200, loggedInUser, "User logged in successfully"));
+    .cookie("accessToken", accessToken, { ...options, path: "/" })
+    .cookie("refreshToken", refreshToken, {
+      ...options,
+      path: "/api/v1/users/refreshTokens",
+    })
+    .json(new ApiResponse(200, loggedInUser, "User logged in successfully"));
 });
 
 const googleLogin = asyncHandler(async (req, res) => {
-  const authHeader = req.headers.authorization || "";
-  const idToken = authHeader.startsWith("Bearer ")
-    ? authHeader.split(" ")[1]
-    : null;
+  const { idToken } = req.body;
 
-  if (!idToken) throw new ApiError(400, "Missing Firebase ID token");
+  if (!idToken) {
+    throw new ApiError(400, "Missing Google ID token");
+  }
 
-  const decoded = await admin.auth().verifyIdToken(idToken);
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
 
-  const firebaseUid = decoded.uid;
-  const email = decoded.email;
-  const fullName = decoded.name || decoded.displayName || "Google User";
-  const avatar = decoded.picture || "";
+  const payload = ticket.getPayload();
 
-  // upsert 
-  const filter = { firebaseUid };
-  const update = {
-    $setOnInsert: {
-      firebaseUid,
-      email,
-      fullName,
-      avatar,
-      provider: "google",
-      createdAt: Date.now(),
+  if (!payload) {
+    throw new ApiError(401, "Invalid Google token");
+  }
+
+  const { sub: googleId, email, name: fullName, picture: avatar } = payload;
+
+  // Upsert user
+  const user = await User.findOneAndUpdate(
+    { googleId },
+    {
+      $setOnInsert: {
+        googleId,
+        email,
+        fullName,
+        avatar,
+        provider: "google",
+        createdAt: Date.now(),
+      },
     },
-  };
-  const options = {
-    upsert: true,
-    new: true,
-    rawResult: true,
-    setDefaultsOnInsert: true,
-  };
+    { upsert: true, new: true }
+  );
 
-  const raw = await User.findOneAndUpdate(filter, update, options);
-
-  const userDoc = raw && raw.value ? raw.value : raw;
-console.log("raw data",raw)
-
-  if (!userDoc) {
+  if (!user) {
     throw new ApiError(500, "Failed to create or fetch user");
   }
 
-  const { accessToken, refreshToken } = await generateTokens(userDoc._id);
-  await User.updateOne({ _id: userDoc._1d ?? userDoc._id }, { $set: { refreshToken } });
+  const { accessToken, refreshToken } = await generateTokens(user._id);
+
+  await User.updateOne({ _id: user._id }, { $set: { refreshToken } });
 
   const safeUser = {
-    _id: userDoc._id, 
-    email: userDoc.email,
-    username: userDoc.username,
-    fullName: userDoc.fullName,
-    avatar: userDoc.avatar,
+    _id: user._id,
+    email: user.email,
+    fullName: user.fullName,
+    avatar: user.avatar,
   };
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
   };
 
@@ -176,45 +179,44 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
- 
+
 const refreshTokens = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
-console.log(incomingRefreshToken,"Inside refresh first entry")
+  console.log(incomingRefreshToken, "Inside refresh first entry");
   if (!incomingRefreshToken) {
     throw new ApiError(401, "unauthorized request");
   }
-  console.log("This is refresh",req.body, incomingRefreshToken);
+  console.log("This is refresh", req.body, incomingRefreshToken);
   const decodedToken = jwt.verify(
     incomingRefreshToken,
     process.env.REFRESH_TOKEN_SECRET
   );
-  console.log(decodedToken,"At token decode")
+  console.log(decodedToken, "At token decode");
   const user = await User.findById(decodedToken?._id);
-console.log("user",user._id)
+  console.log("user", user._id);
   if (!user) {
     throw new ApiError(401, "Invalid refresh token");
   }
 
   if (incomingRefreshToken !== user?.refreshToken) {
-    console.log("invalid refreshToken")
+    console.log("invalid refreshToken");
     throw new ApiError(401, "Refresh token is expired or used");
   }
   const options = {
     httpOnly: true,
     secure: true,
   };
-console.log("about to generate tokens")
+  console.log("about to generate tokens");
   const { accessToken, refreshToken } = await generateTokens(user._id);
-console.log("Got the tokens",accessToken)
-return res
-.cookie("accessToken", accessToken, { ...options, path: "/" }) 
-.cookie("refreshToken", refreshToken, { ...options, path: "/api/v1/users/refreshTokens" }) 
-    .json( 
-      new ApiResponse(
-        200,
-        {accessToken},
-        "User Token updated successfully"
-      )
+  console.log("Got the tokens", accessToken);
+  return res
+    .cookie("accessToken", accessToken, { ...options, path: "/" })
+    .cookie("refreshToken", refreshToken, {
+      ...options,
+      path: "/api/v1/users/refreshTokens",
+    })
+    .json(
+      new ApiResponse(200, { accessToken }, "User Token updated successfully")
     );
 });
 
@@ -244,14 +246,14 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const updates = {};
-  if (fullName)  updates.fullName  = fullName;
-  if (avatar)    updates.avatar    = avatar;
+  if (fullName) updates.fullName = fullName;
+  if (avatar) updates.avatar = avatar;
 
   if (username) {
-    // check uniqueness 
+    // check uniqueness
     const conflict = await User.findOne({
       username,
-      _id: { $ne: userId }
+      _id: { $ne: userId },
     }).lean();
 
     if (conflict) {
@@ -272,26 +274,30 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
-const updateFcmToken = asyncHandler(async(req,res)=>{
-  console.log("Updating fcm")
-  const {token} = req.body
-  console.log(req.user._id)
-  const user = await User.findByIdAndUpdate(req.user?._id,{
-    $set:{
-      notificationToken:token
-    }
-  },{new:true})
-  console.log("This is user",user)
-   return res
+const updateFcmToken = asyncHandler(async (req, res) => {
+  console.log("Updating fcm");
+  const { token } = req.body;
+  console.log(req.user._id);
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        notificationToken: token,
+      },
+    },
+    { new: true }
+  );
+  console.log("This is user", user);
+  return res
     .status(200)
     .json(new ApiResponse(200, user, "Account details updated successfully"));
-})
+});
 
 export const testNotification = asyncHandler(async (req, res) => {
-  console.log("here")
-  const userId = req.user._id ;
+  console.log("here");
+  const userId = req.user._id;
   const user = await User.findById(userId).select("notificationToken");
-  console.log("This ",user)
+  console.log("This ", user);
   if (!user?.notificationToken) {
     throw new ApiError(400, "No FCM token registered for this user");
   }
@@ -300,10 +306,10 @@ export const testNotification = asyncHandler(async (req, res) => {
     token: user.notificationToken,
     notification: {
       title: "🔔 Test Notification",
-      body:  "If you see this, push is working 🎉",
+      body: "If you see this, push is working 🎉",
     },
   });
-console.log("After fcm")
+  console.log("After fcm");
   return res.json(new ApiResponse(200, null, "Test push sent"));
 });
 
@@ -333,7 +339,7 @@ const addPaymentMethod = asyncHandler(async (req, res) => {
     qrCodeData: qrCodeData || null,
     paymentId: paymentId || null,
   };
-console.log(method,"Here ismethod")
+  console.log(method, "Here ismethod");
   user.paymentMethod.push(method);
   await user.save();
   return res
@@ -343,7 +349,7 @@ console.log(method,"Here ismethod")
 
 const deletePaymentMethod = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const { paymentId } = req.params; 
+  const { paymentId } = req.params;
 
   if (!paymentId) {
     throw new ApiError(400, "paymentId is required");
@@ -351,7 +357,7 @@ const deletePaymentMethod = asyncHandler(async (req, res) => {
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,
-    { $pull: { paymentMethod: { _id: paymentId } } }, 
+    { $pull: { paymentMethod: { _id: paymentId } } },
     { new: true, select: "-password -refreshToken" }
   ).lean();
 
@@ -360,11 +366,14 @@ const deletePaymentMethod = asyncHandler(async (req, res) => {
   }
 
   return res.json(
-    new ApiResponse(200, { paymentMethod: updatedUser.paymentMethod }, "Payment method deleted successfully")
+    new ApiResponse(
+      200,
+      { paymentMethod: updatedUser.paymentMethod },
+      "Payment method deleted successfully"
+    )
   );
 });
 
- 
 export {
   registerUser,
   loginUser,
@@ -376,5 +385,5 @@ export {
   fetchSession,
   addPaymentMethod,
   deletePaymentMethod,
-  updateFcmToken
+  updateFcmToken,
 };
