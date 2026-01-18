@@ -7,6 +7,7 @@ export const RoomEventEnum = Object.freeze({
   UPDATE_ROOM_EVENT: "updateRoom",
   ADMIN_ROOM_CHANGE: "adminChange",
   DISCONNECT_EVENT: "disconnect",
+  ONLINE_USERS_UPDATED:"onlineUsersUpdated" 
 });
 
 export const AvailableRoomEvents = Object.values(RoomEventEnum);
