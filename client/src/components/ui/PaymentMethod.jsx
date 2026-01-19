@@ -10,9 +10,9 @@ const PaymentMethod = () => {
       <Button onClick={() => setShowForm(true)
       }>Add Payment Method</Button>
       {show && (
-        <FormWrapper onClose={() => setShowForm(false)}>
+        <FormWrappe onClose={() => setShowForm(false)}>
           <PaymentMethodForm />
-        </FormWrapper>
+        </FormWrappe>
       )}
     </div>
   );

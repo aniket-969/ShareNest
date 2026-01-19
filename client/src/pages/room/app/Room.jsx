@@ -36,7 +36,7 @@ if(isError){
   return (
     <div className="max-h-screen">
       <RoomHeader />
-      <div className="flex flex-col gap-10 items-center pt-7 sm:pt-12">
+      <div className="flex flex-col gap-10 items-center pt-7 sm:pt-12 ">
         <ProfileSettingsView onEdit={() => setIsEditing(true)} />
         <EditProfileModal
           open={isEditing}
