@@ -53,7 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   console.log("Login", req.body);
   const { identifier, password } = req.body;
-
+// console.log("here is id, pass",identifier,password)
   const existedUser = await User.findOne({
     $or: [{ username: identifier }, { email: identifier }],
   });
@@ -67,7 +67,7 @@ const loginUser = asyncHandler(async (req, res) => {
     console.log("Password not valid");
     throw new ApiError(401, "Invalid user credentials");
   }
-
+console.log("ndf here")
   const { accessToken, refreshToken } = await generateTokens(existedUser._id);
 
   const loggedInUser = await User.findById(existedUser._id).select(

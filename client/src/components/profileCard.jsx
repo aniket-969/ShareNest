@@ -14,10 +14,10 @@ const ProfileCard = () => {
     return <>Something went wrong . Please refresh</>;
   }
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 ">
       <div className="">
         <Avatar className="w-[80px] h-[80px] rounded-[2.4rem]">
-          <AvatarImage src={data.avatar} alt={data.fullName} />
+          <AvatarImage src={data?.avatar} alt={data?.fullName} />
           <AvatarFallback>
             <img src="/altAvatar1.jpg" alt="fallback avatar" />
           </AvatarFallback>

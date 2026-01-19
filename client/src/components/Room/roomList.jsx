@@ -40,9 +40,9 @@ const RoomList = () => {
         </>
       ) : (
         <div className="flex flex-col items-center gap-4 text-center ">
-          <p className="text-muted-foreground text-lg">🥲 No rooms yet</p>
+          <p className="text-muted-foreground text-lg"> No rooms yet</p>
           <Link to="/room/create">
-            <Button className="mt-2">Create / Join Room</Button>
+            <Button className="" variant="outline">Create / Join Room</Button>
           </Link>
         </div>
       )}

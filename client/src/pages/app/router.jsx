@@ -62,7 +62,7 @@ export const AppRouter = () => {
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
             </Route>
-
+ 
             {/* Rooms wrapped in providers */}
             <Route path="room" element={<RoomShell />}>
               <Route index element={<Room />} />

@@ -22,7 +22,7 @@ const Room = () => {
 
 const [isEditing, setIsEditing] = useState(false);
 
-if(isLoading){
+if( isLoading){
   return <RoomLoader/>
 }
 
