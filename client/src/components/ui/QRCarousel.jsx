@@ -55,7 +55,7 @@ export const QRCarousel = ({
             <CarouselItem key={item._id} className="">
               {/* add payment method */}
               {item.isAdd ? (
-                <div className=" h-[270px] flex items-center justify-center bg-card ">
+                <div className=" h-[270px] flex items-center justify-center bg-card  ">
                    <Button variant=""
                   className=""
                   onClick={() => setShowForm(true)}

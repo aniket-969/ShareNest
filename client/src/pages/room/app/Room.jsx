@@ -34,9 +34,9 @@ if(isError){
  if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="max-h-screen">
+    <div className="max-h-screen ">
       <RoomHeader />
-      <div className="flex flex-col gap-10 items-center pt-7 sm:pt-12 ">
+      <div className="flex flex-col sm:gap-10 gap-8 items-center pt-3 sm:pt-12 ">
         <ProfileSettingsView onEdit={() => setIsEditing(true)} />
         <EditProfileModal
           open={isEditing}
@@ -44,7 +44,7 @@ if(isError){
           user={user}
           onSave={() => refetch()}
         />
-        <div className="flex flex-col-reverse justify-around items-center w-full gap-20 sm:gap-10 sm:flex-row sm:mt-7">
+        <div className="flex flex-col-reverse justify-center items-center w-full gap-10 sm:gap-80 sm:flex-row sm:mt-7 ">
           <QRCode />
           <RoomList />
         </div>

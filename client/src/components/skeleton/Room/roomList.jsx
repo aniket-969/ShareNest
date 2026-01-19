@@ -4,9 +4,7 @@ const RoomListSkeleton = () => {
   return (
     <div className="flex flex-col gap-5 items-center ">
       <h1 className="text-xl font-semibold">Rooms</h1>
-      <div className="flex flex-col gap-5 h-[15rem] pt-2 sm:pr-2 ">
-        <Skeleton className="w-[180px] h-[40px]" />
-        <Skeleton className="w-[180px] h-[40px]" />
+      <div className="flex flex-col gap-2 h-[6.3rem] pt-2 sm:pr-2 ">
         <Skeleton className="w-[180px] h-[40px]" />
         <Skeleton className="w-[180px] h-[40px]" />
       
