@@ -19,7 +19,7 @@ const RoomList = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 items-center">
+    <div className="flex flex-col gap-3 sm:gap-5 items-center ">
       {data?.rooms?.length > 0 ? (
         <>
           <h1 className="text-xl font-semibold">Rooms</h1>

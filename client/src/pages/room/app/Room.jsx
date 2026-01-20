@@ -36,7 +36,7 @@ if(isError){
   return (
     <div className="max-h-screen ">
       <RoomHeader />
-      <div className="flex flex-col md:gap-10 gap-8 items-center pt-3 md:pt-12 ">
+      <div className="flex flex-col md:gap-10 gap-6 items-center pt-3 md:pt-12 ">
         <ProfileSettingsView onEdit={() => setIsEditing(true)} />
         <EditProfileModal
           open={isEditing}
@@ -44,7 +44,7 @@ if(isError){
           user={user}
           onSave={() => refetch()}
         />
-        <div className="flex flex-col-reverse justify-center items-center w-full gap-10 md:gap-32 lg:gap-80 md:flex-row md:mt-7 ">
+        <div className="flex flex-col-reverse justify-center items-center w-full gap-6 md:gap-32 lg:gap-80 md:flex-row md:mt-7 ">
           <QRCode />
           <RoomList />
         </div>

@@ -16,7 +16,7 @@ const ProfileCard = () => {
   return (
     <div className="flex flex-col items-center gap-4 ">
       <div className="">
-        <Avatar className="w-[80px] h-[80px] rounded-[2.4rem]">
+        <Avatar className="sm:w-[80px] sm:h-[80px] w-[50px] h-[50px] rounded-[2.4rem]">
           <AvatarImage src={data?.avatar} alt={data?.fullName} />
           <AvatarFallback>
             <img src="/altAvatar1.jpg" alt="fallback avatar" />
