@@ -5,14 +5,15 @@ import { Button } from "./button";
 
 const PaymentMethod = () => {
   const [show, setShowForm] = useState(false);
+  console.log('d')
   return (
     <div >
-      <Button onClick={() => setShowForm(true)
+      <Button className="" onClick={() => setShowForm(true)
       }>Add Payment Method</Button>
       {show && (
-        <FormWrappe onClose={() => setShowForm(false)}>
+        <FormWrapper onClose={() => setShowForm(false)}>
           <PaymentMethodForm />
-        </FormWrappe>
+        </FormWrapper>
       )}
     </div>
   );

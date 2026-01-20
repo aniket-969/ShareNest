@@ -14,10 +14,10 @@ const PaymentDetails = ({ participants = [], userId }) => {
    
     <Accordion type="multiple">
       {participants.map((user) => {
-        const isSelf = user._id === userId; 
+        const isSelf = user?._id === userId; 
 
         return (
-          <AccordionItem key={user._id} className="" value={user._id}>
+          <AccordionItem key={user?._id} className="" value={user?._id}>
             <AccordionTrigger>
               <div className="flex items-center gap-3">
                  <Avatar className="w-[30px] h-[30px]">
@@ -29,7 +29,7 @@ const PaymentDetails = ({ participants = [], userId }) => {
 
                 <div className="text-left">
                   <p className="font-medium">
-                    {user.fullName}
+                    {user?.fullName}
                     {isSelf && (
                       <span className="ml-2 text-xs text-muted-foreground">
                         (You)
@@ -45,13 +45,13 @@ const PaymentDetails = ({ participants = [], userId }) => {
 
             <AccordionContent>
              
-              {!isSelf && user.paymentMethod.length === 0 ? (
+              {!isSelf && user?.paymentMethod.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4">
                   No payment methods shared
                 </p>
               ) : (
                 <QRCarousel
-                  paymentMethod={user.paymentMethod}
+                  paymentMethod={user?.paymentMethod}
                   editable={isSelf}   
                 />
               )}
