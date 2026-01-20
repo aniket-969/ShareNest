@@ -13,7 +13,7 @@ const RoomMembers = ({ tenants, showMembers, toggleMembers, admin, onlineMembers
         onClick={toggleMembers}
       >
         <Users className="w-5 h-5" />
-        <span className="flex-1 font-medium">Members [🟢 {onlineMembers.length} ]</span>
+        <span className="flex-1 font-medium">Members [ <span className="h-[0.6rem] w-[0.6rem] rounded-full bg-green-400 inline-block" />  {onlineMembers.length} ]</span>
         
         <span className="text-xs bg-secondary px-2 text-black font-semibold py-1 rounded-full">
           {tenants?.length || 0}
