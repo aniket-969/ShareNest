@@ -9,6 +9,7 @@ import { AvatarSelector } from "../AvatarSelector";
 import { useForm } from "react-hook-form";
 import { updateUserSchema } from "@/schema/authSchema";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   const { updateUserMutation } = useAuth();
@@ -22,9 +23,9 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   } = useForm({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      fullName: initialData.fullName,
-      username: initialData.username,
-      avatar: initialData.avatar,
+      fullName: initialData?.fullName,
+      username: initialData?.username,
+      avatar: initialData?.avatar,
     },
     mode: "onTouched",
   });
@@ -60,11 +61,17 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
       className="max-w-xl mx-auto flex flex-col gap-6 p-4 rounded-2xl  shadow-md"
     >
       <div className="flex flex-col items-center gap-2">
-        <img
+        {/* <img
           src={avatarUrl}
           alt="avatar"
           className="w-20 h-20 rounded-full object-cover"
-        />
+        /> */}
+        <Avatar  className="w-20 h-20 rounded-full object-cover">
+                  <AvatarImage src={avatarUrl} alt={initialData?.fullName} />
+                  <AvatarFallback>
+                    <img src="/altAvatar1.jpg" alt="fallback avatar" />
+                  </AvatarFallback>
+                </Avatar>
         <AvatarSelector onSelect={(url) => setValue("avatar", url, { shouldTouch: true })} />
         {errors.avatar && <p className="text-sm text-destructive">{errors.avatar.message}</p>}
       </div>
