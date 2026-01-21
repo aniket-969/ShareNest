@@ -54,8 +54,8 @@ const RoomMembers = ({
                           member?.fullName?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium max-w-[90px] truncate">
-                      {member?.fullName}
+                    <span className="text-sm font-medium xl:max-w-[70px] max-w-[90px] truncate">
+                      {member?.fullName}jjjjjjj
                     </span>
                   </div>
 
