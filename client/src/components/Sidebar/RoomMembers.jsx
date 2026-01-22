@@ -2,6 +2,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Users } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 const RoomMembers = ({
   tenants,
@@ -15,21 +22,38 @@ const RoomMembers = ({
   return (
     <div className="p-4 border-b">
       {/* Header row */}
-      <div
-        className="flex items-center text-sm cursor-pointer space-x-2 "
-        onClick={toggleMembers}
-      >
-        <Users className="w-5 h-5" />
-        <span className="flex-1 font-medium">
-          Members [{" "}
-          <span className="h-[0.6rem] w-[0.6rem] rounded-full bg-green-400 inline-block" />{" "}
-          {onlineMembers.length} ]
-        </span>
+     <div
+  className="flex items-center text-sm cursor-pointer space-x-2 "
+  onClick={toggleMembers}
+>
+  <Users className="w-5 h-5" />
 
-        <span className="text-xs bg-secondary px-2 text-black font-semibold py-1 rounded-full">
-          {tenants?.length || 0}
-        </span>
-      </div>
+  <span className="flex-1 font-medium">
+    Members [{" "}
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          
+          <span className="inline-flex items-center gap-1">
+            <span className="h-[0.6rem] w-[0.6rem] rounded-full bg-green-400 inline-block" />
+            {onlineMembers.length}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          {onlineMembers.length === 1
+            ? "1 member online"
+            : `${onlineMembers.length} members online`}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    {" "}]
+  </span>
+
+  <span className="text-xs bg-secondary px-2 text-black font-semibold py-1 rounded-full">
+    {tenants?.length}
+  </span>
+</div>
+
 
       {/* Members list */}
       {showMembers && (
@@ -55,7 +79,7 @@ const RoomMembers = ({
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium xl:max-w-[70px] max-w-[90px] truncate">
-                      {member?.fullName}jjjjjjj
+                      {member?.fullName}
                     </span>
                   </div>
 
