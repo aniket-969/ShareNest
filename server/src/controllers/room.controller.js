@@ -153,11 +153,10 @@ const updateRoom = asyncHandler(async (req, res) => {
 });
 
 const addUserRequest = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
+  const userId = req.user._id;
   const { groupCode } = req.body;
 
   const room = await Room.findOne({ groupCode });
-
   if (!room) {
     throw new ApiError(404, "Room doesn't exist");
   }
@@ -166,31 +165,41 @@ const addUserRequest = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Admin can't send request to their own room");
   }
 
-  if (room.pendingRequests.length > 50) {
+  if (room.tenants.some(id => id.toString() === userId.toString())) {
+    throw new ApiError(400, "User is already a member of this room");
+  }
+
+  if (room.pendingRequests.length >= 50) {
     throw new ApiError(400, "Room has too many pending requests already");
   }
 
-  if (
-    !room.pendingRequests.some(
-      (request) => request.userId.toString() === userId.toString()
-    )
-  ) {
-    room.pendingRequests.push({ userId, role: "tenant" });
-    await room.save();
-  } else {
-    return res.json(new ApiResponse(400, {}, "Request already sent"));
+  const alreadyRequested = room.pendingRequests.some(
+    req => req.userId.toString() === userId.toString()
+  );
+
+  if (alreadyRequested) {
+    throw new ApiError(400, "Request already sent");
   }
+
+  const role = "tenant";
+
+  room.pendingRequests.push({ userId, role });
+  await room.save();
+
   emitSocketEvent(
     req,
     room.admin.toString(),
     RoomEventEnum.JOIN_ROOM_REQUEST_EVENT,
     {
       userId,
-      role,
       roomId: room._id,
+      role,
     }
   );
-  return res.json(new ApiResponse(200, {}, "Request sent successfully"));
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Request sent successfully"));
 });
 
 const adminResponse = asyncHandler(async (req, res) => {
