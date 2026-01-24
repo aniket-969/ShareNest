@@ -292,7 +292,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     .digest("hex");
 
   user.resetPasswordToken = hashedToken;
-  user.resetPasswordExpires = new Date(now + process.env.RESET_PASSWORD_TOKEN_EXPIRY); 
+  user.resetPasswordExpires = new Date(now + Number(process.env.RESET_PASSWORD_TOKEN_EXPIRY)); 
   user.resetPasswordRequestCount += 1;
   user.lastPasswordResetRequestAt = now;
 
@@ -313,6 +313,39 @@ const forgotPassword = asyncHandler(async (req, res) => {
       200,
       null,
       "If an account exists, you will receive a reset link."
+    )
+  );
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Reset link is invalid or expired");
+  }
+
+  user.password = password; 
+  user.resetPasswordToken = null;
+  user.resetPasswordExpires = null;
+  user.resetPasswordRequestCount = 0;
+
+  await user.save();
+
+  return res.json(
+    new ApiResponse(
+      200,
+      null,
+      "Password reset successful. Please log in."
     )
   );
 });
@@ -463,5 +496,6 @@ export {
   addPaymentMethod,
   deletePaymentMethod,
   updateFcmToken,
-  forgotPassword
+  forgotPassword,
+  resetPassword
 };

@@ -18,6 +18,7 @@ import {
   logoutUser,
   refreshTokens,
   registerUser,
+  resetPassword,
   testNotification,
   updateAccountDetails,
   updateFcmToken,
@@ -34,6 +35,8 @@ router.route("/google").post(loginLimiter, googleLogin);
 router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
 router.route("/forgot-password")
   .post(loginLimiter, forgotPassword);
+router.route("/reset-password")
+  .post(loginLimiter, resetPassword);
  
 // secured routes
 router
