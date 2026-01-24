@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import admin, { fcm } from "../firebase/config.js";
 import { OAuth2Client } from "google-auth-library";
+import crypto from "crypto";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -245,6 +246,78 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Email is required");
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.json(
+      new ApiResponse(
+        200,
+        null,
+        "If an account exists, you will receive a reset link."
+      )
+    );
+  }
+
+  const now = Date.now();
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+
+  if (
+    user.lastPasswordResetRequestAt &&
+    now - user.lastPasswordResetRequestAt > WEEK
+  ) {
+    user.resetPasswordRequestCount = 0;
+  }
+
+  if (user.resetPasswordRequestCount >= 5) {
+    return res.json(
+      new ApiResponse(
+        200,
+        null,
+        "If an account exists, you will receive a reset link."
+      )
+    );
+  }
+
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(rawToken)
+    .digest("hex");
+
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpires = new Date(now + process.env.RESET_PASSWORD_TOKEN_EXPIRY); 
+  user.resetPasswordRequestCount += 1;
+  user.lastPasswordResetRequestAt = now;
+
+  await user.save({ validateBeforeSave: false });
+
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
+
+    console.log("RESET PASSWORD LINK:", resetLink);
+  
+  // try {
+  //   await sendResetPasswordEmail(user.email, resetLink);
+  // } catch (error) {
+  //   console.error("Reset email failed:", error);
+  // }
+
+  return res.json(
+    new ApiResponse(
+      200,
+      null,
+      "If an account exists, you will receive a reset link."
+    )
+  );
+});
+
+
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, username, avatar } = req.body;
   const userId = req.user._id;
@@ -390,4 +463,5 @@ export {
   addPaymentMethod,
   deletePaymentMethod,
   updateFcmToken,
+  forgotPassword
 };

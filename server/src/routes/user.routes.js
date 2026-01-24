@@ -12,6 +12,7 @@ import {
   changePassword,
   deletePaymentMethod,
   fetchSession,
+  forgotPassword,
   googleLogin,
   loginUser,
   logoutUser,
@@ -31,6 +32,8 @@ router.route("/register").post(loginLimiter,validate(registerSchema), registerUs
 router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
 router.route("/google").post(loginLimiter, googleLogin);
 router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
+router.route("/forgot-password")
+  .post(loginLimiter, forgotPassword);
  
 // secured routes
 router
