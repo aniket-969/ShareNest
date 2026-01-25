@@ -36,7 +36,7 @@ const AppSidebar = ({ roomData }) => {
   const [showMembers, setShowMembers] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const location = useLocation();
-  const [users,setUsers] = useState([])
+  const [users, setUsers] = useState([]);
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
@@ -56,9 +56,9 @@ const AppSidebar = ({ roomData }) => {
     { title: "Home", url: "/room", icon: Home },
     { title: "Room", url: `/room/${roomId}`, icon: Inbox },
     {
-      title: "Awards",
-      url: `/room/${roomId}/awards`,
-      icon: Award,
+      title: "Task",
+      url: `/room/${roomId}/tasks`,
+      icon: ClipboardList,
     },
     {
       title: "Expense",
@@ -66,19 +66,20 @@ const AppSidebar = ({ roomData }) => {
       icon: Wallet,
     },
     {
-      title: "Task",
-      url: `/room/${roomId}/tasks`,
-      icon: ClipboardList,
+      title: "Awards",
+      url: `/room/${roomId}/awards`,
+      icon: Award,
     },
+
     {
       title: "Settings",
       url: `/room/${roomId}/settings`,
       icon: Settings,
     },
   ];
-const {onlineUsers} = useRoomSocket()
+  const { onlineUsers } = useRoomSocket();
 
-  console.log("sidebar rendered",onlineUsers);
+  console.log("sidebar rendered", onlineUsers);
 
   return (
     <Sidebar>
@@ -89,11 +90,14 @@ const {onlineUsers} = useRoomSocket()
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-2 max-w-full">
-            {roomData?.description || ""} just a band which knows how to play music ain't nothing else than that so get that in your mind
+            {roomData?.description || ""} just a band which knows how to play
+            music ain't nothing else than that so get that in your mind
           </p>
 
           <div className="flex items-center justify-between rounded-md pt-4 ">
-            <span className="text-xs font-semibold tracking-wide text-muted-foreground">Room Code:</span>
+            <span className="text-xs font-semibold tracking-wide text-muted-foreground">
+              Room Code:
+            </span>
             <span className="text-sm font-mono font-semibold tracking-widest">
               96EB99
             </span>
@@ -109,7 +113,8 @@ const {onlineUsers} = useRoomSocket()
         </div>
 
         {/* Room Members */}
-        <RoomMembers onlineMembers = {onlineUsers}
+        <RoomMembers
+          onlineMembers={onlineUsers}
           toggleMembers={toggleMembers}
           showMembers={showMembers}
           tenants={roomData?.tenants}

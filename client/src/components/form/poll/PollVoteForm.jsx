@@ -68,6 +68,7 @@ const PollVoteForm = ({ poll }) => {
               </FormItem>
             )}
           />
+          
           <Button type="submit" className="w-full">
             Vote
           </Button>
