@@ -44,7 +44,7 @@ const ForgotPassword = () => {
     <div className="flex flex-col items-center mt-32 h-[100vh]">
       <h1 className="text-md">Forgot Password</h1>
 
-      <Card className="w-full max-w-[20rem] p-5 m-5">
+      <Card className="w-full max-w-[20rem] px-8 py-6 m-5">
         
         <Form {...form}>
           <form

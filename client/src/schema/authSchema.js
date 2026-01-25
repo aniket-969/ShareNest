@@ -66,7 +66,14 @@ export const paymentMethodSchema = z
   email: stringValidation(5, 100, "Email").email("Invalid email address"),
 });
  
-export const resetPasswordSchema = z.object({
-  token: stringValidation(10, 200, "Reset token"),
-  password: stringValidation(8, 100, "Password"),
-});
+export const resetPasswordSchema = z
+  .object({
+    token: stringValidation(10, 200, "Reset token"),
+    password: stringValidation(8, 100, "Password"),
+    confirmPassword: stringValidation(8, 100, "Confirm password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
