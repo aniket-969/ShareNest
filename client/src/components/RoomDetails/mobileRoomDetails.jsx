@@ -41,7 +41,7 @@ const MobileRoomDetails = () => {
   if (isError)   return <>Something went wrong. Please refresh.</>
 
   return (
-    <div className="flex flex-col items-center px-5 py-2 gap-2">
+    <div className="flex flex-col items-center px-5 gap-1 ">
       {/* Poll & Chat buttons */}
      
       <div className="flex w-full max-w-[25rem] justify-end gap-2 mx-2 ">
@@ -74,7 +74,7 @@ const MobileRoomDetails = () => {
         </Dialog>
       </div>
       
- <div  className="flex flex-col items-center gap-8 w-full ">
+ <div  className="flex flex-col items-center gap-4 w-full ">
    {/* Calendar */}
           <div className="w-full max-w-[25rem] bg-card rounded-lg shadow-md p-4 border">
         <Calendar
