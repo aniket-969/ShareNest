@@ -296,7 +296,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   user.resetPasswordRequestCount += 1;
   user.lastPasswordResetRequestAt = now;
 
-  await user.save({ validateBeforeSave: false });
+  await user.save();
 
   const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
 
@@ -349,7 +349,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     )
   );
 });
-
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, username, avatar } = req.body;

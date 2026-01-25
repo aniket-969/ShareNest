@@ -1,13 +1,15 @@
 import { Router } from "express";
 import {
   changePasswordSchema,
+  forgotPasswordSchema,
   loginSchema,
   paymentMethodSchema,
   registerSchema,
+  resetPasswordSchema,
   updateUserSchema,
 } from "./../zod/user.schema.js";
 import { validate } from "../middleware/validator.middleware.js";
-import {
+import { 
   addPaymentMethod,
   changePassword,
   deletePaymentMethod,
@@ -34,9 +36,9 @@ router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
 router.route("/google").post(loginLimiter, googleLogin);
 router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
 router.route("/forgot-password")
-  .post(loginLimiter, forgotPassword);
+  .post(loginLimiter,validate(forgotPasswordSchema), forgotPassword);
 router.route("/reset-password")
-  .post(loginLimiter, resetPassword);
+  .post(loginLimiter,validate(resetPasswordSchema), resetPassword);
  
 // secured routes
 router

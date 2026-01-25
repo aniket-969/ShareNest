@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { objectIdValidation, stringValidation,optionalStringValidation } from "./customValidator.js";
+import {
+  objectIdValidation,
+  stringValidation,
+  optionalStringValidation,
+} from "./customValidator.js";
 
 const passwordSchema = z
   .string()
@@ -51,13 +55,19 @@ export const paymentMethodSchema = z
   .object({
     appName: optionalStringValidation(1, 100, "App name"),
     paymentId: optionalStringValidation(1, 100, "Payment ID"),
-    type:optionalStringValidation(1,50,"Payment Type"),
+    type: optionalStringValidation(1, 50, "Payment Type"),
     qrCodeData: optionalStringValidation(1, 100, "QrCodeData"),
   })
-  .refine(
-    (data) => data.paymentId || data.qrCodeData,
-    {
-      message: "Either paymentId or qrCode is required",
-      path: ["paymentId"],
-    }
-  );
+  .refine((data) => data.paymentId || data.qrCodeData, {
+    message: "Either paymentId or qrCode is required",
+    path: ["paymentId"],
+  });
+
+export const forgotPasswordSchema = z.object({
+  email: stringValidation(5, 100, "Email").email("Invalid email address"),
+});
+ 
+export const resetPasswordSchema = z.object({
+  token: stringValidation(10, 200, "Reset token"),
+  password: stringValidation(8, 100, "Password"),
+});
