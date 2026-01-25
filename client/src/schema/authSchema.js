@@ -61,3 +61,12 @@ export const paymentMethodSchema = z
       path: ["paymentId"],
     }
   );
+ 
+  export const forgotPasswordSchema = z.object({
+  email: stringValidation(5, 100, "Email").email("Invalid email address"),
+});
+ 
+export const resetPasswordSchema = z.object({
+  token: stringValidation(10, 200, "Reset token"),
+  password: stringValidation(8, 100, "Password"),
+});
