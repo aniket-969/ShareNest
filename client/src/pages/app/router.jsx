@@ -3,7 +3,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
-  Route, 
+  Route,
   Outlet,
 } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,6 +24,8 @@ import { NotFound } from "../NotFound.jsx";
 
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
+const ForgotPassword = React.lazy(() => import("../auth/ForgotPassword.jsx"));
+const ResetPassword = React.lazy(() => import("../auth/ResetPassword.jsx"));
 const Room = React.lazy(() => import("../room/app/Room.jsx"));
 const CreateRoom = React.lazy(() => import("../room/app/CreateRoom.jsx"));
 const RoomDetails = React.lazy(() => import("../room/app/RoomDetails.jsx"));
@@ -62,7 +64,8 @@ export const AppRouter = () => {
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
             </Route>
- 
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
             {/* Rooms wrapped in providers */}
             <Route path="room" element={<RoomShell />}>
               <Route index element={<Room />} />

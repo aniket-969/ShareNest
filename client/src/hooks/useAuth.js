@@ -4,11 +4,13 @@ import {
   changePassword,
   deletePayment,
   fetchSession,
+  forgotPassword,
   loginUser,
   loginWithGoogle,
   logOut,
   refreshTokens,
   registerUser,
+  resetPassword,
   updateNotificationToken,
   updateUser,
 } from "@/api/queries/auth";
@@ -190,5 +192,7 @@ export const useAuth = () => {
     addPaymentMutation,
     deletePaymentMutation,
     updateNotificationTokenMutation,
+    forgotPasswordMutation,
+    resetPasswordMutation
   };
 };
