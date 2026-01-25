@@ -88,7 +88,7 @@ const {onlineUsers} = useRoomSocket()
           <h2 className="text-lg font-bold line-clamp-1">
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>
-          <p className="text-sm text-muted-foreground line-clamp-3 max-w-full">
+          <p className="text-sm text-muted-foreground line-clamp-2 max-w-full">
             {roomData?.description || ""} just a band which knows how to play music ain't nothing else than that so get that in your mind
           </p>
 
