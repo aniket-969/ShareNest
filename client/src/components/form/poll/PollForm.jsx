@@ -66,7 +66,7 @@ export const PollForm = ({ onClose }) => {
   };
 
   return (
-    <Form {...form}>
+    <Form  {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Title Field */}
         <FormItem>

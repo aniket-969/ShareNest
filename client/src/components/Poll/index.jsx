@@ -29,7 +29,7 @@ const PollCard = ({ initialPolls }) => {
       <Separator />
 
       {showPoll && (
-        <FormWrapper onClose={() => setShowPoll(false)}>
+        <FormWrapper className="" onClose={() => setShowPoll(false)}>
           <PollForm onClose={() => setShowPoll(false)} />
         </FormWrapper>
       )}

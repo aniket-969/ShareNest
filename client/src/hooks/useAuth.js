@@ -19,6 +19,7 @@ import { useEffect } from "react";
 export const useAuth = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
   const sessionQuery = useQuery({
     queryKey: ["auth", "session"],
     queryFn: fetchSession,
@@ -41,7 +42,6 @@ export const useAuth = () => {
     },
   });
 
-  // Login User Mutation
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
@@ -75,7 +75,6 @@ export const useAuth = () => {
     },
   });
 
-  // Logout Mutation
   const logoutMutation = useMutation({
     mutationFn: logOut,
     onSuccess: () => {
@@ -91,7 +90,6 @@ export const useAuth = () => {
     },
   });
 
-  // Refresh Tokens Mutation
   const refreshTokensMutation = useMutation({
     mutationFn: refreshTokens,
     onSuccess: (data) => {
@@ -102,7 +100,6 @@ export const useAuth = () => {
     },
   });
 
-  // Update User Mutation
   const updateUserMutation = useMutation({
     mutationFn: updateUser,
     onSuccess: () => {
@@ -123,7 +120,6 @@ export const useAuth = () => {
     },
   });
 
-  // Update Payment Mutation
   const addPaymentMutation = useMutation({
     mutationFn: addPayment,
     onSuccess: () => {
@@ -144,12 +140,41 @@ export const useAuth = () => {
     },
   });
 
-  // Change Password Mutation
   const changePasswordMutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {},
     onError: (error) => {
       console.error("change password error:", error);
+    },
+  });
+
+  const forgotPasswordMutation = useMutation({
+    mutationFn: forgotPassword,
+    onSuccess: (data) => {
+      toast(
+        data?.message || "If an account exists, you will receive a reset link."
+      );
+    },
+    onError: (error) => {
+      console.error("Forgot password error:", error);
+      toast(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: resetPassword,
+    onSuccess: (data) => {
+      toast(data?.message || "Password reset successful. Please log in.");
+      navigate("/login");
+    },
+    onError: (error) => {
+      console.error("Reset password error:", error);
+      toast(
+        error.response?.data?.message || "Reset link is invalid or expired."
+      );
     },
   });
 
