@@ -68,7 +68,7 @@ export const paymentMethodSchema = z
  
 export const resetPasswordSchema = z
   .object({
-    token: stringValidation(10, 200, "Reset token"),
+    
     password: stringValidation(8, 100, "Password"),
     confirmPassword: stringValidation(8, 100, "Confirm password"),
   })

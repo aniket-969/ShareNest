@@ -64,11 +64,11 @@ const ResetPassword = () => {
     <div className="flex flex-col items-center mt-32 h-[100vh]">
       <h1 className="text-md">Reset Password</h1>
 
-      <Card className="w-full max-w-[20rem] px-8 py-6 m-5">
+      <Card className="w-full max-w-[30rem] px-8 py-8 m-5">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-2"
+            className="space-y-3 mx-auto w-full max-w-[20rem]"
           >
             {/* Password */}
             <FormField
@@ -111,7 +111,7 @@ const ResetPassword = () => {
             <Button
               type="submit"
               size="sm"
-              className="text-xs mt-5"
+              className="text-xs tracking-wide"
               disabled={resetPasswordMutation.isLoading}
             >
               Reset Password

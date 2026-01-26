@@ -41,15 +41,15 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-32 h-[100vh]">
+    <div className="flex flex-col items-center mt-32 h-[100vh] px-4">
       <h1 className="text-md">Forgot Password</h1>
 
-      <Card className="w-full max-w-[20rem] px-8 py-6 m-5">
+      <Card className="w-full max-w-[25rem] p-8 m-5">
         
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-2"
+            className="space-y-3 mx-auto w-full max-w-[20rem]"
           >
             <FormField
               control={form.control}
@@ -69,7 +69,7 @@ const ForgotPassword = () => {
             />
 
             <Button
-              type="submit" size="sm" className="text-xs mt-5"
+              type="submit" size="sm" className="text-xs tracking-wide"
               disabled={forgotPasswordMutation.isLoading}
             >
               Send reset link
