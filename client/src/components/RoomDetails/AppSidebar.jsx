@@ -23,13 +23,14 @@ import {
 import { useParams, Link, useLocation } from "react-router-dom";
 import { getSocket } from "@/socket";
 import { useRoomSocket } from "@/context/RoomSocket";
+import { useRoom } from "@/hooks/useRoom";
 
 const RoomMembers = lazy(() => import("@/components/Sidebar/RoomMembers"));
 const PendingRequests = lazy(
   () => import("@/components/Sidebar/PendingRequests")
 );
 
-const AppSidebar = ({ roomData }) => {
+const AppSidebar = () => {
   // console.log(roomData);
   const socket = getSocket();
   const { roomId } = useParams();
@@ -37,6 +38,10 @@ const AppSidebar = ({ roomData }) => {
   const [showRequests, setShowRequests] = useState(false);
   const location = useLocation();
   const [users, setUsers] = useState([]);
+  
+    const { roomQuery } = useRoom(roomId);
+    const { data: roomData, isLoading, isError } = roomQuery;
+
   const toggleMembers = () => {
     setShowMembers(!showMembers);
     if (!showMembers) setShowRequests(false);
