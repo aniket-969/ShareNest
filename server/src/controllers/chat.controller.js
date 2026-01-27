@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { AvailableChatEvents, ChatEventEnum } from "../constants.js";
 import mongoose from "mongoose";
-
+ 
 const sendMessage = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { content = "" } = req.body;
