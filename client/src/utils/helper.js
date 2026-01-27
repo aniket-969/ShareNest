@@ -38,180 +38,6 @@ export const getDateLabel = (date) => {
   });
 };
 
-export function getTasksForDate(tasks, selectedDate) {
-  // Normalize date to midnight
-  const targetDate = new Date(selectedDate);
-  targetDate.setHours(0, 0, 0, 0);
-
-  const weekOfMonth = getWeekOfMonth(targetDate);
-  const scheduledTasks = [];
-
-  tasks.forEach((task) => {
-    // Build a unified patterns array: either your recurring ones, or a single "one-time" entry
-    const patterns = task.recurring?.enabled
-      ? task.recurring.patterns
-      : [{ frequency: "one-time", date: task.recurring?.dueDate }];
-
-    // Find the single pattern that matches today
-    const matched = patterns.find((pattern) =>
-      isPatternMatch(task, targetDate, pattern, weekOfMonth)
-    );
-    if (!matched) return;
-
-    // Compute the correct assignee for this occurrence
-    const assignee = determineAssignee(task, targetDate, matched);
-
-    scheduledTasks.push({
-      ...task,
-      scheduledDate: targetDate,
-      assignee,
-    });
-  });
-
-  return scheduledTasks;
-}
-
-function getWeekOfMonth(date) {
-  const day = date.getDate();
-  const weekNumber = Math.ceil(day / 7);
-  const lastDay = new Date(
-    date.getFullYear(),
-    date.getMonth() + 1,
-    0
-  ).getDate();
-
-  if (day > lastDay - 7) return "last";
-  const names = ["first", "second", "third", "fourth"];
-  return names[weekNumber - 1] || "fourth";
-}
-
-/**
- * Determine if a task is scheduled for the given date based on its recurring pattern
- */
-
-function isPatternMatch(task, targetDate, pattern, weekOfMonth) {
-  const {
-    frequency,
-    interval = 1,
-    days = [],
-    weekOfMonth: pattWeek,
-    dayOfWeek,
-    date,
-  } = pattern;
-
-  // ONE-TIME
-  if (frequency === "one-time") {
-    if (!date) return false;
-    const oneTime = new Date(date);
-    oneTime.setHours(0, 0, 0, 0);
-    return oneTime.getTime() === targetDate.getTime();
-  }
-
-  const start = task.recurring?.startDate
-    ? new Date(task.recurring.startDate)
-    : new Date(0);
-  const diffMs = targetDate - start;
-
-  switch (frequency) {
-    case "daily": {
-      const daysSince = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      return daysSince >= 0 && daysSince % interval === 0;
-    }
-
-    case "weekly": {
-      const targetDOW = targetDate.getDay(); // 0–6
-      if (!days.includes(targetDOW)) return false;
-
-      const weeksSince = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
-      return weeksSince % interval === 0;
-    }
-
-    case "monthly": {
-      const y1 = start.getFullYear(),
-        m1 = start.getMonth();
-      const y2 = targetDate.getFullYear(),
-        m2 = targetDate.getMonth();
-      const monthsSince = (y2 - y1) * 12 + (m2 - m1);
-      if (monthsSince < 0 || monthsSince % interval !== 0) return false;
-
-      const dayOfMonth = targetDate.getDate();
-      if (days.length && days.includes(dayOfMonth)) return true;
-
-      if (pattWeek && typeof dayOfWeek === "number") {
-        const dow = targetDate.getDay();
-        return weekOfMonth === pattWeek && dow === dayOfWeek;
-      }
-      return false;
-    }
-
-    default:
-      return false;
-  }
-}
-/**
- * Determine which participant should be assigned based on rotation or fixed assignment
- */
-/**
- * Given a matching pattern, chooses the right user:
- * - "single" mode → task.currentAssignee
- * - "rotation" mode → rotate through task.rotationOrder
- */
-function determineAssignee(task, targetDate, pattern) {
-  //  Single 
-  if (task.assignmentMode === "single" || pattern.frequency === "one-time") {
-    return task.currentAssignee;
-  }
-
-  //  Rotation mode
-  const { rotationOrder = [], participants = [] } = task;
-  if (rotationOrder.length <= 1) {
-    return task.currentAssignee;
-  }
-
-  //  start date
-  let start;
-  if (task.recurring?.startDate) {
-    start = new Date(task.recurring.startDate);
-  } else if (task.createdAt) {
-    start = new Date(task.createdAt);
-  } else {
-    start = new Date();
-  }
-
-  //  Compute daysSince in whole UTC days
-  const MS_PER_DAY = 24 * 60 * 60 * 1000;
-  const startUTC = Date.UTC(start.getFullYear(), start.getMonth(), start.getDate());
-  const targetUTC = Date.UTC(
-    targetDate.getFullYear(),
-    targetDate.getMonth(),
-    targetDate.getDate()
-  );
-  const daysSince = Math.floor((targetUTC - startUTC) / MS_PER_DAY);
-
-  let occurrenceIndex = 0;
-  if (pattern.frequency === "daily") {
-    occurrenceIndex = Math.floor(daysSince / pattern.interval);
-  } else if (pattern.frequency === "weekly") {
-    const weeksSince = Math.floor(daysSince / 7);
-    occurrenceIndex = Math.floor(weeksSince / pattern.interval);
-  } else if (pattern.frequency === "monthly") {
-    const y1 = start.getFullYear(), m1 = start.getMonth();
-    const y2 = targetDate.getFullYear(), m2 = targetDate.getMonth();
-    const monthsSince = (y2 - y1) * 12 + (m2 - m1);
-    occurrenceIndex = Math.floor(monthsSince / pattern.interval);
-  }
-
-  const rotIndex = ((occurrenceIndex % rotationOrder.length) + rotationOrder.length) % rotationOrder.length;
-  const assigneeId = rotationOrder[rotIndex]._id.toString();
-
-  const participantMap = new Map(
-    participants.map(p => [p._id.toString(), p])
-  );
-  const candidate = participantMap.get(assigneeId);
-
-  return candidate || task.currentAssignee;
-}
-
 export function cldUrl(url, { width, height, quality = "auto", format = "auto" }) {
   if (!url?.includes("res.cloudinary.com")) return url;
   return url.replace(
@@ -220,3 +46,163 @@ export function cldUrl(url, { width, height, quality = "auto", format = "auto" }
   );
 }
 
+export const currencyOptions = [
+  { code: "INR", label: "Indian Rupee (₹)" },
+  { code: "USD", label: "US Dollar ($)" },
+  { code: "EUR", label: "Euro (€)" },
+  { code: "GBP", label: "British Pound (£)" },
+  { code: "JPY", label: "Japanese Yen (¥)" },
+  { code: "CNY", label: "Chinese Yuan (¥)" },
+  { code: "AUD", label: "Australian Dollar (A$)" },
+  { code: "CAD", label: "Canadian Dollar (C$)" },
+  { code: "CHF", label: "Swiss Franc (CHF)" },
+  { code: "SGD", label: "Singapore Dollar (S$)" },
+  { code: "HKD", label: "Hong Kong Dollar (HK$)" },
+  { code: "NZD", label: "New Zealand Dollar (NZ$)" },
+  { code: "KRW", label: "South Korean Won (₩)" },
+  { code: "ZAR", label: "South African Rand (R)" },
+  { code: "SEK", label: "Swedish Krona (kr)" },
+  { code: "NOK", label: "Norwegian Krone (kr)" },
+  { code: "DKK", label: "Danish Krone (kr)" },
+  { code: "BRL", label: "Brazilian Real (R$)" },
+  { code: "MXN", label: "Mexican Peso (MX$)" },
+  { code: "RUB", label: "Russian Ruble (₽)" },
+  { code: "THB", label: "Thai Baht (฿)" },
+  { code: "IDR", label: "Indonesian Rupiah (Rp)" },
+  { code: "MYR", label: "Malaysian Ringgit (RM)" },
+  { code: "PHP", label: "Philippine Peso (₱)" },
+  { code: "AED", label: "UAE Dirham (د.إ)" },
+  { code: "SAR", label: "Saudi Riyal (﷼)" }
+];
+
+export function computeBalances({ expenses = [], userId }) {
+  if (!userId) throw new Error("userId required");
+// console.log(expenses)
+  const normalizeId = (id) => (id && id.toString ? id.toString() : String(id));
+
+  const me = normalizeId(userId);
+
+  const currencyBuckets = {};
+
+  for (const exp of expenses) {
+    const currency = exp.currency || "INR";
+
+    if (!currencyBuckets[currency]) {
+      currencyBuckets[currency] = {
+        totalOwedByYou: 0,
+        totalOwedToYou: 0,
+        peersMap: new Map(), 
+      };
+    }
+    const bucket = currencyBuckets[currency];
+
+    const addToPeer = (peerId, amountOwedByYou = 0, amountOwedToYou = 0) => {
+      const id = normalizeId(peerId);
+      const existing = bucket.peersMap.get(id) || {
+        userId: id,
+        owedByYou: 0,
+        owedToYou: 0,
+        unpaidCount: 0,
+        profile: null,
+      };
+      existing.owedByYou += amountOwedByYou;
+      existing.owedToYou += amountOwedToYou;
+      if (amountOwedByYou > 0 || amountOwedToYou > 0) existing.unpaidCount += 1;
+      bucket.peersMap.set(id, existing);
+    };
+
+    // Map payments by participant.user for this expense
+    const paymentsByUser = {};
+    (exp.paymentHistory || []).forEach((p) => {
+      const pid = normalizeId(p.user);
+      paymentsByUser[pid] = (paymentsByUser[pid] || 0) + (p.amount || 0);
+    });
+
+    const payerId = normalizeId(exp.paidBy?._id ?? exp.paidBy);
+
+    // iterate participants
+    for (const part of exp.participants || []) {
+      const participantId = normalizeId(part.user?._id ?? part.user);
+      const totalAmountOwed = Number(part.totalAmountOwed || 0);
+
+      // If schema has participants.hasPaid (some samples did), treat as fully paid
+      const hasPaid = !!part.hasPaid;
+
+      const paidByParticipant = paymentsByUser[participantId] || 0;
+      let unpaid = hasPaid ? 0 : Math.max(totalAmountOwed - paidByParticipant, 0);
+
+      // If unpaid is zero, skip
+      if (unpaid <= 0) continue;
+
+      // case 1: participant owes payer (typical)
+      if (participantId !== payerId) {
+        // participant owes the payer 'unpaid'
+        if (participantId === me) {
+          // current user owes someone
+          addToPeer(payerId, unpaid, 0);
+          bucket.totalOwedByYou += unpaid;
+        } else if (payerId === me) {
+          // someone owes current user
+          addToPeer(participantId, 0, unpaid);
+          bucket.totalOwedToYou += unpaid;
+        } else {
+         
+        }
+      } else {
+        
+        continue;
+      }
+
+    
+      if (part.user && typeof part.user === "object") {
+        const idStr = normalizeId(part.user._id ?? part.user);
+        const entry = bucket.peersMap.get(idStr);
+        if (entry) entry.profile = {
+          fullName: part.user.fullName,
+          avatar: part.user.avatar,
+        };
+      }
+      if (exp.paidBy && typeof exp.paidBy === "object") {
+        const idStr = normalizeId(exp.paidBy._id ?? exp.paidBy);
+        const entry = bucket.peersMap.get(idStr);
+        if (entry) entry.profile = {
+          fullName: exp.paidBy.fullName,
+          avatar: exp.paidBy.avatar,
+        };
+      }
+    }
+  } // end expenses loop
+
+  const result = {};
+  for (const [currency, bucket] of Object.entries(currencyBuckets)) {
+    const peers = Array.from(bucket.peersMap.values()).map((p) => ({
+      userId: p.userId,
+      name: p.profile?.fullName || null,
+      avatar: p.profile?.avatar || null,
+      owedByYou: Number((p.owedByYou || 0).toFixed(2)),
+      owedToYou: Number((p.owedToYou || 0).toFixed(2)),
+      net: Number(((p.owedToYou || 0) - (p.owedByYou || 0)).toFixed(2)),
+      unpaidCount: p.unpaidCount || 0,
+    }));
+
+    result[currency] = {
+      totalOwedByYou: Number((bucket.totalOwedByYou || 0).toFixed(2)),
+      totalOwedToYou: Number((bucket.totalOwedToYou || 0).toFixed(2)),
+      net: Number(((bucket.totalOwedToYou || 0) - (bucket.totalOwedByYou || 0)).toFixed(2)),
+      peers,
+    };
+  }
+  return result;
+}
+
+export const dedupeMessages = (arr) => {
+  const map = new Map();
+  for (const m of arr || []) {
+    if (!m) continue;
+    const id = m._id ?? m.id;
+    if (!id) continue;
+    if (!map.has(id)) map.set(id, m);
+  }
+ 
+  return Array.from(map.values());
+};

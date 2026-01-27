@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { paymentMethodSchema } from "@/schema/authSchema";
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import {
   Form,
   FormItem,
@@ -13,13 +12,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
-import { loginUser } from "@/api/queries/auth";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
 import jsQR from "jsqr";
 import { useState } from "react";
 
-export const PaymentMethodForm = () => {
+ const PaymentMethodForm = () => {
   const { addPaymentMutation } = useAuth();
   const [qrData, setQrData] = useState("");
   const handleFileUpload = async (file,setValue) => {
@@ -165,3 +163,5 @@ export const PaymentMethodForm = () => {
     </Form>
   );
 };
+
+export default PaymentMethodForm

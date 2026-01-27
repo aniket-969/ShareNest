@@ -8,6 +8,8 @@ import { Poll } from "../models/poll.model.js";
 import { Expense } from "../models/expense.model.js";
 import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+import { mongoose } from "mongoose";
+import { ChatMessage } from "./../models/chatMessage.model.js";
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -30,9 +32,78 @@ async function generateUniqueGroupCode() {
   return groupCode;
 }
 
+const getRoomData = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const userId = req.user?._id;
+
+  console.log("getting room Data");
+
+  let roomQuery = Room.findById(roomId);
+
+  const populateArr = [
+    { path: "tenants", select: "username fullName avatar _id paymentMethod" },
+    { path: "admin", select: "username fullName avatar _id" },
+
+    // Tasks
+    {
+      path: "tasks.createdBy",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.participants",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.swapRequests.from",
+      select: "username fullName avatar _id",
+    },
+    {
+      path: "tasks.swapRequests.to",
+      select: "username fullName avatar _id",
+    },
+
+    { path: "awards" },
+    { path: "polls" },
+    
+    { path: "pendingRequests.userId", select: "username fullName avatar _id" },
+  ];
+
+  const room = await roomQuery.populate(populateArr);
+  if (!room) throw new ApiError(404, "Room not found");
+  const isAdmin = room.admin?._id.equals(userId);
+  if (!isAdmin) room.pendingRequests = undefined;
+
+  // Fetch latest messages
+  const LIMIT = 50;
+  const latestPlusOne = await ChatMessage.find({ room: roomId })
+    .sort({ createdAt: -1 })
+    .limit(LIMIT + 1)
+    .populate("sender", "fullName avatar username _id")
+    .lean();
+
+  const hasMore = latestPlusOne.length > LIMIT;
+  const chatMessages = latestPlusOne.slice(0, LIMIT).reverse();
+  const nextBeforeId = hasMore ? latestPlusOne[LIMIT]._id.toString() : null;
+
+  const chatMessagesMeta = {
+    hasMore,
+    nextBeforeId,
+    limit: LIMIT,
+    returnedCount: chatMessages.length,
+  };
+
+  return res.json(
+    new ApiResponse(
+      200,
+      { room, chatMessages, chatMessagesMeta },
+      "Room data + recent messages fetched successfully"
+    )
+  );
+});
+
 const createRoom = asyncHandler(async (req, res) => {
   const admin = req.user?._id;
-  const { name, description, role } = req.body;
+  const { name, description } = req.body;
 
   const groupCode = await generateUniqueGroupCode();
   let roomData = {
@@ -42,11 +113,7 @@ const createRoom = asyncHandler(async (req, res) => {
     groupCode,
   };
 
-  if (role === "landlord") {
-    roomData.landlord = admin;
-  } else if (role === "tenant") {
-    roomData.tenants = [admin];
-  }
+  roomData.tenants = [admin];
 
   const room = await Room.create(roomData);
 
@@ -86,11 +153,10 @@ const updateRoom = asyncHandler(async (req, res) => {
 });
 
 const addUserRequest = asyncHandler(async (req, res) => {
-  const userId = req.user?._id;
-  const { groupCode, role } = req.body;
+  const userId = req.user._id;
+  const { groupCode } = req.body;
 
   const room = await Room.findOne({ groupCode });
-
   if (!room) {
     throw new ApiError(404, "Room doesn't exist");
   }
@@ -99,31 +165,41 @@ const addUserRequest = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Admin can't send request to their own room");
   }
 
-  if (room.pendingRequests.length > 50) {
+  if (room.tenants.some(id => id.toString() === userId.toString())) {
+    throw new ApiError(400, "User is already a member of this room");
+  }
+
+  if (room.pendingRequests.length >= 50) {
     throw new ApiError(400, "Room has too many pending requests already");
   }
 
-  if (
-    !room.pendingRequests.some(
-      (request) => request.userId.toString() === userId.toString()
-    )
-  ) {
-    room.pendingRequests.push({ userId, role });
-    await room.save();
-  } else {
-    return res.json(new ApiResponse(400, {}, "Request already sent"));
+  const alreadyRequested = room.pendingRequests.some(
+    req => req.userId.toString() === userId.toString()
+  );
+
+  if (alreadyRequested) {
+    throw new ApiError(400, "Request already sent");
   }
+
+  const role = "tenant";
+
+  room.pendingRequests.push({ userId, role });
+  await room.save();
+
   emitSocketEvent(
     req,
     room.admin.toString(),
     RoomEventEnum.JOIN_ROOM_REQUEST_EVENT,
     {
       userId,
-      role,
       roomId: room._id,
+      role,
     }
   );
-  return res.json(new ApiResponse(200, {}, "Request sent successfully"));
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Request sent successfully"));
 });
 
 const adminResponse = asyncHandler(async (req, res) => {
@@ -153,12 +229,7 @@ const adminResponse = asyncHandler(async (req, res) => {
     const { userId, role } = room.pendingRequests[requestIndex];
 
     if (action === "approved") {
-      if (role === "landlord") {
-        if (room.landlord) {
-          throw new ApiError(400, "Room already has a landlord");
-        }
-        room.landlord = userId;
-      } else if (role === "tenant") {
+      if (role === "tenant") {
         room.tenants.push(userId);
       }
 
@@ -241,107 +312,134 @@ const deleteRoom = asyncHandler(async (req, res) => {
     );
 });
 
-const getRoomData = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
-  const userId = req.user?._id;
-
-  console.log("getting room Data");
-
-  // Fetch room with/without pendingRequests based on admin status
-  let roomQuery = Room.findById(roomId).select("-groupCode");
-
-  // Check if user is admin (without making an extra DB call)
-  const isAdmin = await Room.exists({ _id: roomId, admin: userId });
-
-  if (!isAdmin) {
-    roomQuery = roomQuery.select("-pendingRequests"); // Exclude pendingRequests for non-admins
-  }
-
-  const room = await roomQuery.populate([
-    { path: "admin", select: "username fullName avatar _id" },
-    { path: "tenants", select: "username fullName avatar _id" },
-    { path: "landlord", select: "username fullName avatar _id" },
-    { path: "awards" },
-    { path: "tasks.currentAssignee", select: "username fullName" },
-    ,
-    {
-      path: "tasks.participants",
-      select: "username fullName avatar _id",
-    },
-    {
-      path: "tasks.rotationOrder",
-      select: "username fullName avatar _id",
-    },
-    { path: "polls" },
-    ...(isAdmin ? [{ path: "pendingRequests.userId" }] : []), // Only populate pendingRequests if admin
-  ]);
-
-  if (!room) {
-    throw new ApiError(404, "Room not found");
-  }
-
-  return res.json(new ApiResponse(200, room, "Room data fetched successfully"));
-});
-
 const leaveRoom = asyncHandler(async (req, res) => {
-  console.log("This is user", req.user);
-  const userId = req.user?._id;
+  const userId = req.user._id.toString();
   const { roomId } = req.params;
 
-  const room = await Room.findById(roomId);
+  // transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (room.admin.toString() === userId.toString()) {
-    throw new ApiError(400, "Admin can't leave the room");
+  try {
+    const room = await Room.findById(roomId).session(session);
+    if (!room) {
+      throw new ApiError(404, "Room not found");
+    }
+    if (room.admin.toString() === userId.toString()) {
+      throw new ApiError(400, "Admin can't leave the room");
+    }
+
+    //  Remove user from room.tenants
+    room.tenants = room.tenants.filter(
+      (tenantId) => tenantId.toString() !== userId
+    );
+    await room.save({ session });
+
+    const user = req.user;
+
+    //  Remove room from user rooms array
+    user.rooms = user.rooms.filter(
+      (room) => room.roomId.toString() !== roomId.toString()
+    );
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    emitSocketEvent(
+      req,
+      roomId,
+      RoomEventEnum.LEAVE_ROOM_EVENT,
+      `${user.fullName} left the room 🥺`
+    );
+
+    return res.json(new ApiResponse(200, {}, "User has left the room"));
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
   }
-
-  room.tenants = room.tenants.filter(
-    (tenant) => tenant.toString() !== userId.toString()
-  );
-  await room.save();
-  const user = req.user;
-  user.rooms = user.rooms.filter(
-    (room) => room.id.toString() !== roomId.toString()
-  );
-  await user.save();
-  emitSocketEvent(
-    req,
-    roomId,
-    RoomEventEnum.LEAVE_ROOM_EVENT,
-    `${user.fullName} left the room 🥺`
-  );
-  return res.json(new ApiResponse(200, {}, "User has left the room"));
 });
 
 const transferAdminControl = asyncHandler(async (req, res) => {
-  const { roomId } = req.params;
-  const { newAdminId } = req.body;
-  const currentAdminId = req.user?._id;
+  const { newAdminId } = req.params;
+  const room = req.room;
 
-  const room = await Room.findById(roomId);
-
-  if (!room) {
-    throw new ApiError(404, "Room not found");
-  }
-
-  if (room.admin.toString() !== currentAdminId.toString()) {
-    throw new ApiError(403, "Only the current admin can transfer admin rights");
-  }
-
+  // Check for newAdminId is a member
   if (!room.tenants.includes(newAdminId)) {
     throw new ApiError(400, "New admin must be a member of the room");
   }
 
   room.admin = newAdminId;
   await room.save();
+
   emitSocketEvent(
     req,
-    roomId,
+    room._id.toString(),
     RoomEventEnum.ADMIN_ROOM_CHANGE,
-    `Room admin changed`
+    "Room admin changed"
   );
+
   return res
     .status(200)
     .json(new ApiResponse(200, room, "Admin rights transferred successfully"));
+});
+
+export const kickUser = asyncHandler(async (req, res) => {
+  const adminId = req.user._id.toString();
+  const { roomId, targetUserId } = req.params;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const room = await Room.findById(roomId).session(session);
+    if (!room) throw new ApiError(404, "Room not found");
+
+    if (room.admin.toString() !== adminId) {
+      throw new ApiError(403, "Only admin can kick members");
+    }
+
+    if (adminId === targetUserId) {
+      throw new ApiError(400, "Admin cannot kick themselves");
+    }
+
+    const tenantIndex = room.tenants.findIndex(
+      (t) => t.toString() === targetUserId
+    );
+    if (tenantIndex === -1) {
+      throw new ApiError(400, "User is not a member of this room");
+    }
+    room.tenants.splice(tenantIndex, 1);
+    await room.save({ session });
+
+    const user = await User.findById(targetUserId).session(session);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    user.rooms = user.rooms.filter(
+      (r) => r.roomId.toString() !== roomId.toString()
+    );
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    emitSocketEvent(
+      req,
+      roomId,
+      RoomEventEnum.KICK_MEMBER_EVENT,
+      `A member was removed by the admin`
+    );
+
+    return res.json(
+      new ApiResponse(200, {}, "User has been kicked from the room")
+    );
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
 });
 
 export {

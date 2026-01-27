@@ -1,29 +1,40 @@
 import { useState } from "react";
-import { PollForm } from "../form/PollForm";
-import { Button } from "../ui/button";
-import FormWrapper from "../ui/formWrapper";
+import { PollForm } from "@/components/form/poll/PollForm";
+import { Button } from "@/components/ui/button";
+import FormWrapper from "@/components/ui/formWrapper";
 import Poll from "./Poll";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "../ui/spinner";
+import { CirclePlus } from "lucide-react";
 
 const PollCard = ({ initialPolls }) => {
   const [showPoll, setShowPoll] = useState(false);
-// console.log(initialPolls)
+  // console.log(initialPolls)
+
   return (
-    <div className="w-[25rem] h-[300px] rounded-lg shadow-md p-4 flex flex-col bmain">
-      <div className="flex justify-between items-center mb-3">
+    <div className="bs:w-[25rem] bs:h-[305px] h-[400px] rounded-lg p-4 flex flex-col bg-card ">
+      {/* Title and create poll button */}
+
+      <div className="flex justify-between items-center pb-1 mb-1 px-2">
         <h2 className="font-semibold text-lg">Polls</h2>
-        <Button size="sm" onClick={() => setShowPoll(true)}>
+        {/* <Button size="sm" onClick={() => setShowPoll(true)}>
           Create Poll
+        </Button> */}
+        <Button size="icon" variant="primary" onClick={() => setShowPoll(true)}>
+          <CirclePlus />
         </Button>
       </div>
 
+      <Separator />
+
       {showPoll && (
-        <FormWrapper onClose={() => setShowPoll(false)}>
-          <PollForm />
+        <FormWrapper className="" onClose={() => setShowPoll(false)}>
+          <PollForm onClose={() => setShowPoll(false)} />
         </FormWrapper>
       )}
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 pr-1">
         <Poll initialPolls={initialPolls} />
       </ScrollArea>
     </div>

@@ -6,11 +6,11 @@ const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
       trim: true,
       index: true,
+      sparse: true,
     },
     email: {
       type: String,
@@ -27,15 +27,26 @@ const userSchema = new Schema(
     },
     avatar: {
       type: String,
-      required: true,
+    },
+    googleId: {
+      type: String,
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
     },
-    role: {
+    provider: {
       type: String,
-      enum: ["tenant", "landlord"],
+      enum: ["local", "google"],
+      default: "local",
+    },
+    firebaseUid: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
     },
     rooms: [
       {
@@ -49,7 +60,7 @@ const userSchema = new Schema(
         },
       },
     ],
-    paymentMethod:[
+    paymentMethod: [
       {
         appName: {
           type: String,
@@ -61,16 +72,30 @@ const userSchema = new Schema(
         },
         type: {
           type: String,
-          enum: ['UPI', 'PayPal', 'Stripe', 'BankTransfer', 'Other']
         },
         qrCodeData: {
-          type: String, 
+          type: String,
         },
-      }
-    ]
-    ,
+      },
+    ],
+    notificationToken: {
+      type: String,
+    },
     refreshToken: {
       type: String,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
+    resetPasswordRequestCount: {
+      type: Number,
+      default: 0,
+    },
+    lastPasswordResetRequestAt: {
+      type: Date,
     },
   },
   {
@@ -79,7 +104,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
@@ -88,9 +113,9 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.path('paymentMethod').validate(function (value) {
-  return value.length <= 3; // Ensures the paymentMethods array has at most 3 elements
-}, 'You can only have up to 3 payment methods.');
+userSchema.path("paymentMethod").validate(function (value) {
+  return value.length <= 3;
+}, "You can only have up to 3 payment methods.");
 
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(

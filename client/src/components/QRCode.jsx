@@ -10,21 +10,10 @@ export default function QRScanner() {
   const { data, isLoading, isError } = sessionQuery;
 
   if (isLoading) {
-    return <QrCodeSkeleton/>;
+    return <QrCodeSkeleton />;
   }
   if (isError) {
-    return <>Something went wrong . Please refresh</>
+    return <>Something went wrong . Please refresh</>;
   }
-  return (
-    <div className="">
-      {data?.paymentMethod?.length > 0 ? (
-        <>
-          {/* <PaymentMethod /> */}
-          <QRCarousel paymentMethod={data?.paymentMethod} />
-        </>
-      ) : (
-        <PaymentMethod />
-      )}
-    </div>
-  );
+  return <QRCarousel paymentMethod={data?.paymentMethod} editable={true} />;
 }

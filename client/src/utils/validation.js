@@ -14,7 +14,7 @@ export const stringValidation = (min, max, fieldName) => {
 export const optionalStringValidation = (min, max, fieldName) => {
   return z
     .string()
-    .transform((val) => (val.trim() === "" ? undefined : val)) // ✅ Convert "" to undefined
+    .transform((val) => (val.trim() === "" ? undefined : val)) 
     .optional()
     .refine((val) => !val || val.length >= min, {
       message: `${fieldName} must be at least ${min} characters long.`,

@@ -1,45 +1,71 @@
 import { Router } from "express";
 import {
   changePasswordSchema,
+  forgotPasswordSchema,
   loginSchema,
   paymentMethodSchema,
   registerSchema,
+  resetPasswordSchema,
   updateUserSchema,
 } from "./../zod/user.schema.js";
 import { validate } from "../middleware/validator.middleware.js";
-import {
+import { 
   addPaymentMethod,
   changePassword,
+  deletePaymentMethod,
   fetchSession,
+  forgotPassword,
+  googleLogin,
   loginUser,
   logoutUser,
   refreshTokens,
   registerUser,
+  resetPassword,
+  testNotification,
   updateAccountDetails,
+  updateFcmToken,
 } from "../controllers/user.controllers.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { validateQRCodeData } from "../middleware/qrcode.middleware.js";
 import { loginLimiter, sessionLimiter } from "../middleware/rateLimiters.js";
 
 const router = Router();
-
+ 
 router.route("/register").post(loginLimiter,validate(registerSchema), registerUser);
 router.route("/login").post(loginLimiter,validate(loginSchema), loginUser);
+router.route("/google").post(loginLimiter, googleLogin);
 router.route("/session").get(sessionLimiter ,verifyJWT,fetchSession);
-
+router.route("/forgot-password")
+  .post(loginLimiter,validate(forgotPasswordSchema), forgotPassword);
+router.route("/reset-password")
+  .post(loginLimiter,validate(resetPasswordSchema), resetPassword);
+ 
 // secured routes
-router.route("/logout").post(verifyJWT, logoutUser);
+router
+  .route("/me")
+  .patch(verifyJWT,validate(updateUserSchema), updateAccountDetails);
 
+router
+  .route("/me/test-notification")
+  .post(
+    verifyJWT,          
+    testNotification
+  );
+router.route("/me/logout").post(verifyJWT, logoutUser);
+router
+  .route("/me/token")
+  .patch(verifyJWT,updateFcmToken);
 router.route("/refreshTokens").post(refreshTokens);
 router
-  .route("/change-password")
-  .post(validate(changePasswordSchema), verifyJWT, changePassword);
+  .route("/me/password")
+  .patch(verifyJWT,validate(changePasswordSchema), changePassword);
 router
-  .route("/update-user")
-  .patch(validate(updateUserSchema), verifyJWT, updateAccountDetails);
-router
-  .route("/payment")
-  .patch(validate(paymentMethodSchema), verifyJWT, validateQRCodeData,addPaymentMethod);
+  .route("/me/payments")
+  .patch(validate(paymentMethodSchema), verifyJWT, addPaymentMethod);
+  router
+  .route("/me/payments/:paymentId")
+  .delete(verifyJWT, deletePaymentMethod);
+
 
 export default router;
  

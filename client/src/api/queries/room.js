@@ -18,8 +18,11 @@ export const adminResponse = async (data, roomId) => {
 };
 
 export const updateRoom = async (roomId, data) => {
+  console.log(roomId,data)
+ 
   const response = axiosClient.patch(`/${baseRoom}/${roomId}`, data);
-  return response.data?.data?._id;
+  console.log(response)
+  return response?.data;
 };
 
 export const deleteRoom = async (data, roomId) => {
@@ -27,16 +30,36 @@ export const deleteRoom = async (data, roomId) => {
 };
 
 export const getRoomData = async (roomId) => {
-  console.log("here")
+  console.log("here");
   const response = await axiosClient.get(`/${baseRoom}/${roomId}`);
+  const payload = response.data?.data;
+
+  const room = payload?.room;
+  const chatMessages = payload?.chatMessages;
+  const chatMessagesMeta = payload?.chatMessagesMeta
+  // console.log(payload)
+  return {...room,chatMessages,chatMessagesMeta};
+}; 
+
+export const leaveRoom = async (roomId) => {
+  console.log("leave room", roomId);
+  
+  const response = await axiosClient.patch(
+    `/${baseRoom}/${roomId}/leave`,
+   {}
+  );
   console.log(response);
   return response.data?.data;
 };
 
-export const leaveRoom = async (data, roomId) => {
-  return axiosClient.patch(`/${baseRoom}/${roomId}/leave`, data);
+export const adminTransfer = async (roomId,newAdminId) => {
+  console.log(roomId,newAdminId)
+  
+  return axiosClient.patch(`/${baseRoom}/${roomId}/admin/${newAdminId}`);
 };
 
-export const adminTransfer = async (data) => {
-  return axiosClient.post(`/${baseRoom}/${roomId}/admin/transfer`);
+export const kickUser = async (roomId,targetUserId) => {
+  console.log(roomId,targetUserId)
+  
+  return axiosClient.patch(`/${baseRoom}/${roomId}/kick/${targetUserId}`);
 };

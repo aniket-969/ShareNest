@@ -11,7 +11,6 @@ import {
   createSwitchRequest,
   deleteRoomTask,
   switchRequestResponse,
-  updateRoomTask,
 } from "../controllers/tasks.controller.js";
 
 const router = Router();
@@ -20,9 +19,6 @@ router.use(verifyJWT);
 router
   .route("/:roomId")
   .post(validate(createRoomTaskSchema),  createRoomTask);
-router
-  .route("/:taskId/:roomId")
-  .patch(validate(updateRoomTaskSchema),  updateRoomTask);
 router.route("/:taskId/:roomId").delete(adminOnly, deleteRoomTask);
 router
   .route("/taskSwitch/:taskId/:roomId")

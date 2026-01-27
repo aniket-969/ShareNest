@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { createExpenseSchema } from "@/schema/expenseSchema";
-import { zodResolver } from '@hookform/resolvers/zod';
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormItem,
@@ -16,22 +15,25 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useExpense } from "@/hooks/useExpense";
 import { useParams } from "react-router-dom";
-import ParticipantSelector from "../ParticipantsSelector";
-import { useRoom } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
 
-const ExpenseForm = ({ participants }) => {
+ 
+const ExpenseForm = ({ participants,onClose,currency }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
+
   const onSubmit = async (values) => {
     console.log(values, roomId);
     // return;
     try {
-      const response = await createExpenseMutation.mutateAsync(values, roomId);
+      const response = await createExpenseMutation.mutateAsync(values);
       console.log(response);
       toast("Splitted Expense ");
+      form.reset()
+      onClose()
+
     } catch (error) {
       console.error("Error during registration:", error);
     }
@@ -42,17 +44,18 @@ const ExpenseForm = ({ participants }) => {
     defaultValues: {
       title: "",
       totalAmount: 0,
-      imageUrl: "",
-      dueDate: undefined,
       paidBy: "",
       participants: [],
+      currency: currency,
     },
   });
-  console.log(form.formState.errors);
+
+  // console.log(form.formState.errors);
   return (
+    <>
     <Form {...form}>
-      {/* title */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 ">
+        {/* title */}
         <FormField
           control={form.control}
           name="title"
@@ -104,43 +107,15 @@ const ExpenseForm = ({ participants }) => {
             </FormItem>
           )}
         />
-        {/* image or bill link */}
-        <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bill image link</FormLabel>
-              <FormControl>
-                <Input placeholder="add link of expense" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* Due date */}
-        <FormField
-          control={form.control}
-          name="dueDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Due Date</FormLabel>
-              <FormControl>
-                <DatePicker
-                  name="dueDate"
-                  field={field}
-                  disableBefore={new Date(new Date().setHours(0, 0, 0, 0))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit">Submit</Button>
+       
+        <Button type="submit" variant="" disabled={createExpenseMutation.isLoading}>
+          Split expense
+        </Button>
       </form>
     </Form>
+    </>
+    
   );
 };
 
-export default ExpenseForm
+export default ExpenseForm;

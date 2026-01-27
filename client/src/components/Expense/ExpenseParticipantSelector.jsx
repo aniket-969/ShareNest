@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, XCircle, Pencil } from "lucide-react";
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useFieldArray } from "react-hook-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ExpenseParticipantSelector = ({
   participants,
@@ -139,8 +140,8 @@ const ExpenseParticipantSelector = ({
   };
 
   return (
-    <div className="space-y-2">
-      <ScrollArea className="h-[14rem] w-full rounded-md border p-2">
+    <div className="space-y-2 ">
+      <ScrollArea className="h-[14rem] w-full rounded-md py-2 ">
         {getParticipantsList().map((participant, index) => {
           const isSelected = fields.some(
             (field) => field.userId === participant._id
@@ -154,17 +155,23 @@ const ExpenseParticipantSelector = ({
             <div
               key={participant._id}
               onClick={() => handleParticipantSelect(participant)}
-              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-accent/50 mb-2 ${
-                isSelected ? "bg-card text-card-foreground" : ""
+              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-neutral-800/20 mb-2 
+                ${
+                isSelected ? "bg-card-muted text-card-foreground" : 
+                "shadow-xl"
               }`}
             >
               <div className="flex-1">
+
                 <div className="flex items-center space-x-3">
-                  <img
-                    src={participant.avatar}
-                    alt={`${participant.fullName} avatar`}
-                    className="w-8 h-8 rounded-full"
-                  />
+
+                    <Avatar className="w-8 h-8 rounded-[2.4rem]">
+                      <AvatarImage src={participant.avatar} alt={participant.fullName} />
+                      <AvatarFallback>
+                        <img src="/altAvatar1.jpg" alt="fallback avatar" />
+                      </AvatarFallback>
+                    </Avatar>
+
                   <div>
                     <p className="font-semibold">{participant.username}</p>
                     <p
@@ -173,6 +180,7 @@ const ExpenseParticipantSelector = ({
                       {participant.fullName}
                     </p>
                   </div>
+
                 </div>
                 {field?.additionalCharges?.length > 0 && (
                   <div className="mt-2 ml-11 space-y-1">

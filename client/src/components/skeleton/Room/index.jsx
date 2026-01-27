@@ -1,0 +1,17 @@
+import ProfileSkeleton from "./profile";
+import QrCodeSkeleton from "./qrCode";
+import RoomListSkeleton from "./roomList";
+
+const RoomLoader = () => {
+  return (
+    <div className="flex flex-col gap-10 items-center pt-7 sm:pt-24 ">
+      <ProfileSkeleton />
+      <div className="flex flex-col-reverse justify-around items-center w-full gap-20 sm:gap-10 sm:flex-row sm:mt-7 ">
+        <QrCodeSkeleton />
+        <RoomListSkeleton />
+      </div>
+    </div>
+  );
+};
+
+export default RoomLoader;

@@ -142,3 +142,8 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+
+/secrets/
+secrets
+/secrets/serviceAccountKey.json
+secrets/serviceAccountKey.json

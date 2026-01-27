@@ -1,40 +1,78 @@
 import axiosClient from "../axiosClient";
 
-const baseAuth = "users";
+const base = "users";
 
 export const fetchSession = async () => {
-  // console.log("calling session");
-
-  const response = await axiosClient.get(`/${baseAuth}/session`);
-  // console.log("Fetched session data",response.data.data)
-  localStorage.setItem("session", JSON.stringify(response.data.data));
+  const response = await axiosClient.get(`/${base}/session`);
+  localStorage.setItem("session", JSON.stringify(response.data?.data));
   return response.data?.data;
 };
 
-export const registerUser = async (data) => {
-  return axiosClient.post(`/${baseAuth}/register`, data);
+export const registerUser = (data) => {
+  return axiosClient.post(`/${base}/register`, data);
 };
 
-export const loginUser = async (data) => {
-  return axiosClient.post(`/${baseAuth}/login`, data);
+export const loginUser = (data) => {
+  return axiosClient.post(`/${base}/login`, data);
 };
 
-export const logOut = async (data) => {
-  return axiosClient.post(`/${baseAuth}/logout`, data);
+export const loginWithGoogle = (idToken) => {
+  console.log(idToken);
+  return axiosClient.post(
+    `/${base}/google`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${idToken}` },
+    }
+  );
 };
 
-export const refreshTokens = async (data) => {
-  return axiosClient.post(`/${baseAuth}/refreshTokens`, data);
+export const logOut = () => {
+  return axiosClient.post(`/${base}/me/logout`);
+};
+
+export const refreshTokens = (data) => {
+  return axiosClient.post(`/${base}/refreshTokens`, data);
 };
 
 export const updateUser = async (data) => {
-  return axiosClient.patch(`/${baseAuth}/update-user`, data);
+  console.log(data);
+  const response = await axiosClient.patch(`/${base}/me`, data);
+  console.log(response);
+  return response.data?.data;
 };
- 
-export const addPayment = async (data) => {
-  return axiosClient.patch(`/${baseAuth}/payment`, data);
+
+export const updateNotificationToken = async (data) => {
+  console.log("In update notification token");
+  const response = await axiosClient.patch(`/${base}/me/token`, data);
+  console.log(response);
+  return;
 };
 
 export const changePassword = async (data) => {
-  return axiosClient.post(`/${baseAuth}/change-password`, data);
+  console.log("changin pass", data);
+  const response = await axiosClient.patch(`/${base}/me/password`, data);
+  console.log(response);
+  return response?.data;
+};
+
+export const addPayment = (data) => {
+  return axiosClient.patch(`/${base}/me/payments`, data);
+};
+
+export const deletePayment = (paymentId) => {
+  console.log(paymentId);
+
+  return axiosClient.delete(`/${base}/me/payments/${paymentId}`);
+};
+
+export const forgotPassword = (data) => {
+  console.log(data)
+  
+  return axiosClient.post(`/${base}/forgot-password`, data);
+};
+
+export const resetPassword = (data) => {
+  console.log(data)
+  return axiosClient.post(`/${base}/reset-password`, data);
 };

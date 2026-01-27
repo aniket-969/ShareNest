@@ -1,4 +1,4 @@
-import { SignIn } from '@/components/form/LoginForm'
+import { SignIn } from '@/components/form/auth/LoginForm'
 import React from 'react'
 import { Link } from 'react-router-dom'
  
@@ -15,7 +15,11 @@ const Login = () => {
         <Link to="/register" className="text-muted-foreground text-bold ">
           Register
         </Link>
+        
       </div>
+          <Link to="/forgot-password" className="text-muted-foreground text-bold text-sm tracking-wide">
+        Forgot Password?
+      </Link>
     </>
    
   )

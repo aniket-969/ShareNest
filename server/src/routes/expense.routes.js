@@ -3,11 +3,11 @@ import { verifyJWT } from "./../middleware/auth.middleware.js";
 import {
   createExpense,
   deleteExpense,
-  getExpenseDetails,
-  getPendingPayments,
-  getUserExpenses,
   updateExpense,
   updatePayment,
+  getSettleUpDrawer,
+  getExpenses,
+  settleAllWithUser
 } from "../controllers/expense.controller.js";
 import { checkMember } from "../middleware/room.middleware.js";
 import { validate } from "./../middleware/validator.middleware.js";
@@ -18,18 +18,23 @@ import {
 } from "../zod/expense.schema.js";
 
 const router = Router();
+
 router
   .route("/:roomId")
-  .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense);
-router 
+  .post(verifyJWT, validate(createExpenseSchema), checkMember, createExpense).get(verifyJWT,checkMember,getExpenses);
+
+  router.route("/:roomId/settle-up")
+  .get(verifyJWT,getSettleUpDrawer);
+  router.route("/:roomId/settle-up/:owedToUserId")
+  .post(verifyJWT,settleAllWithUser);
+
+router
   .route("/:expenseId/payment")
   .patch(verifyJWT, validate(updatePaymentSchema), updatePayment);
-router.route("/").get(verifyJWT, getUserExpenses);
-router.route("/pending").get(verifyJWT, getPendingPayments);
-router.route("/:expenseId").get(verifyJWT, getExpenseDetails); 
+
 router
   .route("/:expenseId")
-  .patch(verifyJWT, validate(updateExpenseSchema),updateExpense);
-router.route("/:expenseId").delete(verifyJWT, deleteExpense);
+  .patch(verifyJWT, validate(updateExpenseSchema), updateExpense)
+  .delete(verifyJWT, deleteExpense);
 
 export default router;

@@ -5,63 +5,77 @@ const expenseSchema = new Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
     },
+
     paidBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+      fullName: { type: String, required: true },
+      username: { type: String, default: null }, // <--- new
+      avatar: { type: String, default: null },
     },
+
     roomId: {
       type: Schema.Types.ObjectId,
       ref: "Room",
       required: true,
     },
-    imageUrl: {
-      type: String,
-      default: null,
+
+    totalAmount: {
+      type: Number,
+      required: true,
     },
+
     participants: [
       {
-        user: { type: Schema.Types.ObjectId, ref: "User" },
-        hasPaid: { type: Boolean, default: false },
-        paidDate: { type: Date, default: null },
+        id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        fullName: { type: String, required: true },
+        username: { type: String, default: null }, 
+        avatar: { type: String, default: null },
         baseAmount: { type: Number, required: true },
-        additionalCharges: {
-          type: [
-            {
-              amount: { type: Number, required: true },
-              reason: { type: String, required: true },
-            },
-          ],
-          default: [],
-        },
+        additionalCharges: [
+          {
+            amount: { type: Number, required: true },
+            reason: { type: String, required: true },
+          },
+        ],
         totalAmountOwed: { type: Number, required: true },
+
+        hasPaid: { type: Boolean, default: false },
+        paidAt: { type: Date, default: null },
+        paymentMode: { type: String, default: null },
       },
     ],
-    dueDate: {
-      type: Date,
-    },
+
     paymentHistory: [
       {
         user: { type: Schema.Types.ObjectId, ref: "User", required: true },
         amount: { type: Number, required: true },
         paymentDate: { type: Date, required: true },
-        description: {
-          type: String,
-        },
+        paymentMode: { type: String, default: null },
+        description: { type: String, default: "" },
       },
     ],
+
+    currency: {
+      type: String,
+      default: "INR",
+      match: /^[A-Z]{3}$/,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
 expenseSchema.index({ room: 1 });
 expenseSchema.index({ "participants.user": 1 });
-expenseSchema.index({ dueDate: 1 });
 expenseSchema.index({ "participants.hasPaid": 1 });
 expenseSchema.index({ "paymentHistory.paymentDate": 1 });
 expenseSchema.index({ createdAt: 1 });
 expenseSchema.index({ room: 1, "participants.hasPaid": 1 });
 
 export const Expense = mongoose.model("Expense", expenseSchema);
- 

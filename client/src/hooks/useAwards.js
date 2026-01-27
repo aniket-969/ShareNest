@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  createRoomAward,
+  createRoomAward, 
   deleteRoomAward,
   getRoomAwards,
   updateRoomAward,
@@ -41,8 +41,13 @@ export const useAward = () => {
   const deleteAwardMutation = useMutation({
     mutationFn: ({ roomId, awardId }) => deleteRoomAward(roomId, awardId),
     onSuccess: (data, { roomId }) => {
-      queryClient.invalidateQueries(["awards", roomId]);
+      queryClient.invalidateQueries(["room", roomId]);
     },
+    
+        onError: (error) => {
+          console.error("Failed to delete award", error);
+          toast.error(error?.response?.data?.message||"Failed to delete award")
+        },
   });
 
   return {

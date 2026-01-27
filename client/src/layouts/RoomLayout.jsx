@@ -2,7 +2,7 @@ import { getSocket } from "@/socket";
 import { Suspense, useEffect } from "react";
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
+import { AppSidebar } from "@/components/RoomDetails/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 import { Spinner } from "@/components/ui/spinner";
 import { useRoom } from "@/hooks/useRoom";
@@ -31,8 +31,8 @@ export const RoomLayout = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex w-full ">
+    <SidebarProvider >
+      <div className="flex w-full overflow-y-hidden ">
         {/*  sidebar in its own Suspense */}
         <Suspense
           fallback={
@@ -44,9 +44,9 @@ export const RoomLayout = () => {
           <AppSidebar roomData={roomData} />
         </Suspense>
 
-        <main className="w-full overflow-hidden ">
-          <SidebarTrigger />
-          <div className="px-2 py-1 w-full ">
+        <main className="w-full ">
+          <SidebarTrigger className=" xl:hidden  "/>
+          <div className=" px-2 py-1 w-full xl:pt-[1.75rem]">
             {/*  outlet content in its own Suspense */}
             <Suspense fallback={<Spinner />}>
               <Outlet />

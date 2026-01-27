@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider,SidebarTrigger } from "../ui/sidebar";
-import { AppSidebar } from "../AppSidebar";
+import { AppSidebar } from "../RoomDetails/AppSidebar";
+import LogOut from "../LogOut";
 
 export const RoomHeader = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const { logoutMutation } = useAuth();
   const onClick = async () => {
     try {
@@ -18,9 +19,9 @@ export const RoomHeader = () => {
     }
   };
   return (
-    <div className="flex items-center justify-between p-3 shadow-md bg-white">
+    <div className="flex items-center justify-around p-3 shadow-md bg-white ">
       {/* Leftmost Title: Dashboard */}
-      <p className="text- font-semibold text-lg text-primary"> Dashboard</p>
+      <h3 className="text- font-semibold text-lg text-primary"> Dashboard</h3>
 
       {/* Navigation Links */}
       <div className="flex space-x-4">
@@ -31,16 +32,8 @@ export const RoomHeader = () => {
           </Button>
         </Link>
 
-        <Link>
-          <Button
-            onClick={() => onClick()}
-            className="text-primary "
-            variant="link"
-            size="sm"
-          >
-            Logout
-          </Button>
-        </Link>
+          <LogOut variant="link"/>
+        
       </div>
     </div>
   );

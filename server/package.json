@@ -27,9 +27,12 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "express-rate-limit": "^7.4.1",
+    "firebase-admin": "^13.4.0",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
     "node-cron": "^3.0.3",
+    "resend": "^6.8.0",
     "socket.io": "^4.8.1",
     "uuid": "^10.0.0",
     "zod": "^3.23.8"

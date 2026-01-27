@@ -8,71 +8,50 @@ import { AvailableChatEvents, ChatEventEnum } from "../constants.js";
 import mongoose from "mongoose";
 
 const sendMessage = asyncHandler(async (req, res) => {
-  console.log(req.params);
   const { roomId } = req.params;
-  console.log("roomId", roomId);
-  const { content } = req.body;
+  const { content = "" } = req.body;
 
-  const selectedRoom = await Room.findById(roomId);
-
+  const selectedRoom = await Room.findById(roomId).select("_id tenants");
   if (!selectedRoom) {
-    throw new ApiError(404, "Chat does not exist");
+    throw new ApiError(404, "Room does not exist");
   }
 
-  const messageFiles = [];
+  const senderSnapshot = {
+    _id: req.user._id,
+    username: req.user.username,
+    fullName: req.user.fullName,
+    avatar: req.user.avatar,
+  };
 
-  if (req.files && req.files.attachments?.length > 0) {
-    req.files.attachments?.map((attachment) => {
-      messageFiles.push({
-        url: attachment.url,
-      });
-    });
-  }
-
-  const message = await ChatMessage.create({
-    sender: new mongoose.Types.ObjectId(req.user._id),
-    content: content || "",
-    chat: new mongoose.Types.ObjectId(roomId),
-    attachments: messageFiles,
+  const messageDoc = await ChatMessage.create({
+    sender: senderSnapshot,
+    content: typeof content === "string" ? content.trim() : "",
+    room: new mongoose.Types.ObjectId(roomId),
   });
 
-  const chat = await Room.findByIdAndUpdate(
-    roomId,
-    {
-      $set: {
-        lastMessage: message._id,
-      },
-    },
-    { new: true }
-  );
-
-  const receivedMessage = await ChatMessage.findById(message._id)
-    .populate("sender", "username avatar email")
-    .populate("chat", "room participants");
-
-  if (!receivedMessage) {
-    throw new ApiError(500, "Internal server error");
+  if (!messageDoc) {
+    throw new ApiError(500, "Failed to create message");
   }
 
-  const recipients = [...selectedRoom.tenants];
-  if (selectedRoom.landlord) {
-    recipients.push(selectedRoom.landlord);
-  }
+  const messageObj = messageDoc.toObject({ getters: true });
 
-  recipients.forEach((participantId) => {
-    if (participantId.toString() === req.user._id.toString()) return;
+ 
+  const tenants = Array.isArray(selectedRoom.tenants) ? selectedRoom.tenants : [];
+  const recipients = new Set(tenants.map((id) => id.toString()));
 
+  for (const participantId of recipients) {
+    if (participantId === req.user._id.toString()) continue;
     emitSocketEvent(
       req,
-      participantId.toString(),
+      participantId,
       ChatEventEnum.MESSAGE_RECEIVED_EVENT,
-      receivedMessage
+      messageObj
     );
-  });
+  }
 
   return res
     .status(201)
-    .json(new ApiResponse(201, receivedMessage, "Message saved successfully"));
+    .json(new ApiResponse(201, messageObj, "Message saved successfully"));
 });
 
 const deleteMessage = asyncHandler(async (req, res) => {
@@ -144,33 +123,55 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
 const getAllMessages = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
-  const limit = parseInt(req.query.limit) || 20;
-  const lastMessageTime = req.query.lastMessageTime || null;
+  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 200); 
+  const beforeId = req.query.beforeId || null; 
 
-  const selectedRoom = await Room.findById(roomId);
+  const selectedRoom = await Room.findById(roomId).select("_id tenants");
   if (!selectedRoom) throw new ApiError(404, "Room does not exist");
 
-  if (
-    !selectedRoom.tenants.includes(req.user._id) &&
-    (!selectedRoom.landlord ||
-      selectedRoom.landlord.toString() !== req.user._id.toString())
-  ) {
+  if (!selectedRoom.tenants.some((id) => id.toString() === req.user._id.toString())) {
     throw new ApiError(403, "You are not authorized to view this chat");
   }
 
-  let query = { chat: roomId };
-  if (lastMessageTime) {
-    query.createdAt = { $lt: new Date(lastMessageTime) };
+ 
+  const query = { room: roomId };
+
+  if (beforeId) {
+  
+    const beforeDoc = await ChatMessage.findById(beforeId).select("createdAt").lean();
+    if (beforeDoc && beforeDoc.createdAt) {
+      query.createdAt = { $lt: new Date(beforeDoc.createdAt) };
+    } else {
+     
+      return res.status(200).json(
+        new ApiResponse(200, { messages: [], meta: { hasMore: false, nextBeforeId: null, limit, returnedCount: 0 } }, "Messages fetched")
+      );
+    }
   }
 
-  const messages = await ChatMessage.find(query)
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .populate("sender", "fullName avatar username");
+  
+  const docs = await ChatMessage.find(query)
+    .sort({ createdAt: -1 })      
+    .limit(limit + 1)
+    .lean();
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, { messages }, "Messages fetched successfully"));
+  const hasMore = docs.length > limit;
+  const pageDocs = docs.slice(0, limit);
+  const messages = pageDocs.reverse();   
+
+ 
+  const nextBeforeId = hasMore ? docs[limit]._id.toString() : null;
+
+  const meta = {
+    hasMore,
+    nextBeforeId,
+    limit,
+    returnedCount: messages.length,
+  };
+
+  return res.status(200).json(
+    new ApiResponse(200, { messages, meta }, "Messages fetched successfully")
+  );
 });
 
 export { sendMessage, deleteMessage, getAllMessages };

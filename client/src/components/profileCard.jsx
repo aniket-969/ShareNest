@@ -1,27 +1,31 @@
 import { useAuth } from "@/hooks/useAuth";
-import React from "react";
 import { Spinner } from "./ui/spinner";
 import ProfileSkeleton from "./skeleton/Room/profile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfileCard = () => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
-//   console.log(data);
+  console.log(data);
   if (isLoading) {
     return <ProfileSkeleton />;
   }
-  if(isError){
-    return <>
-    Something went wrong . Please refresh</>
+  if (isError) {
+    return <>Something went wrong . Please refresh</>;
   }
   return (
-    <div className="flex flex-col items-center gap-3 ">
-      <div className="w-[5rem] ">
-        <img className=" rounded-[2.4rem] w-[80px] h-[80px]" src={data.avatar} alt={data.username} />
+    <div className="flex flex-col items-center gap-4 ">
+      <div className="">
+        <Avatar className="sm:w-[80px] sm:h-[80px] w-[50px] h-[50px] rounded-[2.4rem]">
+          <AvatarImage src={data?.avatar} alt={data?.fullName} />
+          <AvatarFallback>
+            <img src="/altAvatar1.jpg" alt="fallback avatar" />
+          </AvatarFallback>
+        </Avatar>
       </div>
-      <div className="flex gap-5">
-        <h2 >{data.fullName}</h2>
-        <p >{data.username}</p>
+      <div className="flex gap-10 sm:gap-20 items-center justify-center">
+        <p className="max-w-[120px] truncate text-center">{data?.fullName}</p>
+        <p className="max-w-[120px] truncate text-center">@{data?.username}</p>
       </div>
     </div>
   );

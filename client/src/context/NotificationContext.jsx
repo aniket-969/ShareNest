@@ -1,64 +1,61 @@
-// NotificationContext.jsx
-import { createContext, useContext, useEffect, useState } from "react"
-import { getSocket } from "@/socket" // wherever your enums live
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { getSocket } from "@/socket";
+import { useAuth } from "@/hooks/useAuth";
 
-const NotificationContext = createContext()
-export const useNotifications = () => useContext(NotificationContext)
+const NotificationContext = createContext();
+export const useNotifications = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
-  const socket = getSocket()
-  const [notifications, setNotifications] = useState([])
-  const [unreadCount, setUnreadCount] = useState(0)
+  const { sessionQuery } = useAuth();
 
+  // console.log(sessionQuery.data);
+
+  const socket = getSocket();
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // In-app socket notifications
   useEffect(() => {
     const handleAny = (event, payload) => {
-      let message = null
+      let message = null;
 
       switch (event) {
         case "createdTask":
-          message = `${payload.actor || "Someone"} created a new task "${payload.title}"`
-          break
-
+          message = `${payload.actor || "Someone"} created a new task "${payload.title}"`;
+          break;
         case "createdAward":
-          message = `${payload.assignedTo || "Someone"} received a new award "${payload.title}"`
-          break
-
+          message = `${payload.assignedTo || "Someone"} received a new award "${payload.title}"`;
+          break;
         case "createdExpense":
-          message = `${payload.paidBy || "Someone"} added a new expense "${payload.title}"`
-          break
-
+          message = `${payload.paidBy || "Someone"} added a new expense "${payload.title}"`;
+          break;
         case "createdMaintenance":
-          message = `New maintenance request for ${payload.title} was created`
-          break
-
+          message = `New maintenance request for "${payload.title}" was created`;
+          break;
         case "createdPoll":
-          message = `${payload.actor || "Someone"} created a poll "${payload.title}"`
-          break
-
+          message = `${payload.actor || "Someone"} created a poll "${payload.title}"`;
+          break;
         default:
-          return 
+          return;
       }
 
-      // prepend the new notification
       setNotifications((prev) => [
         { id: Date.now(), message, seen: false },
         ...prev,
-      ])
-      setUnreadCount((c) => c + 1)
-    }
+      ]);
+      setUnreadCount((c) => c + 1);
+    };
 
-    socket.onAny(handleAny)
+    socket.onAny(handleAny);
     return () => {
-      socket.offAny(handleAny)
-    }
-  }, [socket])
+      socket.offAny(handleAny);
+    };
+  }, [socket]);
 
   const markAllSeen = () => {
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, seen: true }))
-    )
-    setUnreadCount(0)
-  }
+    setNotifications((prev) => prev.map((n) => ({ ...n, seen: true })));
+    setUnreadCount(0);
+  };
 
   return (
     <NotificationContext.Provider
@@ -66,5 +63,5 @@ export const NotificationProvider = ({ children }) => {
     >
       {children}
     </NotificationContext.Provider>
-  )
-}
+  );
+};

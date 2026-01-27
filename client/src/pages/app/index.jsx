@@ -2,10 +2,14 @@ import { ToastContainer } from "react-toastify";
 import { AppProvider } from "./provider";
 import { AppRouter } from "./router";
 import 'react-toastify/dist/ReactToastify.css'
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const App = () => {
+  
   return (
-    <AppProvider>
+    
+<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+  <AppProvider>
       <AppRouter />
       <ToastContainer
         position="top-right"
@@ -21,5 +25,7 @@ export const App = () => {
         transition:Bounce
       />
     </AppProvider>
+</GoogleOAuthProvider>
+    
   );
 };

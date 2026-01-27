@@ -4,109 +4,86 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Room } from "../models/rooms.model.js";
 import { TaskEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
+import { getNextOccurrenceForUser } from "./../utils/taskHelper.js";
 
 const createRoomTask = asyncHandler(async (req, res) => {
   const createdBy = req.user?._id;
   const { roomId } = req.params;
-  const {
-    title,
-    description,
-    assignmentMode,
-    participants,
-    dueDate,
-    recurring,
-    startDate,
-  } = req.body;
-  // Validate room exists and check task limit
+
+  const { title, description, assignmentMode, participants, recurrence } =
+    req.body;
+
   const room = await Room.findById(roomId);
   if (!room) {
     throw new ApiError(404, "Room not found");
   }
+
   if (room.tasks.length >= 40) {
     throw new ApiError(400, "Maximum tasks limit reached");
   }
-  const members = [
-    ...room.tenants.map((t) => t.toString()),
-    room.landlord.toString(),
-  ];
-  // Validate participants are in the room
+
+  const members = [...room.tenants.map((t) => t.toString())];
+
   const invalidParticipants = participants.filter(
-    (participantId) => !members.includes(participantId)
+    (id) => !members.includes(id)
   );
+
   if (invalidParticipants.length > 0) {
     throw new ApiError(400, "Some participants are not members of this room");
   }
 
-  // type dynamically
-  let type = "fixed";
-  const pattern = recurring?.patterns?.[0] || {};
-  if (
-    assignmentMode === "rotation" &&
-    (pattern.dayOfWeek || pattern.weekOfMonth)
-  ) {
-    type = "mixed";
-  } else if (assignmentMode === "rotation") {
-    type = "dynamic";
-  } else if (pattern.dayOfWeek || pattern.weekOfMonth || pattern.days) {
-    type = "fixed";
+  if (assignmentMode === "rotation" && participants.length === 0) {
+    throw new ApiError(400, "Rotation task must have participants");
   }
-  // Create task object
+
+  if (recurrence?.enabled) {
+    const { frequency, selector } = recurrence;
+
+    if (!frequency || !selector) {
+      throw new ApiError(400, "Invalid recurrence configuration");
+    }
+
+    // daily → selector must be none
+    if (frequency === "daily" && selector.type !== "none") {
+      throw new ApiError(400, "Daily recurrence must use selector type 'none'");
+    }
+
+    // weekly → selector must be weekdays with at least one day
+    if (frequency === "weekly") {
+      if (selector.type !== "weekdays" || !selector.days?.length) {
+        throw new ApiError(400, "Weekly recurrence must specify weekdays");
+      }
+    }
+
+    // monthly → selector must be ordinalWeekday or monthDay
+    if (frequency === "monthly") {
+      if (!["ordinalWeekday", "monthDay"].includes(selector.type)) {
+        throw new ApiError(400, "Monthly recurrence must use a valid selector");
+      }
+    }
+  }
+
   const task = {
     title,
     description,
     assignmentMode,
-    currentAssignee: participants[0],
     participants,
-    rotationOrder: assignmentMode === "rotation" ? [...participants] : null,
-    dueDate,
-    recurring: { ...recurring, type },
     createdBy,
-    lastCompletedDate: null,
+    recurrence,
+    swapRequests: [],
   };
 
-  // Add task to room
   room.tasks.push(task);
   await room.save();
 
-  const savedTaskDoc = room.tasks[room.tasks.length - 1];
-  const taskForSocket = savedTaskDoc.toObject();
+  const savedTask = room.tasks[room.tasks.length - 1];
 
-  // add actor
+  const taskForSocket = savedTask.toObject();
   taskForSocket.actor = req.user.fullName;
 
   emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, taskForSocket);
 
-  return res.json(new ApiResponse(200, savedTaskDoc, "Task created successfully"));
-});
-
-const updateRoomTask = asyncHandler(async (req, res) => {
-  const { taskId, roomId } = req.params;
-  const updates = req.body;
-
-  const updatedRoom = await Room.findOneAndUpdate(
-    { _id: roomId, "tasks._id": taskId },
-    {
-      $set: {
-        "tasks.$.title": updates.title,
-        "tasks.$.description": updates.description,
-        "tasks.$.dueDate": updates.dueDate,
-        "tasks.$.priority": updates.priority,
-        "tasks.$.completed": updates.completed,
-        "tasks.$.completedBy": req.user?._id,
-      },
-    },
-    { new: true, runValidators: true }
-  );
-
-  if (!updatedRoom) {
-    throw new ApiError(404, "Task or Room not found");
-  }
-
-  const updatedTask = updatedRoom.tasks.id(taskId);
-  emitSocketEvent(req, roomId, TaskEventEnum.TASK_UPDATED_EVENT, updatedTask);
-  return res.json(
-    new ApiResponse(200, updatedTask, "Task updated successfully")
-  );
+  return res.json(new ApiResponse(200, savedTask, "Task created successfully"));
 });
 
 const deleteRoomTask = asyncHandler(async (req, res) => {
@@ -129,77 +106,116 @@ const deleteRoomTask = asyncHandler(async (req, res) => {
 });
 
 const createSwitchRequest = asyncHandler(async (req, res) => {
-  const { taskId, roomId } = req.params;
+  const { roomId, taskId } = req.params;
   const { requestedTo } = req.body;
 
-  const updatedRoomTask = await Room.findOneAndUpdate(
-    { _id: roomId, "tasks._id": taskId },
-    {
-      $push: {
-        "tasks.$.switches": {
-          requestedBy: req.user?._id,
-          requestedTo: { userId: requestedTo, accepted: false },
-        },
-      },
-    },
-    { new: true }
+  const requesterId = req.user?._id;
+
+  const room = await Room.findById(roomId);
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  const task = room.tasks.id(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  if (!task.recurrence?.enabled) {
+    throw new ApiError(400, "Only recurring tasks can be swapped");
+  }
+
+  if (task.assignmentMode !== "rotation") {
+    throw new ApiError(400, "Only rotation-based tasks can be swapped");
+  }
+
+  const participantIds = task.participants.map((id) => id.toString());
+
+  if (!participantIds.includes(requestedTo)) {
+    throw new ApiError(400, "Requested user is not a participant of this task");
+  }
+
+  if (requestedTo === requesterId.toString()) {
+    throw new ApiError(400, "You cannot swap with yourself");
+  }
+  const hasActiveSwap = task.swapRequests?.some(
+    (s) => s.status === "pending" || s.status === "approved"
   );
 
-  if (!updateRoomTask) {
-    throw new ApiError(400, "Task or room not found");
+  if (hasActiveSwap) {
+    throw new ApiError(400, "An active swap already exists for this task");
   }
-  return res.json(new ApiResponse(200, {}, "Switch request sent successfully"));
+
+  const today = new Date();
+
+  const dateFrom = getNextOccurrenceForUser(task, requesterId, today);
+  if (!dateFrom) {
+    throw new ApiError(400, "You have no upcoming turn to swap");
+  }
+  const dateTo = getNextOccurrenceForUser(task, requestedTo, today);
+  if (!dateTo) {
+    throw new ApiError(400, "Requested user has no upcoming turn to swap");
+  }
+
+  task.swapRequests.push({
+    from: requesterId,
+    to: requestedTo,
+    dateFrom,
+    dateTo,
+    status: "pending",
+  });
+
+  await room.save();
+  return res.json(new ApiResponse(200, {}, "Swap request sent successfully"));
 });
 
 const switchRequestResponse = asyncHandler(async (req, res) => {
-  const { taskId, roomId } = req.params;
-  const { requestedBy } = req.body;
-  console.log(taskId, roomId, requestedBy);
-  const updatedSwitchResponse = await Room.findOneAndUpdate(
-    {
-      _id: roomId,
-      "tasks._id": taskId,
-      "tasks.switches.requestedBy": requestedBy,
-      "tasks.switches.requestedTo.userId": req.user?._id,
-    },
-    {
-      $pull: {
-        "tasks.$.switches": {
-          requestedBy,
-          "requestedTo.userId": req.user?._id,
-        },
-      },
-      $inc: {
-        "tasks.$.switchCountPerUser.$[requestingUser].requestCount": 1,
-        "tasks.$.switchCountPerUser.$[acceptingUser].acceptCount": 1,
-      },
-    },
-    {
-      arrayFilters: [
-        { "requestingUser.user": requestedBy },
-        { "acceptingUser.user": req.user?._id },
-      ],
-      new: true,
-      runValidators: true,
-    }
-  );
+  const { roomId, taskId } = req.params;
+  const { action } = req.body; // "approved" | "rejected"
+  const responderId = req.user._id;
 
-  if (!updatedSwitchResponse) {
-    throw new ApiError(400, "Task, room or switch request not found");
+  if (!["approved", "rejected"].includes(action)) {
+    throw new ApiError(400, "Invalid action");
   }
+
+  const room = await Room.findById(roomId);
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  const task = room.tasks.id(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  const swap = task.swapRequests?.find((s) => s.status === "pending");
+
+  if (!swap) {
+    throw new ApiError(400, "No pending swap request found");
+  }
+
+  if (swap.to.toString() !== responderId.toString()) {
+    throw new ApiError(
+      403,
+      "You are not allowed to respond to this swap request"
+    );
+  }
+
+  swap.status = action;
+
+  await room.save();
 
   return res.json(
     new ApiResponse(
       200,
       {},
-      "Switch request accepted and task updated successfully"
+      action === "approved" ? "Swap request approved" : "Swap request rejected"
     )
   );
 });
 
 export {
   createRoomTask,
-  updateRoomTask,
   deleteRoomTask,
   createSwitchRequest,
   switchRequestResponse,

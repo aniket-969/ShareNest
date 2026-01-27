@@ -1,9 +1,10 @@
 
 export const validate = (schema) => async (req, res, next) => {
     console.log('Validate:', req.body); 
-    
+    // console.log(schema)
     try {
       await schema.parseAsync(req.body);
+      
       next();  
     } catch (error) {
       console.error('Validation Error:', error);  

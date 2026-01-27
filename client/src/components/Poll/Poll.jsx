@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import PollVoteForm from "../form/PollVoteForm";
+import PollVoteForm from "../form/poll/PollVoteForm";
 import { PollResults } from "./PollResults";
 import { useEffect, useState } from "react";
 import { getSocket } from "@/socket";
@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 
 const Poll = ({ initialPolls }) => {
   const [polls, setPolls] = useState(initialPolls);
+  // console.log(polls)
   const { sessionQuery } = useAuth();
   const { data: user, isLoading, isError } = sessionQuery;
   const { roomId } = useParams();
@@ -59,21 +60,22 @@ const Poll = ({ initialPolls }) => {
       voteForms.push(poll);
     }
   }
-  if (voteForms.length == 0 || resultCards.length == 0) {
+  // console.log(voteForms,resultCards)
+  if (voteForms.length == 0 && resultCards.length == 0) {
     return (
       <p className="text-muted-foreground text-sm">Room has no polls.</p>
     );
   }
   return (
-    <div className="flex flex-col gap-3">
-      {/* unvoted/active polls first */}
+    <div className="flex flex-col gap-3 ">
+      {/* active polls first */}
       {voteForms.map((poll) => (
         <PollVoteForm poll={poll} key={poll._id} />
       ))}
 
-      {/*  voted results/end polls */}
+      {/*  voted results */}
       {resultCards.length > 0 && (
-        <div className="  border-t border-border">
+        <div className="">
           {resultCards.map((poll) => (
             <PollResults poll={poll} key={poll._id} />
           ))}

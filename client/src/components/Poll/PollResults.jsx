@@ -8,7 +8,7 @@ export const PollResults = ({ poll }) => {
         {poll.options.map((option) => (
           <div
             key={option._id}
-            className="flex justify-between items-center px-3 py-2 bg-muted-foreground/10 rounded-md"
+            className="flex justify-between items-center px-3 py-2 bg-card-muted rounded-md"
           >
             <span className="text-sm">{option.optionText}</span>
             <span className="text-sm font-semibold text-primary">

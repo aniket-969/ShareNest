@@ -23,7 +23,7 @@ const DatePicker = ({ name, field, disableBefore, disableAfter }) => {
             {field.value ? format(field.value, "PPP") : "Pick a date"}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 pointer-events-auto z-[99999]" align="start">
           <Calendar
             mode="single"
             selected={field.value instanceof Date ? field.value : undefined}
