@@ -28,9 +28,6 @@ export const NotificationProvider = ({ children }) => {
         case "createdExpense":
           message = `${payload.paidBy || "Someone"} added a new expense "${payload.title}"`;
           break;
-        case "createdMaintenance":
-          message = `New maintenance request for "${payload.title}" was created`;
-          break;
         case "createdPoll":
           message = `${payload.actor || "Someone"} created a poll "${payload.title}"`;
           break;

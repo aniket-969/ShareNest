@@ -7,26 +7,19 @@ export const RoomEventEnum = Object.freeze({
   UPDATE_ROOM_EVENT: "updateRoom",
   ADMIN_ROOM_CHANGE: "adminChange",
   DISCONNECT_EVENT: "disconnect",
-  ONLINE_USERS_UPDATED:"onlineUsersUpdated" 
+  ONLINE_USERS_UPDATED: "onlineUsersUpdated",
 });
 
 export const AvailableRoomEvents = Object.values(RoomEventEnum);
- 
+
 export const ChatEventEnum = Object.freeze({
   JOIN_CHAT_EVENT: "joinChat",
-  // ? when participant gets removed from group, chat gets deleted or leaves a group
   LEAVE_CHAT_EVENT: "leaveChat",
-  // ? when new message is received
   MESSAGE_RECEIVED_EVENT: "messageReceived",
-  // ? when there is new one on one chat, new group chat or user gets added in the group
   MESSAGE_SEND_EVENT: "messageSend",
-  // ? when there is new one on one chat, new group chat or user gets added in the group
   SOCKET_ERROR_EVENT: "socketError",
-  // ? when participant stops typing
   STOP_TYPING_EVENT: "stopTyping",
-  // ? when participant starts typing
   TYPING_EVENT: "typing",
-  // ? when message is deleted
   MESSAGE_DELETE_EVENT: "messageDeleted",
 });
 
@@ -47,16 +40,8 @@ export const TaskEventEnum = Object.freeze({
   TASK_SWITCH_REQUEST_EVENT: "requestSwitchTask",
   TASK_SWITCH_RESPONSE_EVENT: "responseSwitchTask",
 });
-  
-export const AvailableTaskEvents = Object.values(TaskEventEnum);
- 
-export const MaintenanceEventEnum = Object.freeze({
-  MAINTENANCE_CREATED_EVENT: "createcMaintenance",
-  MAINTENANCE_DELETED_EVENT: "deleteMaintenance",
-  MAINTENANCE_UPDATED_EVENT: "updateMaintenace",
-});
 
-export const AvailableMaintenanceEvents = Object.values(MaintenanceEventEnum);
+export const AvailableTaskEvents = Object.values(TaskEventEnum);
 
 export const AwardEventEnum = Object.freeze({
   AWARD_CREATED_EVENT: "createdAward",
@@ -66,11 +51,10 @@ export const AwardEventEnum = Object.freeze({
 
 export const AvailableAwardEvents = Object.values(AwardEventEnum);
 
- 
 export const ExpenseEventEnum = Object.freeze({
   EXPENSE_CREATED_EVENT: "createdExpense",
   EXPENSE_DELETED_EVENT: "deletedExpense",
   EXPENSE_UPDATED_EVENT: "updatedExpense",
 });
- 
+
 export const AvailableExpenseEvents = Object.values(ExpenseEventEnum);
