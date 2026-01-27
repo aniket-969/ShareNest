@@ -42,13 +42,6 @@ export const updateUser = async (data) => {
   return response.data?.data;
 };
 
-export const updateNotificationToken = async (data) => {
-  console.log("In update notification token");
-  const response = await axiosClient.patch(`/${base}/me/token`, data);
-  console.log(response);
-  return;
-};
-
 export const changePassword = async (data) => {
   console.log("changin pass", data);
   const response = await axiosClient.patch(`/${base}/me/password`, data);
