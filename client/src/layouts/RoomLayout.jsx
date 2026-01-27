@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/RoomDetails/AppSidebar";
 import { useRoomSocket } from "@/context/RoomSocket";
 import { Spinner } from "@/components/ui/spinner";
+import SidebarSkeleton from "@/components/skeleton/Room/sidebar";
 
 export const RoomLayout = () => {
   const { roomId } = useParams();
@@ -28,23 +29,20 @@ export const RoomLayout = () => {
   }
 
   return (
-    <SidebarProvider >
-      <div className="flex w-full overflow-y-hidden ">
-        {/*  sidebar in its own Suspense */}
-        <Suspense
-          fallback={
-            <div className="p-4">
-              <Spinner />
-            </div>
-          }
-        >
+    <SidebarProvider>
+      <div className="flex w-full overflow-y-hidden">
+        {/* DESKTOP SIDEBAR SLOT (≥1280px only) */}
+
+        <Suspense fallback={<SidebarSkeleton />}>
           <AppSidebar />
         </Suspense>
 
-        <main className="w-full ">
-          <SidebarTrigger className=" xl:hidden  "/>
-          <div className=" px-2 py-1 w-full xl:pt-[1.75rem]">
-            {/*  outlet content in its own Suspense */}
+        <main className="flex-1 min-w-0 w-full">
+          <div className="xl:hidden p-2">
+            <SidebarTrigger />
+          </div>
+
+          <div className="px-2 py-1 w-full xl:pt-[1.75rem]">
             <Suspense fallback={<Spinner />}>
               <Outlet />
             </Suspense>
