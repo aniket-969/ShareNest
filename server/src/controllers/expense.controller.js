@@ -4,7 +4,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ExpenseEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
-import { fcm } from "./../firebase/config.js";
 import { User } from "../models/user.model.js";
 import { mongoose } from "mongoose";
 import { Room } from "../models/rooms.model.js";
