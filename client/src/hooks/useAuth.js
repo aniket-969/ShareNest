@@ -11,7 +11,6 @@ import {
   refreshTokens,
   registerUser,
   resetPassword,
-  updateNotificationToken,
   updateUser,
 } from "@/api/queries/auth";
 import { useNavigate } from "react-router-dom";
@@ -112,16 +111,6 @@ export const useAuth = () => {
     },
   });
 
-  const updateNotificationTokenMutation = useMutation({
-    mutationFn: updateNotificationToken,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["auth", "profile"]);
-    },
-    onError: (error) => {
-      console.error("update user error", error);
-    },
-  });
-
   const addPaymentMutation = useMutation({
     mutationFn: addPayment,
     onSuccess: () => {
@@ -191,7 +180,6 @@ export const useAuth = () => {
     updateUserMutation,
     addPaymentMutation,
     deletePaymentMutation,
-    updateNotificationTokenMutation,
     forgotPasswordMutation,
     resetPasswordMutation
   };
