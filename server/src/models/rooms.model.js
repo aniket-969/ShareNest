@@ -74,6 +74,54 @@ const roomSchema = new Schema(
       default: "INR",
       match: /^[A-Z]{3}$/,
     },
+    plan: {
+      type: String,
+      enum: ["free", "pro_monthly", "pro_yearly"],
+      required: true,
+      default: "free",
+    },
+    subscription: {
+      provider: {
+        type: String,
+        enum: ["razorpay"],
+      },
+
+      billingCycle: {
+        type: String,
+        enum: ["monthly", "yearly"],
+      },
+
+      billingCurrency: {
+        type: String,
+        enum: ["INR", "USD"],
+      },
+
+      razorpaySubscriptionId: {
+        type: String,
+      },
+
+      razorpayPlanId: {
+        type: String,
+      },
+
+      status: {
+        type: String,
+        enum: ["created", "active", "cancelled", "expired"],
+      },
+
+      startedAt: {
+        type: Date,
+      },
+
+      expiresAt: {
+        type: Date,
+      },
+    },
+    payment: {
+      expiresAt: {
+        type: Date,
+      },
+    },
   },
 
   { timestamps: true }
