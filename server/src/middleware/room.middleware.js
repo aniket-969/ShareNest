@@ -9,7 +9,7 @@ const checkMember = asyncHandler(async (req, res, next) => {
     throw new ApiError(400, "Room Id is required");
   }
 
-  const userId = req.user._id;
+  const userId = req?.user?._id;
 
   const room = await Room.findById(roomId).select("tenants currency");
   if (!room) {
@@ -25,6 +25,28 @@ const checkMember = asyncHandler(async (req, res, next) => {
   }
 
   req.room = room; 
+
+  next();
+});
+
+const checkRoomEntitlement = asyncHandler(async (req, res, next) => {
+  
+  const room = req.room;
+
+  if (!room) {
+    throw new ApiError(500, "Room context missing");
+  }
+
+  const isFreeRoom = room.plan === "free";
+  const isActiveSubscription =
+    room.subscription?.status === "active";
+
+  if (!isFreeRoom && !isActiveSubscription) {
+    throw new ApiError(
+      403,
+      "Room is inactive. Please complete payment to continue."
+    );
+  }
 
   next();
 });
@@ -66,4 +88,4 @@ const isRoomMember = async (roomId, userId) => {
   return isMember;
 };
 
-export { checkMember, adminOnly, isRoomMember };
+export { checkMember, adminOnly, isRoomMember,checkRoomEntitlement };
