@@ -28,32 +28,65 @@ select:-webkit-autofill:focus {
 
 @layer base {
   :root {
-    --radius: 0.5rem;
+  --radius: 0.5rem;
 
-    /* ---- YOUR THEME TOKENS ---- */
-    --background: 0 0% 100%; /* TODO */
-    --foreground: 0 0% 0%; /* TODO */
+  /* BASE */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 4%;
 
-    --card: 0 0% 100%; /* TODO */
-    --card-foreground: 0 0% 0%; /* TODO */
+  /* CARD */
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 4%;
+  --card-muted: 0 0% 96%;
+  --card-border: 240 6% 90%;
 
-    --primary: 0 0% 0%; /* TODO */
-    --primary-foreground: 0 0% 100%; /* TODO */
+  /* POPOVER */
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 4%;
 
-    --border: 0 0% 90%; /* TODO */
-    --input: 0 0% 90%; /* TODO */
-    --ring: 0 0% 0%; /* TODO */
+  /* PRIMARY (pink identity) */
+  --primary: 345 95% 55%;
+  --primary-foreground: 0 0% 100%;
 
-    /* ---- SHADCN SIDEBAR (KEEP AS IS) ---- */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+  /* SECONDARY (cyan identity) */
+  --secondary: 178 70% 45%;
+  --secondary-foreground: 0 0% 100%;
+
+  /* MUTED */
+  --muted: 240 6% 94%;
+  --muted-foreground: 240 5% 35%;
+
+  /* ACCENT */
+  --accent: 178 60% 90%;
+  --accent-foreground: 178 40% 20%;
+
+  /* DESTRUCTIVE */
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* INPUTS / BORDERS */
+  --border: 240 6% 90%;
+  --input: 240 6% 94%;
+  --ring: 345 95% 55%;
+
+  /* CHART */
+  --chart-1: 345 95% 55%;
+  --chart-2: 178 70% 45%;
+  --chart-3: 200 40% 45%;
+  --chart-4: 300 60% 60%;
+  --chart-5: 240 6% 20%;
+
+  /* ---- SHADCN SIDEBAR (UNCHANGED LIGHT) ---- */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
 
   * {
     @apply border-border;
