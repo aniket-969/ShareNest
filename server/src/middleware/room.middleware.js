@@ -36,7 +36,7 @@ const checkRoomEntitlement = asyncHandler(async (req, res, next) => {
   if (!room) {
     throw new ApiError(500, "Room context missing");
   }
-
+  
   const isFreeRoom = room.plan === "free";
   const isActiveSubscription =
     room.subscription?.status === "active";
