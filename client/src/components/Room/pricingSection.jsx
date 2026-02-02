@@ -121,7 +121,7 @@ const PricingSection = ({ onPlanSelect }) => {
       </div>
 
       {selectedPlan && (
-        <Button className="mx-auto">
+        <Button className="mx-auto" variant="outline">
           Continue
         </Button>
       )}

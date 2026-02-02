@@ -24,7 +24,7 @@ const PricingCard = ({
         "w-full max-w-xs cursor-pointer transition border-none px-2",
         selected
           ? "scale-105"
-          : "hover:bg-card/60"
+          : "hover:bg-card/90"
       )}
     >
       <CardHeader className="relative space-y-1 ">
@@ -50,12 +50,12 @@ const PricingCard = ({
             </>
           )}
 
-          <Button
+          <Button variant="outline"
             className={cn(
-              "w-full rounded-md py-2 mt-3 text-sm font-medium transition border cursor-pointer",
+              "w-full mt-4 transition  cursor-pointer hover:bg-secondary-foreground/70 hover:text-primary-foreground",
               selected
-                ? "bg-primary text-white"
-                : "bg-muted hover:bg-muted-foreground/10"
+                ? "bg-primary hover:bg-primary hover:text-primary-foreground"
+                : ""
             )}
           >
             {selected ? "Selected" : actionLabel}
