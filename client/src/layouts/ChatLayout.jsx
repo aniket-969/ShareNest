@@ -154,10 +154,10 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
   }
 
   return (
-    <div className="flex flex-col sm:max-w-[25rem]  h-full">
+    <div className="flex flex-col sm:max-w-[25rem] h-full ">
       <ScrollArea
         ref={viewportRef}
-        className="flex flex-col px-4 py-2 h-[450px] overflow-y-auto"
+        className="flex flex-col px-4 py- h-[450px] overflow-y-auto "
         onScroll={debouncedHandleScroll}
       >
         {messages.length > 0 ? (
@@ -173,7 +173,7 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
             return (
               <div key={msg._id}>
                 {showDateSeparator && (
-                  <div className="text-center my-4 text-muted-foreground text-sm font-medium">
+                  <div className="text-center my-4 text-muted-foreground text-sm font-medium ">
                     {currentDateLabel}
                   </div>
                 )}

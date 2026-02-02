@@ -123,7 +123,9 @@ select:-webkit-autofill:focus {
     --destructive: 345 99% 57%;
     --destructive-foreground: 0 0% 2%;
 
-    --border: 0 0% 16%;
+    /* --border: 0 0% 16%; */
+    --border: 240 4% 16%;
+
     --input: 345 99% 57%;
     --ring: 345 99% 57%;
 

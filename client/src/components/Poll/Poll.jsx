@@ -63,7 +63,7 @@ const Poll = ({ initialPolls }) => {
   // console.log(voteForms,resultCards)
   if (voteForms.length == 0 && resultCards.length == 0) {
     return (
-      <p className="text-muted-foreground text-sm">Room has no polls.</p>
+      <p className="text-muted-foreground text-sm mt-8 text-center">Room has no polls.</p>
     );
   }
   return (

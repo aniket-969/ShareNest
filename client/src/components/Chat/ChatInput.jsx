@@ -52,7 +52,7 @@ const ChatInput = ({ roomId: propRoomId }) => {
   };
 
   return (
-    <div className="flex items-center p-2 border-t gap-2">
+    <div className="flex items-center p-2 border- gap-2">
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
