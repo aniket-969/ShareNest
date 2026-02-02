@@ -451,18 +451,56 @@ const getRoomPricing = asyncHandler(async (req, res) => {
         country: "IN",
         currency: "INR",
         plans: {
-          free: { price: 0, maxMembers: 1 },
-          monthly: { price: 99, maxMembers: 6 },
-          yearly: { price: 999, maxMembers: 6 },
+          free: { price: 0, maxMembers: 1,
+      features: [
+        "Up to 1 member",
+        "Smart task management",
+        "Expense tracking",
+      ], },
+          monthly: { price: 99, maxMembers: 6,features: [
+        "Up to 6 members",
+        "Smart task management",
+        "Split Expenses",
+        "Admin controls",
+        "Room chat & polls",
+      ], },
+          yearly: { price: 999, maxMembers: 6,
+      features: [
+        "Up to 6 members",
+        "Smart task management",
+        "Split Expenses",
+        "Admin controls",
+        "Room chat & polls",
+        "Save upto 200₹ on yearly billing",
+      ] },
         },
       }
     : {
         country: country || "UNKNOWN",
         currency: "USD",
         plans: {
-          free: { price: 0, maxMembers: 1 },
-          monthly: { price: 2.49, maxMembers: 6 },
-          yearly: { price: 24.99, maxMembers: 6 },
+          free: { price: 0, maxMembers: 1,
+      features: [
+        "Up to 1 member",
+        "Smart task management",
+        "Expense tracking",
+      ], },
+          monthly: { price: 2.49, maxMembers: 6,features: [
+        "Up to 6 members",
+        "Smart task management",
+        "Split Expenses",
+        "Admin controls",
+        "Room chat & polls",
+      ], },
+          yearly: { price: 24.99, maxMembers: 6,
+      features: [
+        "Up to 6 members",
+        "Smart task management",
+        "Split Expenses",
+        "Admin controls",
+        "Room chat & polls",
+        "Save upto 5$ on yearly billing",
+      ] },
         },
       };
 
