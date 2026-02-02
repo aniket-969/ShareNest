@@ -3,10 +3,11 @@ import {
   createRoom,
   getRoomData,
   adminResponse,
-  updateRoom, 
+  updateRoom,
   deleteRoom,
   leaveRoom,
   adminTransfer,
+  getRoomPricing,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -29,13 +30,12 @@ export const useRoom = (roomId) => {
   });
 
   const updateRoomMutation = useMutation({
-  
-  mutationFn: (newValues) => updateRoom(roomId, newValues),
-  onSuccess: (newRoomId) => {
-    queryClient.invalidateQueries(["room", newRoomId]);
-    toast.success("Room details updated");
-  },
-});
+    mutationFn: (newValues) => updateRoom(roomId, newValues),
+    onSuccess: (newRoomId) => {
+      queryClient.invalidateQueries(["room", newRoomId]);
+      toast.success("Room details updated");
+    },
+  });
 
   const deleteRoomMutation = useMutation({
     queryFn: deleteRoom,
@@ -61,37 +61,35 @@ export const useRoom = (roomId) => {
     onSuccess: () => {
       navigate("/room");
       toast.success("Left room successfully");
-    }, 
+    },
     onError: (error) => {
       console.error("Failed to left room", error);
-      toast.error(error?.response?.data?.message||"Unable to left room")
+      toast.error(error?.response?.data?.message || "Unable to left room");
     },
   });
 
   const adminTransferMutation = useMutation({
-    mutationFn: ({targetUserId}) => adminTransfer(roomId,targetUserId),
+    mutationFn: ({ targetUserId }) => adminTransfer(roomId, targetUserId),
     onSuccess: () => {
       navigate(`/room/${roomId}`);
       toast.success("Admin changed successfully");
     },
     onError: (error) => {
       console.error("Failed to change admin", error);
-      toast.error(error?.response?.data?.message||"Failed to change admin")
+      toast.error(error?.response?.data?.message || "Failed to change admin");
     },
   });
 
-   const kickUserMutation = useMutation({
-    mutationFn: ({targetUserId}) => kickUser(roomId,targetUserId),
+  const kickUserMutation = useMutation({
+    mutationFn: ({ targetUserId }) => kickUser(roomId, targetUserId),
     onSuccess: () => {
-     
       toast.success("User kicked out successfully");
     },
     onError: (error) => {
       console.error("Failed to kick user", error);
-      toast.error(error?.response?.data?.message||"Failed to kick out user")
+      toast.error(error?.response?.data?.message || "Failed to kick out user");
     },
   });
-
 
   return {
     roomQuery,
@@ -100,13 +98,22 @@ export const useRoom = (roomId) => {
     deleteRoomMutation,
     leaveRoomMutation,
     adminTransferMutation,
-    kickUserMutation
+    kickUserMutation,
   };
 };
 
 export const useRoomMutation = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const roomPricingQuery = useQuery({
+    queryKey: ["room", "pricing"],
+    queryFn: getRoomPricing,
+    enabled: false, 
+    staleTime: 5 * 60 * 1000,
+    retry: 3,
+  });
+
   const createRoomMutation = useMutation({
     mutationFn: createRoom,
     onSuccess: (newRoomId) => {
