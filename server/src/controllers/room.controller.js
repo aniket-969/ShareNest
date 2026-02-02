@@ -443,65 +443,103 @@ const kickUser = asyncHandler(async (req, res) => {
 });
 
 const getRoomPricing = asyncHandler(async (req, res) => {
-  const country = req.headers["cf-ipcountry"];
-  const isIndia = country === "IN";
+  const countryHeader = req.headers["cf-ipcountry"];
+  const isIndia = countryHeader === "IN";
 
   const pricing = isIndia
     ? {
         country: "IN",
         currency: "INR",
-        plans: {
-          free: { price: 0, maxMembers: 1,
-      features: [
-        "Up to 1 member",
-        "Smart task management",
-        "Expense tracking",
-      ], },
-          monthly: { price: 99, maxMembers: 6,features: [
-        "Up to 6 members",
-        "Smart task management",
-        "Split Expenses",
-        "Admin controls",
-        "Room chat & polls",
-      ], },
-          yearly: { price: 999, maxMembers: 6,
-      features: [
-        "Up to 6 members",
-        "Smart task management",
-        "Split Expenses",
-        "Admin controls",
-        "Room chat & polls",
-        "Save upto 200₹ on yearly billing",
-      ] },
-        },
+        plans: [
+          {
+            id: "free",
+            name: "Free",
+            price: 0,
+            period: null,
+            maxMembers: 1,
+            features: [
+              "Up to 1 member",
+              "Smart task management",
+              "Expense tracking",
+            ],
+          },
+          {
+            id: "monthly",
+            name: "Monthly",
+            price: 99,
+            period: "month",
+            maxMembers: 6,
+            features: [
+              "Up to 6 members",
+              "Smart task management",
+              "Split expenses",
+              "Admin controls",
+              "Room chat & polls",
+            ],
+          },
+          {
+            id: "yearly",
+            name: "Yearly",
+            price: 999,
+            period: "year",
+            maxMembers: 6,
+            features: [
+              "Up to 6 members",
+              "Smart task management",
+              "Split expenses",
+              "Admin controls",
+              "Room chat & polls",
+              "Save more with yearly billing",
+            ],
+          },
+        ],
       }
     : {
-        country: country || "UNKNOWN",
+        country: "INTL",
         currency: "USD",
-        plans: {
-          free: { price: 0, maxMembers: 1,
-      features: [
-        "Up to 1 member",
-        "Smart task management",
-        "Expense tracking",
-      ], },
-          monthly: { price: 2.49, maxMembers: 6,features: [
-        "Up to 6 members",
-        "Smart task management",
-        "Split Expenses",
-        "Admin controls",
-        "Room chat & polls",
-      ], },
-          yearly: { price: 24.99, maxMembers: 6,
-      features: [
-        "Up to 6 members",
-        "Smart task management",
-        "Split Expenses",
-        "Admin controls",
-        "Room chat & polls",
-        "Save upto 5$ on yearly billing",
-      ] },
-        },
+        plans: [
+          {
+            id: "free",
+            name: "Free",
+            price: 0,
+            period: null,
+            maxMembers: 1,
+            features: [
+              "Up to 1 member",
+              "Smart task management",
+              "Expense tracking",
+            ],
+          },
+          {
+            id: "monthly",
+            name: "Monthly",
+            price: 2.49,
+            period: "month",
+            maxMembers: 6,
+            features: [
+              "Up to 6 members",
+              "Smart task management",
+              "Split expenses",
+              "Admin controls",
+              "Room chat & polls",
+            ],
+          },
+          {
+            id: "yearly",
+            name: "Yearly",
+            price: 24.99,
+            period: "year",
+            maxMembers: 6,
+            features: [
+              "Up to 6 members",
+              "Smart task management",
+              "Split expenses",
+              "Admin controls",
+              "Room chat & polls",
+              "Save more with yearly billing",
+            ],
+          },
+        ],
       };
 
   return res
