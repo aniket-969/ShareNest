@@ -136,5 +136,5 @@ export const useRoomMutation = () => {
     },
   });
 
-  return { createRoomMutation, requestJoinRoomMutation };
+  return { createRoomMutation, requestJoinRoomMutation,roomPricingQuery };
 };

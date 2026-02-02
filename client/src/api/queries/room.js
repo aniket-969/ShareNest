@@ -11,7 +11,6 @@ export const createRoom = async (data) => {
 export const getRoomPricing = async () => {
   const response = await axiosClient.get(`/${baseRoom}/pricing`);
   console.log(response);
-  return;
   return response.data?.data;
 };
 
