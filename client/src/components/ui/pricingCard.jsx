@@ -21,13 +21,13 @@ const PricingCard = ({
     <Card
       onClick={onSelect}
       className={cn(
-        "w-full max-w-xs cursor-pointer transition border-none px-2 shadow-lg",
+        "w-full max-w-xs cursor-pointer transition border-none px-2 shadow-lg ",
         selected
           ? "scale-105"
           : "hover:bg-card/70"
       )}
     >
-      <CardHeader className="relative space-y-1 ">
+      <CardHeader className="relative space-y-2 ">
         {period === "year" && (
           <span className="absolute right-4 top-4 rounded-full bg-primary px-2 py-1 text-xs text-white">
             Save More
@@ -52,7 +52,7 @@ const PricingCard = ({
 
           <Button variant="outline"
             className={cn(
-              "w-full mt-4 transition  cursor-pointer hover:bg-secondary-foreground/70 hover:text-primary-foreground",
+              "w-full mt-5 transition  cursor-pointer hover:bg-secondary-foreground/70 hover:text-primary-foreground",
               selected
                 ? "bg-primary hover:bg-primary hover:text-primary-foreground"
                 : ""
@@ -63,7 +63,7 @@ const PricingCard = ({
         </div>
       </CardHeader>
 
-      <CardContent className="b">
+      <CardContent className="mt-4">
         <ul className="space-y-2 text-sm font-semibold ">
           {features.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-2">

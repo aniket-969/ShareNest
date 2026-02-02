@@ -17,18 +17,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRoom, useRoomMutation } from "@/hooks/useRoom";
 import { toast } from "react-toastify";
 
-export const CreateRoomForm = () => {
+export const CreateRoomForm = ({onSubmit}) => {
+
   const { createRoomMutation } = useRoomMutation();
-  const onSubmit = async (values) => {
-    console.log(values);
-    try {
-      const response = await createRoomMutation.mutateAsync(values);
-      console.log(response);
-      toast("Room created successfully");
-    } catch (error) {
-      console.error("Error during registration:", error);
-    }
-  };
 
   const form = useForm({
     resolver: zodResolver(createRoomSchema),
