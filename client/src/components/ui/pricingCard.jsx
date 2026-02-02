@@ -21,10 +21,10 @@ const PricingCard = ({
     <Card
       onClick={onSelect}
       className={cn(
-        "w-full max-w-xs cursor-pointer transition border-none px-2",
+        "w-full max-w-xs cursor-pointer transition border-none px-2 shadow-lg",
         selected
           ? "scale-105"
-          : "hover:bg-card/90"
+          : "hover:bg-card/70"
       )}
     >
       <CardHeader className="relative space-y-1 ">
