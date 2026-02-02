@@ -13,13 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useRoom, useRoomMutation } from "@/hooks/useRoom";
-import { toast } from "react-toastify";
 
-export const CreateRoomForm = ({onSubmit}) => {
-
-  const { createRoomMutation } = useRoomMutation();
+export const CreateRoomForm = ({onSubmit,disabled}) => {
 
   const form = useForm({
     resolver: zodResolver(createRoomSchema),
@@ -39,7 +34,7 @@ export const CreateRoomForm = ({onSubmit}) => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter room name" {...field} />
+                <Input placeholder="Enter room name" {...field} disabled={disabled}/>
               </FormControl>
 
               <FormMessage />
@@ -54,7 +49,7 @@ export const CreateRoomForm = ({onSubmit}) => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter room description" {...field} />
+                <Textarea placeholder="Enter room description" {...field} disabled={disabled}/>
               </FormControl>
 
               <FormMessage />
@@ -62,7 +57,7 @@ export const CreateRoomForm = ({onSubmit}) => {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button disabled={disabled} type="submit">Submit</Button>
       </form>
     </Form>
   );

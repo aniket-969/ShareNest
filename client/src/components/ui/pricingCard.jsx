@@ -29,7 +29,7 @@ const PricingCard = ({
     >
       <CardHeader className="relative space-y-2 ">
         {period === "year" && (
-          <span className="absolute right-4 top-4 rounded-full bg-primary px-2 py-1 text-xs text-white">
+          <span className="absolute right-4 top-2 rounded-full bg-primary px-2 py-1 text-xs text-white">
             Save More
           </span>
         )}

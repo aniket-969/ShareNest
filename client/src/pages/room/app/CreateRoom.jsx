@@ -16,6 +16,7 @@ const CreateRoom = () => {
     setStep("pricing");
     roomPricingQuery.refetch();
   };
+const isLocked = step === "pricing";
 
   return (
     <div className="flex flex-col gap-5 mt-12 mb-32">
@@ -39,7 +40,7 @@ const CreateRoom = () => {
         </div>
 
         <div className="w-full max-w-sm mt-4">
-          {isCreateRoom ? <CreateRoomForm onSubmit = {handleDraftSubmit}/> : <JoinRoomForm />}
+          {isCreateRoom ? <CreateRoomForm onSubmit = {handleDraftSubmit} disabled={isLocked}/> : <JoinRoomForm />}
         </div>
       </div>
       {step === "pricing" && (
