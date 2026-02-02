@@ -64,7 +64,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
     { path: "awards" },
     { path: "polls" },
-    
+
     { path: "pendingRequests.userId", select: "username fullName avatar _id" },
   ];
 
@@ -165,7 +165,7 @@ const addUserRequest = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Admin can't send request to their own room");
   }
 
-  if (room.tenants.some(id => id.toString() === userId.toString())) {
+  if (room.tenants.some((id) => id.toString() === userId.toString())) {
     throw new ApiError(400, "User is already a member of this room");
   }
 
@@ -174,7 +174,7 @@ const addUserRequest = asyncHandler(async (req, res) => {
   }
 
   const alreadyRequested = room.pendingRequests.some(
-    req => req.userId.toString() === userId.toString()
+    (req) => req.userId.toString() === userId.toString()
   );
 
   if (alreadyRequested) {
@@ -385,7 +385,7 @@ const transferAdminControl = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, room, "Admin rights transferred successfully"));
 });
 
-export const kickUser = asyncHandler(async (req, res) => {
+const kickUser = asyncHandler(async (req, res) => {
   const adminId = req.user._id.toString();
   const { roomId, targetUserId } = req.params;
 
@@ -442,6 +442,37 @@ export const kickUser = asyncHandler(async (req, res) => {
   }
 });
 
+const getRoomPricing = asyncHandler(async (req, res) => {
+  const country = req.headers["cf-ipcountry"];
+  const isIndia = country === "IN";
+
+  const pricing = isIndia
+    ? {
+        country: "IN",
+        currency: "INR",
+        plans: {
+          free: { price: 0, maxMembers: 1 },
+          monthly: { price: 99, maxMembers: 6 },
+          yearly: { price: 999, maxMembers: 6 },
+        },
+      }
+    : {
+        country: country || "UNKNOWN",
+        currency: "USD",
+        plans: {
+          free: { price: 0, maxMembers: 1 },
+          monthly: { price: 2.49, maxMembers: 6 },
+          yearly: { price: 24.99, maxMembers: 6 },
+        },
+      };
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, pricing, "Pricing details fetched successfully")
+    );
+});
+
 export {
   createRoom,
   addUserRequest,
@@ -451,4 +482,6 @@ export {
   getRoomData,
   leaveRoom,
   transferAdminControl,
+  kickUser,
+  getRoomPricing,
 };

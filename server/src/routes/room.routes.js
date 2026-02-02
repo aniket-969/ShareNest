@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addUserRequest, adminResponse, createRoom, deleteRoom, getRoomData, kickUser, leaveRoom, transferAdminControl, updateRoom } from "../controllers/room.controller.js";
+import { addUserRequest, adminResponse, createRoom, deleteRoom, getRoomData, getRoomPricing, kickUser, leaveRoom, transferAdminControl, updateRoom } from "../controllers/room.controller.js";
 import { verifyJWT } from './../middleware/auth.middleware.js';
 import { adminOnly, checkMember } from "../middleware/room.middleware.js";
 import { addUserRequestSchema, adminResponseSchema, creatRoomSchema, transferRoleSchema, updateRoomSchema } from "../zod/room.schema.js";
@@ -9,6 +9,7 @@ const router = Router();
 
 router.route("/").post(verifyJWT,validate(creatRoomSchema),createRoom);
 router.route("/request").post(verifyJWT,validate(addUserRequestSchema),addUserRequest);
+router.route("/pricing").get(verifyJWT,getRoomPricing)
 router.route("/:roomId/responses").post(verifyJWT,validate(adminResponseSchema),adminResponse);
 router.route("/:roomId").patch(verifyJWT,updateRoom);
 router.route("/:roomId").delete(verifyJWT,deleteRoom);
