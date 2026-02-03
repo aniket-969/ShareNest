@@ -17,12 +17,12 @@ const PricingSection = ({ onPlanSelect, pricing, isLoading }) => {
   console.log(pricing);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 px-8">
       <h2 className="text-xl font-semibold text-center mt-12 mb-4">
         Choose a plan
       </h2>
 
-      <div className="flex gap-5 justify-center">
+      <div className="flex gap-5 justify-center flex-col md:flex-row md:items-stretch items-center">
         {plans.map((plan) => (
           <PricingCard
             key={plan.id}
@@ -39,7 +39,7 @@ const PricingSection = ({ onPlanSelect, pricing, isLoading }) => {
 
       {selectedPlanId && (
         <Button className="mx-auto" variant="outline">
-          Continue
+          Continue to Payment
         </Button>
       )}
     </div>
