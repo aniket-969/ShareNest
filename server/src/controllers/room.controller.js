@@ -102,35 +102,123 @@ const getRoomData = asyncHandler(async (req, res) => {
   );
 });
 
+const getRoomPricing = asyncHandler(async (req, res) => {
+  const country = req.headers["cf-ipcountry"];
+  const region = country === "IN" ? "IN" : "USD";
+
+  const regionConfig = ROOM_PLANS[region];
+
+  const plans = Object.values(regionConfig.plans).map((plan) => ({
+    planId: plan.planId,
+    label: plan.label,
+    price: plan.price,
+    billingCycle: plan.billingCycle,
+    maxMembers: plan.maxMembers,
+    period:plan.period,
+    features:
+      plan.planId === "free"
+        ? PLAN_FEATURES.free
+        : [
+            ...PLAN_FEATURES.pro,
+            plan.billingCycle === "yearly"
+              ? "Save more with yearly billing"
+              : null,
+          ].filter(Boolean),
+  }));
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      country: region,
+      currency: regionConfig.currency,
+      plans,
+    }, "Pricing details fetched successfully")
+  );
+});
+
 const createRoom = asyncHandler(async (req, res) => {
   const admin = req.user?._id;
-  const { name, description } = req.body;
+  const { name, description, planId } = req.body;
 
+  const country = req.headers["cf-ipcountry"];
+  const region = country === "IN" ? "IN" : "USD";
+
+  const regionConfig = ROOM_PLANS[region];
+  const planConfig = regionConfig.plans[planId];
+
+  if (!planConfig) {
+    throw new ApiError(400, "Invalid plan selected");
+  }
+
+  const currency = regionConfig.currency;
+
+  // Free Plan
+  if (!planConfig.paid) {
+    const existingFreeRoom = await Room.findOne({
+      admin,
+      plan: "free",
+    });
+
+    if (existingFreeRoom) {
+      throw new ApiError(
+        403,
+        "Free plan limit reached. Upgrade to create more rooms."
+      );
+    }
+
+    const groupCode = await generateUniqueGroupCode();
+
+    const room = await Room.create({
+      name,
+      description,
+      admin,
+      groupCode,
+      plan: "free",
+      currency,
+      tenants: [admin],
+    });
+
+    const user = await User.findById(admin);
+    if (user) {
+      user.rooms.push({ roomId: room._id, name: room.name });
+      await user.save();
+    }
+
+    return res.status(201).json(
+      new ApiResponse(201, room, "Room created successfully")
+    );
+  }
+
+  // Paid Plan
   const groupCode = await generateUniqueGroupCode();
-  let roomData = {
+
+  const room = await Room.create({
     name,
     description,
     admin,
     groupCode,
-  };
+    plan: planId,
+    currency,
+    tenants: [admin],
+    subscription: {
+      provider: "razorpay",
+      billingCycle: planConfig.billingCycle,
+      billingCurrency: currency,
+      status: "created",
+    },
+    payment: {
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    },
+  });
 
-  roomData.tenants = [admin];
-
-  const room = await Room.create(roomData);
-
-  const createdRoom = await Room.findById(room._id);
-  if (!createdRoom) {
-    throw new ApiError(400, "Error creating room");
-  }
-
-  const user = await User.findById(admin);
-  if (user) {
-    user.rooms.push({ roomId: createdRoom._id, name: createdRoom.name });
-    await user.save();
-  }
-
-  return res.json(
-    new ApiResponse(201, createdRoom, "Room created successfully")
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      {
+        roomId: room._id,
+        paymentRequired: true,
+      },
+      "Room created. Payment required to activate."
+    )
   );
 });
 
@@ -443,38 +531,6 @@ const kickUser = asyncHandler(async (req, res) => {
   }
 });
 
-const getRoomPricing = asyncHandler(async (req, res) => {
-  const country = req.headers["cf-ipcountry"];
-  const region = country === "IN" ? "IN" : "USD";
-
-  const regionConfig = ROOM_PLANS[region];
-
-  const plans = Object.values(regionConfig.plans).map((plan) => ({
-    planId: plan.planId,
-    label: plan.label,
-    price: plan.price,
-    billingCycle: plan.billingCycle,
-    maxMembers: plan.maxMembers,
-    period:plan.period,
-    features:
-      plan.planId === "free"
-        ? PLAN_FEATURES.free
-        : [
-            ...PLAN_FEATURES.pro,
-            plan.billingCycle === "yearly"
-              ? "Save more with yearly billing"
-              : null,
-          ].filter(Boolean),
-  }));
-
-  return res.status(200).json(
-    new ApiResponse(200, {
-      country: region,
-      currency: regionConfig.currency,
-      plans,
-    }, "Pricing details fetched successfully")
-  );
-});
 
 
 export {
