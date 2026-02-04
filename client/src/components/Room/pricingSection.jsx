@@ -19,21 +19,21 @@ const PricingSection = forwardRef(
 
   return (
     <div className="flex flex-col gap-5 px-8" ref={ref}>
-      <h2 className="text-xl font-semibold text-center mt-12 mb-4">
+      <h2 className="text-2xl font-semibold text-center mt-12 mb-4">
         Choose a plan
       </h2>
 
       <div className="flex gap-5 justify-center flex-col md:flex-row md:items-stretch items-center">
         {plans.map((plan) => (
           <PricingCard
-            key={plan.id}
+            key={plan.planId}
             title={plan.name}
             price={plan.price}
             currency={currency}
             period={plan.period}
             features={plan.features}
-            selected={selectedPlanId === plan.id}
-            onSelect={() => handleSelect(plan.id)}
+            selected={selectedPlanId === plan.planId}
+            onSelect={() => handleSelect(plan.planId)}
           />
         ))}
       </div>
