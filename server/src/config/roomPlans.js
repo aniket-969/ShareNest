@@ -10,6 +10,7 @@ export const ROOM_PLANS = {
         paid: false,
         billingCycle: null,
         maxMembers: 1,
+        period: null,
       },
       pro_monthly: {
         planId: "pro_monthly",
@@ -18,6 +19,7 @@ export const ROOM_PLANS = {
         paid: true,
         billingCycle: "monthly",
         maxMembers: 6,
+        period: "month",
       },
       pro_yearly: {
         planId: "pro_yearly",
@@ -26,6 +28,7 @@ export const ROOM_PLANS = {
         paid: true,
         billingCycle: "yearly",
         maxMembers: 6,
+        period: "year",
       },
     },
   },
@@ -41,6 +44,7 @@ export const ROOM_PLANS = {
         paid: false,
         billingCycle: null,
         maxMembers: 1,
+        period: null,
       },
       pro_monthly: {
         planId: "pro_monthly",
@@ -49,6 +53,7 @@ export const ROOM_PLANS = {
         paid: true,
         billingCycle: "monthly",
         maxMembers: 6,
+        period: "month",
       },
       pro_yearly: {
         planId: "pro_yearly",
@@ -57,7 +62,19 @@ export const ROOM_PLANS = {
         paid: true,
         billingCycle: "yearly",
         maxMembers: 6,
+        period: "year",
       },
     },
   },
+};
+
+export const PLAN_FEATURES = {
+  free: ["Up to 1 member", "One time and recurring tasks", "Expense tracking"],
+  pro: [
+    "Up to 6 members",
+    "Smart task management",
+    "Split expenses",
+    "Admin controls",
+    "Room chat & polls",
+  ],
 };

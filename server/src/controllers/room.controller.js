@@ -10,6 +10,7 @@ import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { mongoose } from "mongoose";
 import { ChatMessage } from "./../models/chatMessage.model.js";
+import { ROOM_PLANS,PLAN_FEATURES } from "../config/roomPlans.js";
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -443,111 +444,38 @@ const kickUser = asyncHandler(async (req, res) => {
 });
 
 const getRoomPricing = asyncHandler(async (req, res) => {
-  const countryHeader = req.headers["cf-ipcountry"];
-  const isIndia = countryHeader === "IN";
+  const country = req.headers["cf-ipcountry"];
+  const region = country === "IN" ? "IN" : "USD";
 
-  const pricing = isIndia
-    ? {
-        country: "IN",
-        currency: "INR",
-        plans: [
-          {
-            id: "free",
-            name: "Free",
-            price: 0,
-            period: null,
-            maxMembers: 1,
-            features: [
-              "Up to 1 member",
-              "Smart task management",
-              "Expense tracking",
-            ],
-          },
-          {
-            id: "monthly",
-            name: "Monthly",
-            price: 99,
-            period: "month",
-            maxMembers: 6,
-            features: [
-              "Up to 6 members",
-              "Smart task management",
-              "Split expenses",
-              "Admin controls",
-              "Room chat & polls",
-            ],
-          },
-          {
-            id: "yearly",
-            name: "Yearly",
-            price: 999,
-            period: "year",
-            maxMembers: 6,
-            features: [
-              "Up to 6 members",
-              "Smart task management",
-              "Split expenses",
-              "Admin controls",
-              "Room chat & polls",
-              "Save upto 200Rs. with yearly billing",
-            ],
-          },
-        ],
-      }
-    : {
-        country: "INTL",
-        currency: "USD",
-        plans: [
-          {
-            id: "free",
-            name: "Free",
-            price: 0,
-            period: null,
-            maxMembers: 1,
-            features: [
-              "Up to 1 member",
-              "Smart task management",
-              "Expense tracking",
-            ],
-          },
-          {
-            id: "monthly",
-            name: "Monthly",
-            price: 2.49,
-            period: "month",
-            maxMembers: 6,
-            features: [
-              "Up to 6 members",
-              "Smart task management",
-              "Split expenses",
-              "Admin controls",
-              "Room chat & polls",
-            ],
-          },
-          {
-            id: "yearly",
-            name: "Yearly",
-            price: 24.99,
-            period: "year",
-            maxMembers: 6,
-            features: [
-              "Up to 6 members",
-              "Smart task management",
-              "Split expenses",
-              "Admin controls",
-              "Room chat & polls",
-              "Save upto 5$ with yearly billing",
-            ],
-          },
-        ],
-      };
+  const regionConfig = ROOM_PLANS[region];
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, pricing, "Pricing details fetched successfully")
-    );
+  const plans = Object.values(regionConfig.plans).map((plan) => ({
+    planId: plan.planId,
+    label: plan.label,
+    price: plan.price,
+    billingCycle: plan.billingCycle,
+    maxMembers: plan.maxMembers,
+    period:plan.period,
+    features:
+      plan.planId === "free"
+        ? PLAN_FEATURES.free
+        : [
+            ...PLAN_FEATURES.pro,
+            plan.billingCycle === "yearly"
+              ? "Save more with yearly billing"
+              : null,
+          ].filter(Boolean),
+  }));
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      country: region,
+      currency: regionConfig.currency,
+      plans,
+    }, "Pricing details fetched successfully")
+  );
 });
+
 
 export {
   createRoom,
