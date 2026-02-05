@@ -109,17 +109,27 @@ export const useRoomMutation = () => {
   const roomPricingQuery = useQuery({
     queryKey: ["room", "pricing"],
     queryFn: getRoomPricing,
-    enabled: false, 
+    enabled: false,
     staleTime: 5 * 60 * 1000,
     retry: 3,
   });
 
   const createRoomMutation = useMutation({
     mutationFn: createRoom,
-    onSuccess: (newRoomId) => {
-      queryClient.invalidateQueries(["auth", "session"]);
-      navigate(`/room`);
-    },
+     onSuccess: (response) => {
+    queryClient.invalidateQueries(["auth", "session"]);
+
+    const data = response.data;
+
+    // FREE PLAN
+    if (!data?.paymentRequired) {
+      navigate(`/room/${data._id}`);
+      return;
+    }
+
+    // PAID PLAN
+    navigate(`/room/${data.roomId}/payment`);
+  },
     onError: (error) => {
       console.error("Room creation failed:", error);
     },
@@ -136,5 +146,5 @@ export const useRoomMutation = () => {
     },
   });
 
-  return { createRoomMutation, requestJoinRoomMutation,roomPricingQuery };
+  return { createRoomMutation, requestJoinRoomMutation, roomPricingQuery };
 };

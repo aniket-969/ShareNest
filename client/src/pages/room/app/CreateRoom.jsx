@@ -12,7 +12,7 @@ const CreateRoom = () => {
   const pricingRef = useRef(null);
   const [roomDraft, setRoomDraft] = useState(null);
 
-  const { roomPricingQuery } = useRoomMutation();
+  const { roomPricingQuery, createRoomMutation } = useRoomMutation();
 
   useEffect(() => {
     if (
@@ -39,9 +39,13 @@ const CreateRoom = () => {
     setRoomDraft((prev) => ({ ...prev, planId }));
   };
 
-  const handleContinueToPayment = ()=>{
-    
-  }
+  const handleContinueToPayment = () => {
+    if (!roomDraft?.planId) {
+      return;
+    }
+
+    createRoomMutation.mutate(roomDraft);
+  };
 
   return (
     <div className="flex flex-col gap-5 mt-12 mb-32">
@@ -80,6 +84,7 @@ const CreateRoom = () => {
           isLoading={roomPricingQuery.isLoading}
           onPlanSelect={onPlanSelect}
           onBack={() => setStep("form")}
+          handleContinueToPayment={handleContinueToPayment}
         />
       )}
     </div>

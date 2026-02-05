@@ -2,11 +2,11 @@ import axiosClient from "../axiosClient";
 
 const baseRoom = "room";
 
-export const createRoom = async (data) => {
-  const response = await axiosClient.post(`/${baseRoom}`, data);
-
-  return response.data?.data?._id;
+export const createRoom = async (payload) => {
+  const response = await axiosClient.post(`/${baseRoom}`, payload);
+  return response.data;
 };
+
 
 export const getRoomPricing = async () => {
   const response = await axiosClient.get(`/${baseRoom}/pricing`);
