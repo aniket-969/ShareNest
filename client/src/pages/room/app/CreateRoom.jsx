@@ -7,7 +7,6 @@ import PricingSection from "@/components/Room/pricingSection";
 import { useRoomMutation } from "@/hooks/useRoom";
 
 const CreateRoom = () => {
-  
   const [isCreateRoom, setIsCreateRoom] = useState(true);
   const [step, setStep] = useState("form");
   const pricingRef = useRef(null);
@@ -33,7 +32,16 @@ const CreateRoom = () => {
     setStep("pricing");
     roomPricingQuery.refetch();
   };
+
   const isLocked = step === "pricing";
+
+  const onPlanSelect = (planId) => {
+    setRoomDraft((prev) => ({ ...prev, planId }));
+  };
+
+  const handleContinueToPayment = ()=>{
+    
+  }
 
   return (
     <div className="flex flex-col gap-5 mt-12 mb-32">
@@ -70,6 +78,7 @@ const CreateRoom = () => {
           ref={pricingRef}
           pricing={roomPricingQuery.data}
           isLoading={roomPricingQuery.isLoading}
+          onPlanSelect={onPlanSelect}
           onBack={() => setStep("form")}
         />
       )}

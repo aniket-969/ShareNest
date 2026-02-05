@@ -11,7 +11,7 @@ const PricingSection = forwardRef(
 
   const handleSelect = (planKey) => {
     setSelectedPlanId(planKey);
-    onPlanSelect?.(planKey);
+    onPlanSelect(planKey);
   };
 
   const { currency, plans } = pricing;
