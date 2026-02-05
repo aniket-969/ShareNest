@@ -4,7 +4,7 @@ const baseRoom = "room";
 
 export const createRoom = async (payload) => {
   const response = await axiosClient.post(`/${baseRoom}`, payload);
-  return response.data;
+  return response?.data;
 };
 
 
