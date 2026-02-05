@@ -1,9 +1,9 @@
-import { stringValidation } from "@/utils/validation"
+import { optionalStringValidation, stringValidation } from "@/utils/validation"
 import {z} from "zod"
 
 export const createRoomSchema = z.object({
     name:stringValidation(1,20,"name"),
-    description:stringValidation(1,50,"description").optional(),
+    description:optionalStringValidation(1,50,"description"),
 })
 
 export const updateRoomSchema = createRoomSchema
