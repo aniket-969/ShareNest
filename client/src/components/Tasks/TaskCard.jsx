@@ -7,7 +7,7 @@ const TaskCard = ({ scheduledTasks }) => {
   return (
     <div className="relative ">
       <NotificationBell />
-      <div className=" max-w-md rounded-lg p-3 clip bg-card ">
+      <div className="w-[25rem] max-w-full rounded-lg p-3 clip bg-card ">
         <h3 className="font-semibold text-base mx-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>
