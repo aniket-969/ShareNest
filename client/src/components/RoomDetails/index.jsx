@@ -8,6 +8,7 @@ import TaskCard from "@/components/Tasks/TaskCard";
 import Chat from "@/pages/room/Chat/Chat";
 import RoomDetailsLoader from "@/components/skeleton/RoomDetails";
 import { getTasksForDate } from "@/utils/taskHelper";
+import MobileRoomDetails from "./mobileRoomDetails";
 
 const RoomDetailsIndex = () => {
   const { roomId } = useParams();
@@ -15,7 +16,7 @@ const RoomDetailsIndex = () => {
   const { data, isLoading, isError } = roomQuery;
 
   const [date, setDate] = useState(new Date());
-
+  // console.log(data)
   const scheduledTasks = useMemo(() => {
     if (!data?.tasks || !date) return [];
     return getTasksForDate(data.tasks, date);
@@ -23,10 +24,9 @@ const RoomDetailsIndex = () => {
 
   if (isLoading) return <RoomDetailsLoader />;
   if (isError) return <>Something went wrong. Please refresh</>;
-
+  if (data?.plan === "free") return <MobileRoomDetails />;
   return (
-   <div className=" flex  w-full items-center justify-center  gap-10 my-5 ">
-
+    <div className=" flex  w-full items-center justify-center  gap-10 my-5 ">
       {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}
@@ -57,7 +57,10 @@ const RoomDetailsIndex = () => {
         <TaskCard scheduledTasks={scheduledTasks} />
 
         {/* Chat */}
-        <Chat messages={data?.chatMessages} chatMessagesMeta ={data?.chatMessagesMeta}/>
+        <Chat
+          messages={data?.chatMessages}
+          chatMessagesMeta={data?.chatMessagesMeta}
+        />
       </div>
     </div>
   );

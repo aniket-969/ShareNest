@@ -41,10 +41,10 @@ const MobileRoomDetails = () => {
   if (isError)   return <>Something went wrong. Please refresh.</>
 
   return (
-    <div className="flex flex-col items-center px-5 gap-1 ">
+    <div className="sm:mt-5 mt-0 flex flex-col items-center px-5 gap-1 ">
       {/* Poll & Chat buttons */}
      
-      <div className="flex w-full max-w-[25rem] justify-end gap-2 mx-2 ">
+     {(data?.plan !="free" && <div className="flex w-full max-w-[25rem] justify-end gap-2 mx-2 ">
         <Dialog >
 
           <DialogTrigger asChild>
@@ -72,7 +72,7 @@ const MobileRoomDetails = () => {
           
           </DialogContent>
         </Dialog>
-      </div>
+      </div>)}
       
  <div  className="flex flex-col items-center gap-4 w-full ">
    {/* Calendar */}
