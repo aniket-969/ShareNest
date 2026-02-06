@@ -10,7 +10,7 @@ import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { mongoose } from "mongoose";
 import { ChatMessage } from "./../models/chatMessage.model.js";
-import { ROOM_PLANS,PLAN_FEATURES } from "../config/roomPlans.js";
+import { ROOM_PLANS, PLAN_FEATURES } from "../config/roomPlans.js";
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -114,7 +114,7 @@ const getRoomPricing = asyncHandler(async (req, res) => {
     price: plan.price,
     billingCycle: plan.billingCycle,
     maxMembers: plan.maxMembers,
-    period:plan.period,
+    period: plan.period,
     features:
       plan.planId === "free"
         ? PLAN_FEATURES.free
@@ -127,12 +127,79 @@ const getRoomPricing = asyncHandler(async (req, res) => {
   }));
 
   return res.status(200).json(
-    new ApiResponse(200, {
-      country: region,
-      currency: regionConfig.currency,
-      plans,
-    }, "Pricing details fetched successfully")
+    new ApiResponse(
+      200,
+      {
+        country: region,
+        currency: regionConfig.currency,
+        plans,
+      },
+      "Pricing details fetched successfully"
+    )
   );
+});
+
+export const getRoomPaymentDetails = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const userId = req.user?._id;
+
+  const room = await Room.findById(roomId);
+
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  if (room.admin.toString() !== userId.toString()) {
+    throw new ApiError(403, "Only room admin can complete payment");
+  }
+
+  if (!room.subscription || room.subscription.status !== "created") {
+    throw new ApiError(400, "Room is not in a payable state");
+  }
+
+  if (
+    room.payment?.expiresAt &&
+    new Date(room.payment.expiresAt) < new Date()
+  ) {
+    throw new ApiError(
+      410,
+      "Payment session expired. Please recreate the room."
+    );
+  }
+
+  const country = req.headers["cf-ipcountry"];
+  const region = country === "IN" ? "IN" : "USD";
+
+  const regionConfig = ROOM_PLANS[region];
+  const planConfig = regionConfig.plans[room.plan];
+
+  if (!planConfig || !planConfig.paid) {
+    throw new ApiError(400, "Invalid paid plan for this room");
+  }
+
+  const paymentDetails = {
+    roomId: room._id,
+    roomName: room.name,
+
+    planId: planConfig.planId,
+    planLabel: planConfig.label,
+    billingCycle: planConfig.billingCycle,
+
+    price: planConfig.price,
+    currency: regionConfig.currency,
+
+    expiresAt: room.payment.expiresAt,
+  };
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        paymentDetails,
+        "Room payment details fetched successfully"
+      )
+    );
 });
 
 const createRoom = asyncHandler(async (req, res) => {
@@ -183,9 +250,9 @@ const createRoom = asyncHandler(async (req, res) => {
       await user.save();
     }
 
-    return res.status(201).json(
-      new ApiResponse(201, room, "Room created successfully")
-    );
+    return res
+      .status(201)
+      .json(new ApiResponse(201, room, "Room created successfully"));
   }
 
   // Paid Plan
@@ -530,8 +597,6 @@ const kickUser = asyncHandler(async (req, res) => {
     throw err;
   }
 });
-
-
 
 export {
   createRoom,
