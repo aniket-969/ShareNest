@@ -36,6 +36,9 @@ const RoomExpense = React.lazy(() => import("../room/Expense/RoomExpense.jsx"));
 
 const RoomLayout = React.lazy(() => import("@/layouts/RoomLayout.jsx"));
 const Settings = React.lazy(() => import("./../room/Settings/index"));
+const RoomPayment = React.lazy(
+  () => import("@/components/Room/roomPayment.jsx")
+);
 
 const RoomShell = () => (
   <SocketProvider>
@@ -66,10 +69,15 @@ export const AppRouter = () => {
             </Route>
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
-            {/* Rooms wrapped in providers */}
+            
+            <Route path="room">
+              <Route path="create" element={<CreateRoom />} />
+              <Route path=":roomId/payment" element={<RoomPayment />} />
+            </Route>
+
+            {/* Room Routes with socket */}
             <Route path="room" element={<RoomShell />}>
               <Route index element={<Room />} />
-              <Route path="create" element={<CreateRoom />} />
               <Route path=":roomId" element={<RoomLayout />}>
                 <Route index element={<RoomDetails />} />
                 <Route path="awards" element={<Awards />} />
