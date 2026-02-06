@@ -8,6 +8,7 @@ import {
   leaveRoom,
   adminTransfer,
   getRoomPricing,
+  getRoomPaymentDetails,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +22,17 @@ export const useRoom = (roomId) => {
   const roomQuery = useQuery({
     queryKey: ["room", roomId],
     queryFn: () => getRoomData(roomId),
+    enabled: !!roomId,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+    retry: 3,
+  });
+
+  const roomPaymentDetails = useQuery({
+    queryKey: ["room", roomId, "paymentDetails"],
+    queryFn: () => getRoomPaymentDetails(roomId),
     enabled: !!roomId,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -93,6 +105,7 @@ export const useRoom = (roomId) => {
 
   return {
     roomQuery,
+    roomPaymentDetails,
     adminResponseMutation,
     updateRoomMutation,
     deleteRoomMutation,
@@ -113,6 +126,7 @@ export const useRoomMutation = () => {
     staleTime: 5 * 60 * 1000,
     retry: 3,
   });
+
 
   const createRoomMutation = useMutation({
     mutationFn: createRoom,

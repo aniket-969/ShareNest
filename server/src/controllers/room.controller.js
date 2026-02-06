@@ -139,7 +139,7 @@ const getRoomPricing = asyncHandler(async (req, res) => {
   );
 });
 
-export const getRoomPaymentDetails = asyncHandler(async (req, res) => {
+const getRoomPaymentDetails = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
 
@@ -609,4 +609,5 @@ export {
   transferAdminControl,
   kickUser,
   getRoomPricing,
+  getRoomPaymentDetails
 };

@@ -13,6 +13,12 @@ export const getRoomPricing = async () => {
   return response.data?.data;
 };
 
+export const getRoomPaymentDetails = async (roomId) => {
+  const response = await axiosClient.get(`/${baseRoom}/${roomId}/payment`);
+  console.log(response);
+  return response.data?.data;
+};
+
 export const addUserRequest = async (data, roomId) => {
   return axiosClient.post(`/${baseRoom}/request`, data);
 };
