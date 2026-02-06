@@ -49,7 +49,7 @@ export const QRCarousel = ({
 
   return (
     <div className="flex flex-col items-center ">
-      <Carousel className="w-full max-w-[12rem] md:max-w-[20rem] sm:max-w-[15rem] ">
+      <Carousel className="w-full max-w-[12rem] md:max-w-[20rem] sm:max-w-[15rem] border-none">
         <CarouselContent className="">
           {items.map((item) => (
             <CarouselItem key={item._id} className="">

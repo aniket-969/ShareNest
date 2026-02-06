@@ -15,7 +15,7 @@ const RoomSettings = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="flex flex-col items-start gap-5">
+    <div className="flex flex-col items-start gap-5 ">
       <RoomDetailsView
         room={room}
         isAdmin={isAdmin}

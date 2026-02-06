@@ -76,7 +76,7 @@ const MobileRoomDetails = () => {
       
  <div  className="flex flex-col items-center gap-4 w-full ">
    {/* Calendar */}
-          <div className="w-full max-w-[25rem] bg-card rounded-lg shadow-md p-4 border">
+          <div className="w-full max-w-[25rem] bg-card rounded-lg shadow-md p-4">
         <Calendar
           mode="single"
           selected={date}
