@@ -146,6 +146,7 @@ export const useRoomMutation = () => {
   },
     onError: (error) => {
       console.error("Room creation failed:", error);
+      toast(error?.response?.data?.message)
     },
   });
 
