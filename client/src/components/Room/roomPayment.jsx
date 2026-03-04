@@ -23,11 +23,10 @@ const RoomPayment = () => {
     expiresAt,
   } = data;
 
-  const formattedExpiry = new Date(expiresAt).toLocaleString();
 
   return (
     <div className="flex justify-center items-center px-4 min-h-[100vh]">
-      <Card className="w-full max-w-xl p-6 flex flex-col gap-3">
+      <Card className="w-full max-w-xl p-6 flex flex-col gap-3 border-none">
         
         {/* Header */}
         <div className="flex flex-col gap-1">
@@ -71,7 +70,7 @@ const RoomPayment = () => {
         </div>
 
         {/* Secure Info */}
-        <div className="text-xs text-muted-foreground border rounded-xl p-3">
+        <div className="text-xs text-muted-foreground rounded-xl p-3">
           <p className="font-medium text-foreground mb-1">Secure Payment</p>
           <p>
             Payments are processed securely via Razorpay. We do not store your
