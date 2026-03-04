@@ -154,6 +154,7 @@ export const useRoomMutation = () => {
     mutationFn: addUserRequest,
     onSuccess: () => {
       console.log("Join request sent successfully");
+      
       navigate("/room");
     },
     onError: (error) => {

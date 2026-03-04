@@ -273,7 +273,7 @@ const createRoom = asyncHandler(async (req, res) => {
       status: "created",
     },
     payment: {
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 10*60 * 60 * 1000),
     },
   });
 
