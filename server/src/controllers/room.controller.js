@@ -210,19 +210,17 @@ const createRoom = asyncHandler(async (req, res) => {
   const region = country === "IN" ? "IN" : "USD";
 
   const regionConfig = ROOM_PLANS[region];
-  const planConfig = regionConfig.plans[planId];
+  const planConfig = regionConfig?.plans?.[planId];
 
   if (!planConfig) {
     throw new ApiError(400, "Invalid plan selected");
   }
 
-  const currency = regionConfig.currency;
-
   // Free Plan
   if (!planConfig.paid) {
     const existingFreeRoom = await Room.findOne({
       admin,
-      plan: "free",
+      "plan.planId": "free",
     });
 
     if (existingFreeRoom) {
@@ -239,8 +237,10 @@ const createRoom = asyncHandler(async (req, res) => {
       description,
       admin,
       groupCode,
-      plan: "free",
-      currency,
+      plan: {
+        planId: "free",
+        region,
+      },
       tenants: [admin],
     });
 
@@ -263,17 +263,19 @@ const createRoom = asyncHandler(async (req, res) => {
     description,
     admin,
     groupCode,
-    plan: planId,
-    currency,
+    plan: {
+      planId,
+      region,
+    },
     tenants: [admin],
     subscription: {
       provider: "razorpay",
       billingCycle: planConfig.billingCycle,
-      billingCurrency: currency,
+      billingCurrency: regionConfig.currency,
       status: "created",
     },
     payment: {
-      expiresAt: new Date(Date.now() + 10*60 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 10 * 60 * 60 * 1000),
     },
   });
 
