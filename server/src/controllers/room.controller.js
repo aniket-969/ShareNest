@@ -149,46 +149,50 @@ const getRoomPaymentDetails = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Room not found");
   }
 
+  // Only admin can complete payment
   if (room.admin.toString() !== userId.toString()) {
-    throw new ApiError(403, "Only room admin can complete payment");
+    throw new ApiError(403, "Only the room admin can complete payment");
+  }
+
+  
+  if (room.subscription?.status === "active") {
+    throw new ApiError(409, "Room subscription already active");
   }
 
   if (!room.subscription || room.subscription.status !== "created") {
     throw new ApiError(400, "Room is not in a payable state");
   }
 
-  if (
-    room.payment?.expiresAt &&
-    new Date(room.payment.expiresAt) < new Date()
-  ) {
+  if (room.payment?.expiresAt && room.payment.expiresAt < new Date()) {
     throw new ApiError(
       410,
       "Payment session expired. Please recreate the room."
     );
   }
 
-  const country = req.headers["cf-ipcountry"];
-  const region = country === "IN" ? "IN" : "USD";
-
+  // Resolve plan configuration
+  const { planId, region } = room.plan || {};
   const regionConfig = ROOM_PLANS[region];
-  const planConfig = regionConfig.plans[room.plan];
+  const planConfig = regionConfig?.plans?.[planId];
 
   if (!planConfig || !planConfig.paid) {
-    throw new ApiError(400, "Invalid paid plan for this room");
+    throw new ApiError(400, "Invalid paid plan configuration");
   }
 
   const paymentDetails = {
     roomId: room._id,
     roomName: room.name,
 
-    planId: planConfig.planId,
+    planId,
     planLabel: planConfig.label,
     billingCycle: planConfig.billingCycle,
 
     price: planConfig.price,
     currency: regionConfig.currency,
 
-    expiresAt: room.payment.expiresAt,
+    expiresAt: room.payment?.expiresAt,
+
+    subscriptionId: room.subscription?.razorpaySubscriptionId || null,
   };
 
   return res
