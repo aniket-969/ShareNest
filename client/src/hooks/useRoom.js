@@ -30,17 +30,6 @@ export const useRoom = (roomId) => {
     retry: 3,
   });
 
-  const roomPaymentDetails = useQuery({
-    queryKey: ["room", roomId, "paymentDetails"],
-    queryFn: () => getRoomPaymentDetails(roomId),
-    enabled: !!roomId,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 10 * 60 * 1000,
-    retry: 3,
-  });
-
   const updateRoomMutation = useMutation({
     mutationFn: (newValues) => updateRoom(roomId, newValues),
     onSuccess: (newRoomId) => {
@@ -105,13 +94,32 @@ export const useRoom = (roomId) => {
 
   return {
     roomQuery,
-    roomPaymentDetails,
     adminResponseMutation,
     updateRoomMutation,
     deleteRoomMutation,
     leaveRoomMutation,
     adminTransferMutation,
     kickUserMutation,
+  };
+};
+
+export const useRoomPayment = (roomId) => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const roomPaymentDetails = useQuery({
+    queryKey: ["room", roomId, "paymentDetails"],
+    queryFn: () => getRoomPaymentDetails(roomId),
+    enabled: !!roomId,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+    retry: 3,
+  });
+
+  return {
+    roomPaymentDetails,
   };
 };
 
@@ -154,7 +162,7 @@ export const useRoomMutation = () => {
     mutationFn: addUserRequest,
     onSuccess: () => {
       console.log("Join request sent successfully");
-      
+
       navigate("/room");
     },
     onError: (error) => {

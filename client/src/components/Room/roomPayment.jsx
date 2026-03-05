@@ -1,4 +1,4 @@
-import { useRoom } from "@/hooks/useRoom";
+import { useRoomPayment } from "@/hooks/useRoom";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import React from "react";
@@ -6,8 +6,9 @@ import { useParams } from "react-router-dom";
 import { Card } from '@/components/ui/card';
 
 const RoomPayment = () => {
+  console.log("In roompayment.jsx")
   const { roomId } = useParams();
-  const { roomPaymentDetails } = useRoom(roomId);
+  const { roomPaymentDetails } = useRoomPayment(roomId);
   const { data, isLoading, isError } = roomPaymentDetails;
 
   if (isLoading) return <Spinner />;
