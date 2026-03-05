@@ -127,7 +127,7 @@ const AppSidebar = () => {
         />
 
         {/* Pending Requests */}
-        {roomData?.pendingRequests && (
+        {roomData?.pendingRequests && roomData?.plan != "free" && (
           <PendingRequests
             pendingRequests={roomData?.pendingRequests}
             showRequests={showRequests}

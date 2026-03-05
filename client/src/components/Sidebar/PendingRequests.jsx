@@ -36,7 +36,7 @@ const PendingRequests = ({ pendingRequests, showRequests, toggleRequests }) => {
   };
   
   return (
-    <div className="p-4 border-b">
+    <div className="p-4 border-b ">
       <div
         className="flex items-center text-sm cursor-pointer space-x-2"
         onClick={toggleRequests}
