@@ -75,10 +75,16 @@ const roomSchema = new Schema(
       match: /^[A-Z]{3}$/,
     },
     plan: {
-      type: String,
-      enum: ["free", "pro_monthly", "pro_yearly"],
-      required: true,
-      default: "free",
+      planId: {
+        type: String,
+        enum: ["free", "pro_monthly", "pro_yearly"],
+        required: true,
+      },
+      region: {
+        type: String,
+        enum: ["IN", "USD"],
+        required: true,
+      },
     },
     subscription: {
       provider: {

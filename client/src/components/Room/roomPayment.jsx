@@ -26,7 +26,7 @@ const RoomPayment = () => {
 
   return (
     <div className="flex justify-center items-center px-4 min-h-[100vh]">
-      <Card className="w-full max-w-xl p-6 flex flex-col gap-3 border-none">
+      <Card className="w-full max-w-xl px-8 py-6 flex flex-col gap-3 border-none">
         
         {/* Header */}
         <div className="flex flex-col gap-1">
@@ -35,14 +35,11 @@ const RoomPayment = () => {
         </div>
 
         {/* Room Details */}
-        <div className="border rounded-xl p-4 flex flex-col gap-2">
-          <h2 className="font-semibold">Room Details</h2>
+       
           <p className="text-sm">
             <span className="font-medium">Room Name:</span> {roomName}
           </p>
          
-        </div>
-
         {/* Plan Details */}
         <div className="border rounded-xl p-4 flex flex-col gap-3">
           <h2 className="font-semibold">Subscription Plan</h2>
