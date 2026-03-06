@@ -159,7 +159,7 @@ export function getTasksForDate(tasks, selectedDate) {
       assignees: [finalAssignee],
     });
   }
-  console.log(scheduled);
+  // console.log(scheduled);
   return scheduled;
 }
 

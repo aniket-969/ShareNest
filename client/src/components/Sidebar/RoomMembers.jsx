@@ -18,7 +18,7 @@ const RoomMembers = ({
   onlineMembers,
 }) => {
   const onlineMembersSet = new Set(onlineMembers);
-  console.log(onlineMembersSet,onlineMembers);
+  // console.log(onlineMembersSet,onlineMembers);
   return (
     <div className="p-4 border-b">
       {/* Header row */}
