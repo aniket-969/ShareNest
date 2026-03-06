@@ -1,30 +1,28 @@
 import React, { createContext, useContext, useEffect,useState } from "react";
 import { getSocket } from "@/socket";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const RoomSocketContext = createContext();
 
 export const useRoomSocket = () => useContext(RoomSocketContext);
 
 export const RoomSocketProvider = ({ children }) => {
+  const {roomId} = useParams()
   const socket = getSocket();
-  const location = useLocation();
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const joinRoom = (roomId) => {
-    if (roomId && location.pathname.includes(`/room/${roomId}`)) {
-      socket.emit("joinRoom", roomId);
-      console.log(`Joined room: ${roomId}`);
-      localStorage.setItem("currentRoomId", roomId);
-    }
-  };
 
-  const leaveRoom = (roomId) => {
-    if (roomId) {
+ useEffect(() => {
+    if (!roomId) return;
+
+    socket.emit("joinRoom", roomId);
+    console.log(`Joined room: ${roomId}`);
+
+    return () => {
       socket.emit("leaveRoom", roomId);
       console.log(`Left room: ${roomId}`);
-      localStorage.removeItem("currentRoomId");
-    }
-  };
+    };
+  }, [roomId, socket]);
+
 
   useEffect(() => {
     const handleOnlineUsersUpdate = ({ users, count }) => {
@@ -41,7 +39,7 @@ export const RoomSocketProvider = ({ children }) => {
   }, [socket]);
 
   return (
-    <RoomSocketContext.Provider value={{ joinRoom, leaveRoom, onlineUsers }}>
+    <RoomSocketContext.Provider value={{  onlineUsers }}>
       {children}
     </RoomSocketContext.Provider>
   );
