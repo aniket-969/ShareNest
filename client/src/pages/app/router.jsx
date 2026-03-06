@@ -69,22 +69,25 @@ export const AppRouter = () => {
             </Route>
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
-            
+
             <Route path="room">
               <Route path="create" element={<CreateRoom />} />
               <Route path=":roomId/payment" element={<RoomPayment />} />
             </Route>
 
             {/* Room Routes with socket */}
-            <Route path="room" element={<RoomShell />}>
+            <Route path="room">
               <Route index element={<Room />} />
-              <Route path=":roomId" element={<RoomLayout />}>
-                <Route index element={<RoomDetails />} />
-                <Route path="awards" element={<Awards />} />
-                <Route path="chat" element={<Chat />} />
-                <Route path="tasks" element={<Tasks />} />
-                <Route path="expense" element={<RoomExpense />} />
-                <Route path="settings" element={<Settings />} />
+
+              <Route path=":roomId" element={<RoomShell />}>
+                <Route element={<RoomLayout />}>
+                  <Route index element={<RoomDetails />} />
+                  <Route path="awards" element={<Awards />} />
+                  <Route path="chat" element={<Chat />} />
+                  <Route path="tasks" element={<Tasks />} />
+                  <Route path="expense" element={<RoomExpense />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
               </Route>
             </Route>
 
