@@ -7,16 +7,13 @@ let socketInstance;
 
 export const getSocket = () => {
   if (!socketInstance) {
-    const currentRoomId = localStorage.getItem("currentRoomId");
-
+    
     socketInstance = io(
       import.meta.env.REACT_APP_SOCKET_SERVER || "http://localhost:3000",
       {
         withCredentials: true,
         transports: ["polling", "websocket"],
-        auth: {
-          roomId: currentRoomId, 
-        },
+       
       }
     );
   }
@@ -43,6 +40,9 @@ const SocketProvider = ({ children }) => {
       socket.off("connect");
       socket.off("socketError");
       socket.offAny();
+      socket.disconnect()
+      socketInstance = null
+      console.log("Socket disconnected and cleaned up");
     };
   }, [socket]);
 
