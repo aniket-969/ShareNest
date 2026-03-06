@@ -32,14 +32,14 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar, ...props }) => {
     >
       <div className="flex gap-2 ">
         {/* avatar */}
-        {showAvatar && (
+        {showAvatar ? (
           <Avatar className="h-7 w-7">
             <AvatarImage src={message.sender?.avatar} />
             <AvatarFallback>
               {message.sender?.fullName?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
-        )}
+        ):(<p className="h-7 w-7"></p>)}
 
         {/* name and message box */}
         <div className="space-y-1 max-w-[80%] sm:max-w-[70%]">
