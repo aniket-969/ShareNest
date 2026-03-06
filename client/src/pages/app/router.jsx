@@ -16,7 +16,6 @@ import AuthLayout from "@/layouts/AuthLayout.jsx";
 import { SocketProvider } from "@/socket.jsx";
 import { RoomSocketProvider } from "@/context/RoomSocket.jsx";
 import { NotificationProvider } from "@/context/NotificationContext.jsx";
-import { RouteMonitor } from "@/utils/RouteMonitor.js";
 
 // Pages
 import LandingPage from "../LandingPage.jsx";
@@ -44,7 +43,6 @@ const RoomShell = () => (
   <SocketProvider>
     <RoomSocketProvider>
       <NotificationProvider>
-        <RouteMonitor />
         <Outlet />
       </NotificationProvider>
     </RoomSocketProvider>
