@@ -11,7 +11,7 @@ const TaskCard = ({ scheduledTasks }) => {
         <h3 className="font-semibold text-base mx-2">
           Scheduled Tasks ({scheduledTasks.length})
         </h3>
-        <ScrollArea className=" h-[13rem] px-3 py-3 mt-1">
+        <ScrollArea className=" h-[13rem] py-4 pl-2 pr-4 mt-1 ">
           {scheduledTasks.length === 0 ? (
             <p className="text-muted-foreground text-sm">
               No tasks for this date.
