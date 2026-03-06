@@ -9,16 +9,8 @@ import SidebarSkeleton from "@/components/skeleton/Room/sidebar";
 
 export const RoomLayout = () => {
   const { roomId } = useParams();
-  const { joinRoom, leaveRoom } = useRoomSocket();
+ 
   const session = localStorage.getItem("session");
-
-  // join room socket
-  useEffect(() => {
-    if (roomId) {
-      joinRoom(roomId);
-      return () => leaveRoom(roomId);
-    }
-  }, [roomId]);
 
   if (!roomId) {
     return <Navigate to="/room" />;
