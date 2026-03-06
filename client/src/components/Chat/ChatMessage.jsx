@@ -44,10 +44,10 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar, ...props }) => {
         {/* name and message box */}
         <div className="space-y-1 max-w-[80%] sm:max-w-[70%]">
           {showAvatar && (
-            <p className="text-sm font-medium ">{message.sender?.fullName}</p>
+            <p className="text-[0.85rem] ">{message.sender?.fullName}</p>
           )}
           <div className="relative  bg-primary text-primary-foreground rounded-2xl rounded-bl-md px-4 py-[0.3rem] ">
-            <p className="break-words text-[0.9rem] tracking-wide">
+            <p className="break-words text-[0.9rem] tracking-wide ">
               {message?.content}
             </p>
             <p className="text-[0.6rem] opacity-70 text-right ">
