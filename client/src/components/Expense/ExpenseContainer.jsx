@@ -60,14 +60,15 @@ const expenses = expenseData?.pages
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
       
       {/* Scrollable expense history */}
-      <Card className="w-full max-w-[25rem] border-none py-6">
+      <Card className="w-full max-w-[25rem] border-none py-6 ">
         <ScrollArea
           ref={viewportRef}
-          className="h-[31rem]"
+          className="h-[31rem] "
           onScroll={handleScroll}
         >
-          <Card className="flex flex-col gap-6 items-center border-none rounded-none">
-            {expenses.map((exp) => (
+          <Card className="flex flex-col gap-6 items-center border-none rounded-none ">
+            {expenses.length>0?
+          ( expenses.map((exp) => (
               <div key={exp._id}>
                 {/* Timestamp */}
                 <p className="text-center text-xs">
@@ -103,7 +104,9 @@ const expenses = expenseData?.pages
                 {/* Expense card */}
                 <ExpenseCard userId={_id} expense={exp} roomId={roomId}/>
               </div>
-            ))}
+            ))) :
+           ( <p className="mt-8">No expenses to show</p>)}
+            
           </Card>
         </ScrollArea>
       </Card>
