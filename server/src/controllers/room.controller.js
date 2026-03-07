@@ -210,7 +210,7 @@ const createRoom = asyncHandler(async (req, res) => {
   const { name, description, planId } = req.body;
 
   const country = req.headers["cf-ipcountry"];
-  const region = country === "IN" ? "IN" : "USD";
+  const region = country != "IN" ? "IN" : "USD";
 
   const regionConfig = ROOM_PLANS[region];
   const planConfig = regionConfig?.plans?.[planId];
