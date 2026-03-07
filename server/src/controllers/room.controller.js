@@ -11,6 +11,7 @@ import { emitSocketEvent } from "../socket/index.js";
 import { mongoose } from "mongoose";
 import { ChatMessage } from "./../models/chatMessage.model.js";
 import { ROOM_PLANS, PLAN_FEATURES } from "../config/roomPlans.js";
+import { razorpay } from './../config/razorPay.js';
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -300,6 +301,76 @@ const createRoom = asyncHandler(async (req, res) => {
         paymentRequired: true,
       },
       "Room created. Payment required to activate."
+    )
+  );
+});
+
+const initiateRoomPayment = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const userId = req.user?._id;
+
+  const room = await Room.findById(roomId);
+
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  if (room.admin.toString() !== userId.toString()) {
+    throw new ApiError(403, "Only the room admin can initiate payment");
+  }
+
+  if (room.subscription?.status === "active") {
+    throw new ApiError(409, "Room subscription already active");
+  }
+
+  if (!room.subscription || room.subscription.status !== "created") {
+    throw new ApiError(400, "Room is not in a payable state");
+  }
+
+  if (room.payment?.expiresAt && room.payment.expiresAt < new Date()) {
+    throw new ApiError(
+      410,
+      "Payment session expired. Please recreate the room."
+    );
+  }
+
+  // Resolve plan configuration
+  const { planId, region } = room.plan;
+  const regionConfig = ROOM_PLANS[region];
+  const planConfig = regionConfig?.plans?.[planId];
+
+  if (!planConfig || !planConfig.razorpayPlanId) {
+    throw new ApiError(400, "Invalid payment plan configuration");
+  }
+
+  let subscriptionId = room.subscription?.razorpaySubscriptionId;
+
+  if (!subscriptionId) {
+    const subscription = await razorpay.subscriptions.create({
+      plan_id: planConfig.razorpayPlanId,
+      customer_notify: 1,
+      notes: {
+        roomId: room._id.toString(),
+        adminId: userId.toString(),
+      },
+    });
+
+    subscriptionId = subscription.id;
+
+    room.subscription.razorpaySubscriptionId = subscriptionId;
+    room.subscription.razorpayPlanId = planConfig.razorpayPlanId;
+
+    await room.save();
+  }
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        key: process.env.RAZORPAY_KEY_ID,
+        subscriptionId,
+      },
+      "Payment session created"
     )
   );
 });
@@ -615,6 +686,7 @@ const kickUser = asyncHandler(async (req, res) => {
 
 export {
   createRoom,
+  initiateRoomPayment,
   addUserRequest,
   adminResponse,
   updateRoom,
