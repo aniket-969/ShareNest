@@ -20,6 +20,7 @@ export const ROOM_PLANS = {
         billingCycle: "monthly",
         maxMembers: 6,
         period: "month",
+        razorpayPlanId: "plan_SOLaij3GtulYlx",
       },
       pro_yearly: {
         planId: "pro_yearly",
@@ -29,6 +30,7 @@ export const ROOM_PLANS = {
         billingCycle: "yearly",
         maxMembers: 6,
         period: "year",
+        razorpayPlanId: "plan_SOLbIOcMDAFnQ5",
       },
     },
   },
@@ -54,6 +56,8 @@ export const ROOM_PLANS = {
         billingCycle: "monthly",
         maxMembers: 6,
         period: "month",
+
+        razorpayPlanId: "plan_SOLaij3GtulYlx",
       },
       pro_yearly: {
         planId: "pro_yearly",
@@ -63,6 +67,7 @@ export const ROOM_PLANS = {
         billingCycle: "yearly",
         maxMembers: 6,
         period: "year",
+        razorpayPlanId: "plan_SOLaij3GtulYlx",
       },
     },
   },
