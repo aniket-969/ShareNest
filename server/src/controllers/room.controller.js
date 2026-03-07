@@ -104,7 +104,7 @@ const getRoomData = asyncHandler(async (req, res) => {
 
 const getRoomPricing = asyncHandler(async (req, res) => {
   const country = req.headers["cf-ipcountry"];
-  const region = country === "IN" ? "IN" : "USD";
+  const region = country != "IN" ? "IN" : "USD";
 
   const regionConfig = ROOM_PLANS[region];
 
@@ -154,7 +154,6 @@ const getRoomPaymentDetails = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Only the room admin can complete payment");
   }
 
-  
   if (room.subscription?.status === "active") {
     throw new ApiError(409, "Room subscription already active");
   }
@@ -233,7 +232,17 @@ const createRoom = asyncHandler(async (req, res) => {
         "Free plan limit reached. Upgrade to create more rooms."
       );
     }
-
+    const pendingRooms = await Room.countDocuments({
+      admin,
+      "subscription.status": "created",
+      "payment.expiresAt": { $gt: new Date() },
+    });
+    if (pendingRooms >= 2) {
+      throw new ApiError(
+        403,
+        "You already have 2 rooms awaiting payment. Complete one before creating another."
+      );
+    }
     const groupCode = await generateUniqueGroupCode();
 
     const room = await Room.create({
@@ -615,5 +624,5 @@ export {
   transferAdminControl,
   kickUser,
   getRoomPricing,
-  getRoomPaymentDetails
+  getRoomPaymentDetails,
 };

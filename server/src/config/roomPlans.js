@@ -56,7 +56,6 @@ export const ROOM_PLANS = {
         billingCycle: "monthly",
         maxMembers: 6,
         period: "month",
-
         razorpayPlanId: "plan_SOLaij3GtulYlx",
       },
       pro_yearly: {
