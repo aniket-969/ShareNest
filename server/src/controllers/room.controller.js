@@ -10,7 +10,11 @@ import { RoomEventEnum } from "../constants.js";
 import { emitSocketEvent } from "../socket/index.js";
 import { mongoose } from "mongoose";
 import { ChatMessage } from "./../models/chatMessage.model.js";
-import { ROOM_PLANS, PLAN_FEATURES } from "../config/roomPlans.js";
+import {
+  ROOM_PLANS,
+  TEST_ROOM_PLANS,
+  PLAN_FEATURES,
+} from "../config/roomPlans.js";
 import { razorpay } from "./../config/razorPay.js";
 
 function generateGroupCode() {
@@ -334,7 +338,7 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
   }
   // Resolve plan configuration
   const { planId, region } = room.plan;
-  const regionConfig = ROOM_PLANS[region];
+  const regionConfig = TEST_ROOM_PLANS[region];
   const planConfig = regionConfig?.plans?.[planId];
 
   if (!planConfig || !planConfig.razorpayPlanId) {
@@ -345,10 +349,11 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
   if (!subscriptionId) {
     try {
       console.log("creating razorpay subscription");
-console.log(planConfig.razorpayPlanId)
+      console.log(planConfig.razorpayPlanId);
       const subscription = await razorpay.subscriptions.create({
         plan_id: planConfig.razorpayPlanId,
         customer_notify: 1,
+        total_count:120,
         notes: {
           roomId: room._id.toString(),
           adminId: userId.toString(),
