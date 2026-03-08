@@ -354,7 +354,7 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
         plan_id: planConfig.razorpayPlanId,
         customer_notify: 1,
         total_count:120,
-        notes: {
+        notes: { 
           roomId: room._id.toString(),
           adminId: userId.toString(),
         },
