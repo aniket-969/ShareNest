@@ -119,8 +119,21 @@ export const useRoomPayment = (roomId) => {
     retry: 3,
   });
 
+  const initiateRoomPaymentMutation = useMutation({
+    mutationFn: initiateRoomPayment,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries(["auth", "session"]);
+      console.log(response);
+    },
+    onError: (error) => {
+      console.error("Room Payment failed:", error);
+      toast(error?.response?.data?.message);
+    },
+  });
+
   return {
     roomPaymentDetails,
+    initiateRoomPaymentMutation,
   };
 };
 
@@ -136,39 +149,25 @@ export const useRoomMutation = () => {
     retry: 3,
   });
 
-
   const createRoomMutation = useMutation({
     mutationFn: createRoom,
-     onSuccess: (response) => {
-    queryClient.invalidateQueries(["auth", "session"]);
+    onSuccess: (response) => {
+      queryClient.invalidateQueries(["auth", "session"]);
 
-    const data = response.data;
+      const data = response.data;
 
-    // FREE PLAN
-    if (!data?.paymentRequired) {
-      navigate(`/room/${data._id}`);
-      return;
-    }
+      // FREE PLAN
+      if (!data?.paymentRequired) {
+        navigate(`/room/${data._id}`);
+        return;
+      }
 
-    // PAID PLAN
-    navigate(`/room/${data.roomId}/payment`);
-  },
+      // PAID PLAN
+      navigate(`/room/${data.roomId}/payment`);
+    },
     onError: (error) => {
       console.error("Room creation failed:", error);
-      toast(error?.response?.data?.message)
-    },
-  });
-
-  const initiateRoomPaymentMutation = useMutation({
-    mutationFn: initiateRoomPayment,
-     onSuccess: (response) => {
-    queryClient.invalidateQueries(["auth", "session"]);
-console.log(response)
-    
-  },
-    onError: (error) => {
-      console.error("Room Payment failed:", error);
-      toast(error?.response?.data?.message)
+      toast(error?.response?.data?.message);
     },
   });
 
@@ -184,5 +183,9 @@ console.log(response)
     },
   });
 
-  return { createRoomMutation, requestJoinRoomMutation, roomPricingQuery,initiateRoomPaymentMutation };
+  return {
+    createRoomMutation,
+    requestJoinRoomMutation,
+    roomPricingQuery,
+  };
 };

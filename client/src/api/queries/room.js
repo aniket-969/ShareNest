@@ -7,10 +7,10 @@ export const createRoom = async (payload) => {
   return response?.data;
 };
 
-export const initiateRoomPayment = async (payload) => {
-  const response = await axiosClient.post(`/${baseRoom}/${roomId}/payment`, payload);
+export const initiateRoomPayment = async (roomId) => {
+  const response = await axiosClient.post(`/${baseRoom}/${roomId}/payment`, {});
   console.log(response)
-  return response?.data;
+  return response?.data; 
 };
 
 export const getRoomPricing = async () => {

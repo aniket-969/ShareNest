@@ -26,7 +26,7 @@ const ChatMessage = ({ message, isCurrentUser, showAvatar, ...props }) => {
   ) : (
     // Other's message box
     <div
-      className="flex flex-col mb-3 px-3"
+      className="flex flex-col mb-2 px-3 "
       data-message-id={message._id}
       {...props}
     >
