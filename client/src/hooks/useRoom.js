@@ -122,8 +122,31 @@ export const useRoomPayment = (roomId) => {
   const initiateRoomPaymentMutation = useMutation({
     mutationFn: initiateRoomPayment,
     onSuccess: (response) => {
-      queryClient.invalidateQueries(["auth", "session"]);
-      console.log(response);
+      const { key, subscriptionId } = response.data;
+
+      const options = {
+        key,
+        subscription_id: subscriptionId,
+        name: "ShareNest",
+        description: "Room Subscription",
+
+        handler: function (response) {
+          console.log("Payment success:", response);
+        },
+
+        modal: {
+          ondismiss: function () {
+            console.log("Checkout closed");
+          },
+        },
+
+        theme: {
+          color: "#fe2858",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     },
     onError: (error) => {
       console.error("Room Payment failed:", error);
