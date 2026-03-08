@@ -11,7 +11,7 @@ import { emitSocketEvent } from "../socket/index.js";
 import { mongoose } from "mongoose";
 import { ChatMessage } from "./../models/chatMessage.model.js";
 import { ROOM_PLANS, PLAN_FEATURES } from "../config/roomPlans.js";
-import { razorpay } from './../config/razorPay.js';
+import { razorpay } from "./../config/razorPay.js";
 
 function generateGroupCode() {
   return crypto.randomBytes(6).toString("hex").slice(0, 6).toUpperCase();
@@ -308,7 +308,6 @@ const createRoom = asyncHandler(async (req, res) => {
 const initiateRoomPayment = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
-
   const room = await Room.findById(roomId);
 
   if (!room) {
@@ -333,7 +332,6 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
       "Payment session expired. Please recreate the room."
     );
   }
-
   // Resolve plan configuration
   const { planId, region } = room.plan;
   const regionConfig = ROOM_PLANS[region];
@@ -342,27 +340,37 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
   if (!planConfig || !planConfig.razorpayPlanId) {
     throw new ApiError(400, "Invalid payment plan configuration");
   }
-
   let subscriptionId = room.subscription?.razorpaySubscriptionId;
 
   if (!subscriptionId) {
-    const subscription = await razorpay.subscriptions.create({
-      plan_id: planConfig.razorpayPlanId,
-      customer_notify: 1,
-      notes: {
-        roomId: room._id.toString(),
-        adminId: userId.toString(),
-      },
-    });
+    try {
+      console.log("creating razorpay subscription");
+console.log(planConfig.razorpayPlanId)
+      const subscription = await razorpay.subscriptions.create({
+        plan_id: planConfig.razorpayPlanId,
+        customer_notify: 1,
+        notes: {
+          roomId: room._id.toString(),
+          adminId: userId.toString(),
+        },
+      });
 
-    subscriptionId = subscription.id;
+      subscriptionId = subscription.id;
 
-    room.subscription.razorpaySubscriptionId = subscriptionId;
-    room.subscription.razorpayPlanId = planConfig.razorpayPlanId;
+      room.subscription.razorpaySubscriptionId = subscriptionId;
+      room.subscription.razorpayPlanId = planConfig.razorpayPlanId;
 
-    await room.save();
+      await room.save();
+    } catch (error) {
+      console.error("Razorpay subscription creation failed:", error);
+
+      throw new ApiError(
+        error?.statusCode || 500,
+        error?.error?.description || "Failed to create Razorpay subscription"
+      );
+    }
   }
-
+  console.log(subscriptionId);
   return res.status(200).json(
     new ApiResponse(
       200,

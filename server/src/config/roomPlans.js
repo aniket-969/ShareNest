@@ -71,6 +71,44 @@ export const ROOM_PLANS = {
     },
   },
 };
+export const TEST_ROOM_PLANS = {
+  IN: {
+    region: "IN",
+    currency: "INR",
+    plans: {
+      free: {
+        planId: "free",
+        label: "Free",
+        price: 0,
+        paid: false,
+        billingCycle: null,
+        maxMembers: 1,
+        period: null,
+      },
+      pro_monthly: {
+        planId: "pro_monthly",
+        label: "Monthly",
+        price: 99,
+        paid: true,
+        billingCycle: "monthly",
+        maxMembers: 6,
+        period: "month",
+        razorpayPlanId: "plan_SOfn9ot0FpQF36",
+      },
+      pro_yearly: {
+        planId: "pro_yearly",
+        label: "Yearly",
+        price: 999,
+        paid: true,
+        billingCycle: "yearly",
+        maxMembers: 6,
+        period: "year",
+        razorpayPlanId: "plan_SOfniW7DwDDspo",
+      },
+    },
+  },
+
+};
 
 export const PLAN_FEATURES = {
   free: ["Up to 1 member", "One time and recurring tasks", "Expense tracking"],
