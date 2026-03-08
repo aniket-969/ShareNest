@@ -9,6 +9,7 @@ import {
   adminTransfer,
   getRoomPricing,
   getRoomPaymentDetails,
+  initiateRoomPayment,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -158,6 +159,19 @@ export const useRoomMutation = () => {
     },
   });
 
+  const initiateRoomPaymentMutation = useMutation({
+    mutationFn: initiateRoomPayment,
+     onSuccess: (response) => {
+    queryClient.invalidateQueries(["auth", "session"]);
+console.log(response)
+    
+  },
+    onError: (error) => {
+      console.error("Room Payment failed:", error);
+      toast(error?.response?.data?.message)
+    },
+  });
+
   const requestJoinRoomMutation = useMutation({
     mutationFn: addUserRequest,
     onSuccess: () => {
@@ -170,5 +184,5 @@ export const useRoomMutation = () => {
     },
   });
 
-  return { createRoomMutation, requestJoinRoomMutation, roomPricingQuery };
+  return { createRoomMutation, requestJoinRoomMutation, roomPricingQuery,initiateRoomPaymentMutation };
 };

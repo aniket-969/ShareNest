@@ -15,7 +15,7 @@ const PricingSection = forwardRef(
     };
 
     const { currency, plans } = pricing;
-    console.log(pricing);
+    // console.log(pricing);
  
     return (
       <div className="flex flex-col gap-5 px-8" ref={ref}>
