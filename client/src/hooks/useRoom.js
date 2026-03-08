@@ -132,6 +132,7 @@ export const useRoomPayment = (roomId) => {
 
         handler: function (response) {
           console.log("Payment success:", response);
+           navigate(`/rooms/${roomId}/activating`);
         },
 
         modal: {
