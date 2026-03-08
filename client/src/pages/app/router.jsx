@@ -20,6 +20,7 @@ import { NotificationProvider } from "@/context/NotificationContext.jsx";
 // Pages
 import LandingPage from "../LandingPage.jsx";
 import { NotFound } from "../NotFound.jsx";
+import ActivateRoom from "../room/app/ActivateRoom.jsx";
 
 const Login = React.lazy(() => import("../auth/Login.jsx"));
 const Register = React.lazy(() => import("../auth/Register.jsx"));
@@ -71,6 +72,7 @@ export const AppRouter = () => {
             <Route path="room">
               <Route path="create" element={<CreateRoom />} />
               <Route path=":roomId/payment" element={<RoomPayment />} />
+              <Route path=":roomId/activating" element={<ActivateRoom />} />
             </Route>
 
             {/* Room Routes with socket */}

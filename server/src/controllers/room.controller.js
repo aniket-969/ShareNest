@@ -347,14 +347,15 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
   let subscriptionId = room.subscription?.razorpaySubscriptionId;
 
   if (!subscriptionId) {
+    const totalCount = planConfig.billingCycle === "monthly" ? 100 : 10;
     try {
       console.log("creating razorpay subscription");
       console.log(planConfig.razorpayPlanId);
       const subscription = await razorpay.subscriptions.create({
         plan_id: planConfig.razorpayPlanId,
         customer_notify: 1,
-        total_count:120,
-        notes: { 
+        total_count: totalCount,
+        notes: {
           roomId: room._id.toString(),
           adminId: userId.toString(),
         },
