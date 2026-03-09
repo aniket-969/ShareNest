@@ -389,6 +389,54 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
   );
 });
 
+const getRoomPaymentStatus = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  const userId = req.user?._id;
+
+  const room = await Room.findById(roomId).select(
+    "admin subscription payment"
+  );
+
+  if (!room) {
+    throw new ApiError(404, "Room not found");
+  }
+
+  if (room.admin.toString() !== userId.toString()) {
+    throw new ApiError(403, "Only room admin can check payment status");
+  }
+
+  const now = new Date();
+
+  // Payment expired
+  if (room.payment?.expiresAt && room.payment.expiresAt < now) {
+    return res.status(200).json(
+      new ApiResponse(200, { status: "expired" }, "Payment session expired")
+    );
+  }
+
+  const subscriptionStatus = room.subscription?.status;
+
+  if (subscriptionStatus === "active") {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { status: "active" }, "Room activated"));
+  }
+
+  if (subscriptionStatus === "created") {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { status: "pending" }, "Waiting for payment"));
+  }
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      { status: "failed" },
+      "Subscription not in a payable state"
+    )
+  );
+});
+
 const updateRoom = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { name, description } = req.body;
@@ -701,6 +749,7 @@ const kickUser = asyncHandler(async (req, res) => {
 export {
   createRoom,
   initiateRoomPayment,
+  getRoomPaymentStatus,
   addUserRequest,
   adminResponse,
   updateRoom,
