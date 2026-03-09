@@ -41,7 +41,7 @@ const MobileRoomDetails = () => {
   if (isError)   return <>Something went wrong. Please refresh.</>
 
   return (
-    <div className="sm:mt-5 mt-0 flex flex-col items-center px-5 gap-1 ">
+    <div className="md:mt-5 mt-0 flex flex-col items-center px-5 gap-1 ">
       {/* Poll & Chat buttons */}
      
      {(data?.plan !="free" && <div className="flex w-full max-w-[25rem] justify-end gap-2 mx-2 ">
