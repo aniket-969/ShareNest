@@ -261,13 +261,13 @@ const createRoom = asyncHandler(async (req, res) => {
       },
       tenants: [admin],
     });
-
+console.log("Pushing room to user",room)
     const user = await User.findById(admin);
     if (user) {
       user.rooms.push({ roomId: room._id, name: room.name });
       await user.save();
     }
-
+console.log("Pushed to user",user)
     return res
       .status(201)
       .json(new ApiResponse(201, room, "Room created successfully"));
@@ -433,6 +433,41 @@ const getRoomPaymentStatus = asyncHandler(async (req, res) => {
       200,
       { status: "failed" },
       "Subscription not in a payable state"
+    )
+  );
+});
+
+const getUserRooms = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+
+  const rooms = await Room.find(
+      { admin: userId })
+
+  const now = new Date();
+
+  const formattedRooms = rooms.map((room) => {
+    let status = "active";
+
+    if (room.subscription?.status === "created") {
+      if (room.payment?.expiresAt && room.payment.expiresAt < now) {
+        status = "expired";
+      } else {
+        status = "pending";
+      }
+    }
+
+    return {
+      roomId: room._id,
+      name: room.name,
+      status
+    };
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      formattedRooms,
+      "Rooms fetched successfully"
     )
   );
 });
@@ -750,6 +785,7 @@ export {
   createRoom,
   initiateRoomPayment,
   getRoomPaymentStatus,
+  getUserRooms,
   addUserRequest,
   adminResponse,
   updateRoom,
