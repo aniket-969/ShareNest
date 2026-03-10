@@ -26,6 +26,7 @@ import {
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { validateQRCodeData } from "../middleware/qrcode.middleware.js";
 import { loginLimiter, sessionLimiter } from "../middleware/rateLimiters.js";
+import { getUserRooms } from "../controllers/room.controller.js";
 
 const router = Router();
 
@@ -56,6 +57,7 @@ router
 router
   .route("/me/payments")
   .patch(validate(paymentMethodSchema), verifyJWT, addPaymentMethod);
+  router.route("/me/room").get(verifyJWT,getUserRooms)
 router.route("/me/payments/:paymentId").delete(verifyJWT, deletePaymentMethod);
 
 export default router;
