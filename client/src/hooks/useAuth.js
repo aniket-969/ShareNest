@@ -4,6 +4,7 @@ import {
   changePassword,
   deletePayment,
   fetchSession,
+  fetchUserRooms,
   forgotPassword,
   loginUser,
   loginWithGoogle,
@@ -183,4 +184,13 @@ export const useAuth = () => {
     forgotPasswordMutation,
     resetPasswordMutation
   };
+};
+
+export const useRooms = () => {
+  const roomsQuery = useQuery({
+    queryKey: ["auth","rooms"],
+    queryFn: fetchUserRooms,
+  });
+
+  return { roomsQuery };
 };

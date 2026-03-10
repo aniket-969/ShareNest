@@ -8,6 +8,12 @@ export const fetchSession = async () => {
   return response.data?.data;
 };
 
+export const fetchUserRooms = async () => {
+  const response = await axiosClient.get(`/${base}/me/room`);
+  console.log(response);
+  return response.data?.data;
+};
+
 export const registerUser = (data) => {
   return axiosClient.post(`/${base}/register`, data);
 };
