@@ -23,7 +23,7 @@ const RoomPayment = () => {
     data;
 
   return (
-    <div className="flex justify-center items-center px-4 min-h-[100vh]">
+    <div className="flex justify-center items-center px-4 min-h-[100vh] ">
       <Card className="w-full max-w-xl px-8 py-6 flex flex-col gap-3 border-none">
         {/* Header */}
         <div className="flex flex-col gap-1">

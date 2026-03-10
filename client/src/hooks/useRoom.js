@@ -13,6 +13,7 @@ import {
   getRoomPaymentStatus,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { kickUser } from "@/api/queries/room";

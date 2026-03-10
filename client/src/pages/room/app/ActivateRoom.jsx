@@ -1,6 +1,6 @@
 import { useRoomActivation } from "@/hooks/useRoom";
-import React from "react";
-import { useParams } from 'react-router-dom';
+import {useEffect} from "react";
+import { useParams,useNavigate } from 'react-router-dom';
 
 const ActivateRoom = () => {
   const { roomId } = useParams();
