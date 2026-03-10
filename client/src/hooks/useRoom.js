@@ -216,18 +216,25 @@ export const useRoomMutation = () => {
 };
 
 export const useRoomActivation = (roomId) => {
+  const startTime = useRef(Date.now());
+
   return useQuery({
     queryKey: ["room", roomId, "status"],
     queryFn: () => getRoomPaymentStatus(roomId),
     enabled: !!roomId,
-    refetchInterval: (data) => {
-      if (!data) return 2000;
+    refetchInterval: (query) => {
+      const data = query.state.data;
 
-      if (data.status === "pending") {
-        return 2000; // polling
+      if (data?.status !== "pending") {
+        return false;
       }
 
-      return false; 
+      const elapsed = Date.now() - startTime.current;
+      if (elapsed > 30000) {
+        return false;
+      }
+
+      return 2000; 
     },
     refetchOnWindowFocus: false,
   });
