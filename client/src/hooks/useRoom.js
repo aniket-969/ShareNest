@@ -218,8 +218,9 @@ export const useRoomMutation = () => {
 
 export const useRoomActivation = (roomId) => {
   const startTime = useRef(Date.now());
+  const timeout = 5000;
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["room", roomId, "status"],
     queryFn: () => getRoomPaymentStatus(roomId),
     enabled: !!roomId,
@@ -231,13 +232,22 @@ export const useRoomActivation = (roomId) => {
       }
 
       const elapsed = Date.now() - startTime.current;
-      if (elapsed > 5000) {
-        console.log("expired")
+
+      if (elapsed > timeout) {
         return false;
       }
 
-      return 2000; 
+      return 2000;
     },
     refetchOnWindowFocus: false,
   });
+
+  const isTimedOut =
+    Date.now() - startTime.current > timeout &&
+    query.data?.status === "pending";
+
+  return {
+    ...query,
+    isTimedOut,
+  };
 };

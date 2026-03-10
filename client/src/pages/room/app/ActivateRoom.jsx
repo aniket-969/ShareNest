@@ -5,22 +5,30 @@ import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const ActivateRoom = () => {
+
   const { roomId } = useParams();
   const navigate = useNavigate();
 
-  const { data } = useRoomActivation(roomId);
+  const { data, isTimedOut } = useRoomActivation(roomId);
 
   useEffect(() => {
     if (!data) return;
-console.log("checking status",data)
+console.log(data)
     if (data.status === "active") {
       navigate(`/room/${roomId}`);
+      return;
     }
 
     if (data.status === "expired" || data.status === "failed") {
-      navigate("/rooms");
+      navigate("/room");
+      return; 
     }
-  }, [data]);
+
+    if (isTimedOut) {
+      navigate("/room");
+    }
+  }, [data, isTimedOut]);
+
 
   return (
     <div className="flex items-center justify-center min-h-[100vh] px-4">
