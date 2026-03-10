@@ -26,7 +26,7 @@ export const RoomSocketProvider = ({ children }) => {
 
   useEffect(() => {
     const handleOnlineUsersUpdate = ({ users, count }) => {
-      // console.log("🟢 Online users updated");
+      console.log("🟢 Online users updated");
       // console.log("Users:", users);
       setOnlineUsers(users);
     };

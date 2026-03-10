@@ -12,6 +12,7 @@ const emitPresenceUpdate = (io, roomId, roomMap) => {
     users: Array.from(roomMap.keys()),
     count: roomMap.size,
   });
+  console.log("Presence updated",roomPresence)
 };
 
 /**
