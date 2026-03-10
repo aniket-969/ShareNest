@@ -231,7 +231,8 @@ export const useRoomActivation = (roomId) => {
       }
 
       const elapsed = Date.now() - startTime.current;
-      if (elapsed > 30000) {
+      if (elapsed > 5000) {
+        console.log("expired")
         return false;
       }
 
