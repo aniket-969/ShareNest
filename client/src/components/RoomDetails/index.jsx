@@ -26,7 +26,7 @@ const RoomDetailsIndex = () => {
   if (isError) return <>Something went wrong. Please refresh</>;
   if (data?.plan === "free") return <MobileRoomDetails />;
   return (
-    <div className=" flex  w-full items-center justify-center  gap-10 my-5 ">
+    <div className=" flex  w-full items-center justify-center  gap-10 my-2 ">
       {/* calendar and poll container */}
       <div className="flex flex-col gap-5 ">
         {/* Calendar */}

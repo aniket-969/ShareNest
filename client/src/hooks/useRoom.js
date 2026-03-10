@@ -10,6 +10,7 @@ import {
   getRoomPricing,
   getRoomPaymentDetails,
   initiateRoomPayment,
+  getRoomPaymentStatus,
 } from "@/api/queries/room";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -212,4 +213,22 @@ export const useRoomMutation = () => {
     requestJoinRoomMutation,
     roomPricingQuery,
   };
+};
+
+export const useRoomActivation = (roomId) => {
+  return useQuery({
+    queryKey: ["room", roomId, "status"],
+    queryFn: () => getRoomPaymentStatus(roomId),
+    enabled: !!roomId,
+    refetchInterval: (data) => {
+      if (!data) return 2000;
+
+      if (data.status === "pending") {
+        return 2000; // polling
+      }
+
+      return false; 
+    },
+    refetchOnWindowFocus: false,
+  });
 };
