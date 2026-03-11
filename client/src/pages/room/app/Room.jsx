@@ -5,7 +5,7 @@ import RoomList from "@/components/Room/roomList";
 import EditProfileModal from "@/components/Settings/profile/EditProfileModal";
 import ProfileSettingsView from "@/components/Settings/profile/ProfileSettingsView";
 import RoomLoader from "@/components/skeleton/Room";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, useRooms } from "@/hooks/useAuth";
 import { useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
@@ -19,6 +19,13 @@ const Room = () => {
     isError,
     refetch,
   } = sessionQuery;
+const { roomsQuery } = useRooms()
+const {
+    data: pendingRooms,
+    isLoading:roomLoading,
+    isError:roomError,
+  } = roomsQuery;
+  console.log(pendingRooms)
 
 const [isEditing, setIsEditing] = useState(false);
 
