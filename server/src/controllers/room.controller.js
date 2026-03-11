@@ -312,6 +312,7 @@ console.log("Pushed to user",user)
 const initiateRoomPayment = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
+
   const room = await Room.findById(roomId);
 
   if (!room) {
@@ -336,7 +337,7 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
       "Payment session expired. Please recreate the room."
     );
   }
-  // Resolve plan configuration
+
   const { planId, region } = room.plan;
   const regionConfig = TEST_ROOM_PLANS[region];
   const planConfig = regionConfig?.plans?.[planId];
@@ -344,13 +345,13 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
   if (!planConfig || !planConfig.razorpayPlanId) {
     throw new ApiError(400, "Invalid payment plan configuration");
   }
+
   let subscriptionId = room.subscription?.razorpaySubscriptionId;
 
   if (!subscriptionId) {
     const totalCount = planConfig.billingCycle === "monthly" ? 100 : 10;
+
     try {
-      console.log("creating razorpay subscription");
-      console.log(planConfig.razorpayPlanId);
       const subscription = await razorpay.subscriptions.create({
         plan_id: planConfig.razorpayPlanId,
         customer_notify: 1,
@@ -363,10 +364,25 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
 
       subscriptionId = subscription.id;
 
-      room.subscription.razorpaySubscriptionId = subscriptionId;
-      room.subscription.razorpayPlanId = planConfig.razorpayPlanId;
+      const updatedRoom = await Room.findOneAndUpdate(
+        {
+          _id: roomId,
+          "subscription.razorpaySubscriptionId": { $exists: false },
+        },
+        {
+          $set: {
+            "subscription.razorpaySubscriptionId": subscriptionId,
+            "subscription.razorpayPlanId": planConfig.razorpayPlanId,
+          },
+        },
+        { new: true }
+      );
 
-      await room.save();
+      // if another request already saved one, use that instead
+      if (!updatedRoom) {
+        const latestRoom = await Room.findById(roomId);
+        subscriptionId = latestRoom.subscription.razorpaySubscriptionId;
+      }
     } catch (error) {
       console.error("Razorpay subscription creation failed:", error);
 
@@ -376,7 +392,7 @@ const initiateRoomPayment = asyncHandler(async (req, res) => {
       );
     }
   }
-  console.log(subscriptionId);
+
   return res.status(200).json(
     new ApiResponse(
       200,
