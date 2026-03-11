@@ -16,7 +16,7 @@ const emitPresenceUpdate = (io, roomId, roomMap) => {
 };
 
 /**
- * Helper: Cleanup presence for a socket
+ *  Cleanup presence for a socket
  */
 const cleanupPresence = (socket, roomId) => {
   const roomMap = roomPresence.get(roomId);
@@ -125,13 +125,13 @@ const initializeSocketIO = (io) => {
       socket.user = user;
       socket.data.userId = user._id.toString();
 
-      // Personal room (DMs / notifications)
+      // Personal room 
       socket.join(socket.data.userId);
 
       mountJoinRoomEvent(socket);
 
       /**
-       * IMPORTANT: real disconnect handler
+       * disconnect handler
        */
       socket.on("disconnect", () => {
         const roomId = socket.data.roomId;

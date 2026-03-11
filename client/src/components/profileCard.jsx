@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const ProfileCard = () => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
-  console.log(data);
+  // console.log(data);
   if (isLoading) {
     return <ProfileSkeleton />;
   }

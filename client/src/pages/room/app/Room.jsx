@@ -37,7 +37,7 @@ if(isError){
   return <>Something went wrong, Please refresh</>
 }
   
-  console.log("in room");
+  // console.log("in room");
  if (!user) return <Navigate to="/login" replace />;
 
   return (
