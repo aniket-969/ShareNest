@@ -439,36 +439,22 @@ const getRoomPaymentStatus = asyncHandler(async (req, res) => {
 
 const getUserRooms = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-
-  const rooms = await Room.find(
-      { admin: userId })
-
   const now = new Date();
 
-  const formattedRooms = rooms.map((room) => {
-    let status = "active";
+  const rooms = await Room.find({
+    admin: userId,
+    "subscription.status": "created",
+    "payment.expiresAt": { $gt: now },
+  }).select("name");
 
-    if (room.subscription?.status === "created") {
-      if (room.payment?.expiresAt && room.payment.expiresAt < now) {
-        status = "expired";
-      } else {
-        status = "pending";
-      }
-    }
-
-    return {
-      roomId: room._id,
-      name: room.name,
-      status
-    };
-  });
+  const formattedRooms = rooms.map((room) => ({
+    roomId: room._id,
+    name: room.name,
+    status: "pending",
+  }));
 
   return res.status(200).json(
-    new ApiResponse(
-      200,
-      formattedRooms,
-      "Rooms fetched successfully"
-    )
+    new ApiResponse(200, formattedRooms, "Pending rooms fetched successfully")
   );
 });
 
