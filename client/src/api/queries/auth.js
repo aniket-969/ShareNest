@@ -10,7 +10,7 @@ export const fetchSession = async () => {
 
 export const fetchUserRooms = async () => {
   const response = await axiosClient.get(`/${base}/me/room`);
-  // console.log(response);
+  console.log(response);
   return response.data?.data;
 };
 

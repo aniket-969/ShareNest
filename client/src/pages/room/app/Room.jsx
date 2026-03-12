@@ -1,5 +1,6 @@
 import ProfileCard from "@/components/ProfileCard";
 import QRCode from "@/components/QRCode";
+import PendingRoomList from "@/components/Room/pendingRoom";
 import { RoomHeader } from "@/components/Room/roomHeader";
 import RoomList from "@/components/Room/roomList";
 import EditProfileModal from "@/components/Settings/profile/EditProfileModal";
@@ -21,12 +22,13 @@ const Room = () => {
   } = sessionQuery;
 const { roomsQuery } = useRooms()
 const {
-    data: pendingRooms,
+    data: rooms,
     isLoading:roomLoading,
     isError:roomError,
   } = roomsQuery;
-  console.log(pendingRooms)
 
+  const pendingRooms = rooms?.filter(room => room.status === "pending");
+console.log(rooms)
 const [isEditing, setIsEditing] = useState(false);
 
 if( isLoading){
@@ -55,6 +57,7 @@ if(isError){
           <QRCode />
           <RoomList />
         </div>
+        <PendingRoomList rooms={pendingRooms}/>
       </div>
     </div>
   );
