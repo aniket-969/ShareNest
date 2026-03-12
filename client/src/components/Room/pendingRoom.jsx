@@ -14,7 +14,7 @@ const PendingRoomList = ({ rooms }) => {
 
   return (
     <div className="flex flex-col gap-3 sm:gap-5 items-center my-8">
-      <h1 className="text-xl font-semibold">Pending Payment</h1>
+      <h1 className="text-xl font-semibold">Pending Payments</h1>
 
       <ScrollArea>
         <div className="flex flex-col gap-2 h-[6.3rem] pt-2 sm:pr-2 ">
@@ -31,7 +31,7 @@ const PendingRoomList = ({ rooms }) => {
                         {room?.name}
 
                       {/* pending indicator */}
-                      <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-red-400 rounded-full"></span>
+                      <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
                     </Button>
                   </Link>
                 </TooltipTrigger>
