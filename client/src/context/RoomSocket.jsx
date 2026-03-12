@@ -14,36 +14,32 @@ export const RoomSocketProvider = ({ children }) => {
   useEffect(() => {
     if (!roomId) return;
 
+    const handleOnlineUsersUpdate = ({ users, count }) => {
+      console.log("🟢 Online users updated");
+      setOnlineUsers(users);
+    };
+
+    //  listener added before joining to avoid race condition
+    socket.on("onlineUsersUpdated", handleOnlineUsersUpdate);
+
     const joinRoom = () => {
       socket.emit("joinRoom", roomId);
       console.log("Joined room", roomId);
     };
 
     if (socket.connected) {
-      console.log("connected")
       joinRoom();
     } else {
       socket.once("connect", joinRoom);
     }
 
     return () => {
+      socket.off("onlineUsersUpdated", handleOnlineUsersUpdate);
+      socket.off("connect", joinRoom);
       socket.emit("leaveRoom", roomId);
+      setOnlineUsers([]);
     };
   }, [roomId]);
-
-  useEffect(() => {
-    const handleOnlineUsersUpdate = ({ users, count }) => {
-      console.log("🟢 Online users updated");
-      // console.log("Users:", users);
-      setOnlineUsers(users);
-    };
-
-    socket.on("onlineUsersUpdated", handleOnlineUsersUpdate);
-
-    return () => {
-      socket.off("onlineUsersUpdated", handleOnlineUsersUpdate);
-    };
-  }, [socket]);
 
   return (
     <RoomSocketContext.Provider value={{ onlineUsers }}>
