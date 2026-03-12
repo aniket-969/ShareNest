@@ -471,7 +471,7 @@ const getUserRooms = asyncHandler(async (req, res) => {
       },
     ],
   }).select("name subscription");
-
+console.log("Here are they",rooms)
   const formattedRooms = rooms.map((room) => {
     const status =
       room.subscription?.status === "active" ? "active" : "pending";
