@@ -261,13 +261,13 @@ const createRoom = asyncHandler(async (req, res) => {
       },
       tenants: [admin],
     });
-console.log("Pushing room to user",room)
+    console.log("Pushing room to user", room);
     const user = await User.findById(admin);
     if (user) {
       user.rooms.push({ roomId: room._id, name: room.name });
       await user.save();
     }
-console.log("Pushed to user",user)
+    console.log("Pushed to user", user);
     return res
       .status(201)
       .json(new ApiResponse(201, room, "Room created successfully"));
@@ -409,9 +409,7 @@ const getRoomPaymentStatus = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const userId = req.user?._id;
 
-  const room = await Room.findById(roomId).select(
-    "admin subscription payment"
-  );
+  const room = await Room.findById(roomId).select("admin subscription payment");
 
   if (!room) {
     throw new ApiError(404, "Room not found");
@@ -425,9 +423,11 @@ const getRoomPaymentStatus = asyncHandler(async (req, res) => {
 
   // Payment expired
   if (room.payment?.expiresAt && room.payment.expiresAt < now) {
-    return res.status(200).json(
-      new ApiResponse(200, { status: "expired" }, "Payment session expired")
-    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, { status: "expired" }, "Payment session expired")
+      );
   }
 
   const subscriptionStatus = room.subscription?.status;
@@ -444,13 +444,15 @@ const getRoomPaymentStatus = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, { status: "pending" }, "Waiting for payment"));
   }
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      { status: "failed" },
-      "Subscription not in a payable state"
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { status: "failed" },
+        "Subscription not in a payable state"
+      )
+    );
 });
 
 const getUserRooms = asyncHandler(async (req, res) => {
@@ -459,19 +461,31 @@ const getUserRooms = asyncHandler(async (req, res) => {
 
   const rooms = await Room.find({
     admin: userId,
-    "subscription.status": "created",
-    "payment.expiresAt": { $gt: now },
-  }).select("name");
+    $or: [
+      {
+        "subscription.status": "created",
+        "payment.expiresAt": { $gt: now },
+      },
+      {
+        "subscription.status": "active",
+      },
+    ],
+  }).select("name subscription");
 
-  const formattedRooms = rooms.map((room) => ({
-    roomId: room._id,
-    name: room.name,
-    status: "pending",
-  }));
+  const formattedRooms = rooms.map((room) => {
+    const status =
+      room.subscription?.status === "active" ? "active" : "pending";
 
-  return res.status(200).json(
-    new ApiResponse(200, formattedRooms, "Pending rooms fetched successfully")
-  );
+    return {
+      roomId: room._id,
+      name: room.name,
+      status,
+    };
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, formattedRooms, "Rooms fetched successfully"));
 });
 
 const updateRoom = asyncHandler(async (req, res) => {
