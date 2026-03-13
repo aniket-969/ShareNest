@@ -80,6 +80,14 @@ const RoomExpense = () => {
       <div ref={paymentRef}>
         <PaymentDetails participants={participants} userId={userId} />
       </div>
+
+        {isFormOpen && (
+        <Suspense fallback={<Spinner />}>
+        <FormWrapper onClose={() => setIsFormOpen(false)}>
+        <ExpenseForm onClose={() => {setIsFormOpen(false)}} participants={participants} />
+      </FormWrapper>
+        </Suspense>
+      )}
     </div>
   );
 };
