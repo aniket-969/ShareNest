@@ -20,9 +20,9 @@ import BalanceDrawer from "./balanceDrawer";
 const BalanceSheet = () => {
  
   return (
-    <Drawer>
+    <Drawer >
       <DrawerTrigger asChild>
-        <Button variant="outline">
+        <Button size="icon" variant="outline">
           <ScrollText />
         </Button>
       </DrawerTrigger>

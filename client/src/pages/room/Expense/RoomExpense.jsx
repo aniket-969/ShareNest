@@ -42,14 +42,17 @@ const RoomExpense = () => {
   return (
     <div>
       <div className="flex flex-col gap-6 items-center">
-        <div className="flex items-center justify-around w-full">
+
+{/* heading and icons */}
+        <div className="flex items-center justify-around w-full ">
           <h2 className="font-bold text-2xl hidden sm:block">Expense</h2>
 
           <div className="flex gap-3">
+           
             <Button
               className="md:hidden"
               size="icon"
-              variant="primary"
+              variant="outline"
               onClick={() => setIsFormOpen(true)}
             >
               <CirclePlus />
