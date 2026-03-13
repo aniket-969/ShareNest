@@ -13,7 +13,7 @@ const PendingRoomList = ({ rooms }) => {
   if (!rooms?.length) return null;
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-5 items-center my-8">
+    <div className="flex flex-col gap-3 sm:gap-5 items-center my-10">
       <h1 className="text-xl font-semibold">Pending Payments</h1>
 
       <ScrollArea>
