@@ -35,7 +35,7 @@ export const AvatarSelector = ({ onSelect }) => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" onClick={() => setIsDialogOpen(true)}>
+        <Button size="sm" variant="outline" onClick={() => setIsDialogOpen(true)}>
           Select Avatar
         </Button>
       </DialogTrigger>

@@ -6,29 +6,16 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
   FormField,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
-import { toast } from "react-toastify";
-import { zodResolver } from '@hookform/resolvers/zod';
-import { AvatarSelector } from './../../AvatarSelector';
-
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AvatarSelector } from "./../../AvatarSelector";
 
 export const SignUp = () => {
   const { registerMutation } = useAuth();
-
-  const onSubmit = async (values) => {
-    console.log(values);
-    try {
-      await registerMutation.mutateAsync(values);
-    } catch (error) {
-      console.error("Error during registration:", error);
-    }
-  };
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -40,11 +27,21 @@ export const SignUp = () => {
     },
   });
 
+  const onSubmit = async (values) => {
+    try {
+      await registerMutation.mutateAsync(values);
+    } catch (error) {
+      console.error("Error during registration:", error);
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-       
-        {/* email */}
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-5"
+      >
+        {/* Email */}
         <FormField
           control={form.control}
           name="email"
@@ -52,14 +49,17 @@ export const SignUp = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your email" {...field} />
+                <Input
+                  placeholder="Enter your email"
+                  {...field}
+                />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
-        {/* name */}
+
+        {/* Name */}
         <FormField
           control={form.control}
           name="fullName"
@@ -67,14 +67,17 @@ export const SignUp = () => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your fullname" {...field} />
+                <Input
+                  placeholder="Enter your full name"
+                  {...field}
+                />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
-        {/* password */}
+
+        {/* Password */}
         <FormField
           control={form.control}
           name="password"
@@ -88,13 +91,12 @@ export const SignUp = () => {
                   {...field}
                 />
               </FormControl>
-
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* avatar */}
+        {/* Avatar */}
         <FormField
           control={form.control}
           name="avatar"
@@ -107,8 +109,15 @@ export const SignUp = () => {
           )}
         />
 
-        <Button type="submit"  borderRadius="lg" >
-          Submit
+        {/* Submit */}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending
+            ? "Creating..."
+            : "Create Account"}
         </Button>
       </form>
     </Form>
