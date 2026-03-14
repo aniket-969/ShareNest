@@ -9,7 +9,7 @@ const AuthLayout = () => {
   return session ? (
     <Navigate to="/room" />
   ) : (
-    <div className="flex items-center flex-col gap-6 max-h-screen mt-10">
+    <div className="flex items-center flex-col gap-6 max-h-screen mt-10 px-10">
       <Outlet />
       <LoginGoogle />
     </div>

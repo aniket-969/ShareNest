@@ -10,7 +10,7 @@ import { QRCarousel } from "../ui/QRCarousel";
 const PaymentDetails = ({ participants = [], userId }) => {
   return (
     <div className="w-full max-w-4xl mx-auto px-5 mb-20">
-      <h3 className="font-semibold tracking-wide text-xl my-6">Payment Details</h3>
+      <h3 className="font-semibold tracking-wide text-xl my-6">Payment Methods</h3>
    
     <Accordion type="multiple">
       {participants.map((user) => {
