@@ -155,18 +155,18 @@ const ExpenseParticipantSelector = ({
             <div
               key={participant._id}
               onClick={() => handleParticipantSelect(participant)}
-              className={`flex items-center justify-between space-x-2 p-2 rounded-lg cursor-pointer hover:bg-neutral-800/20 mb-2 
+              className={`flex items-center justify-between space-x-2 p-2  rounded-lg cursor-pointer  hover:bg-neutral-800/20 mb-1 
                 ${
                 isSelected ? "bg-card-muted text-card-foreground" : 
                 "shadow-xl"
               }`}
             >
-              <div className="flex-1">
+              <div className="flex-1 ">
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 ">
 
                     <Avatar className="w-8 h-8 rounded-[2.4rem]">
-                      <AvatarImage src={participant.avatar} alt={participant.fullName} />
+                      <AvatarImage src={participant.avatar} alt={participant.fullName[0]} />
                       <AvatarFallback>
                         <img src="/altAvatar1.jpg" alt="fallback avatar" />
                       </AvatarFallback>
@@ -214,16 +214,18 @@ const ExpenseParticipantSelector = ({
                   </div>
                 )}
               </div>
+              {/* additional charges and deselect icons */}
               {isSelected && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 ">
                   <Button
+                  className=""
                     type="button"
                     variant="ghost"
                     size="icon"
                     onClick={(e) => handleAddCharge(participant._id, e)}
                     disabled={disabled}
                   >
-                    <PlusCircle className="h-4 w-4" />
+                    <PlusCircle className="" />
                   </Button>
                   <Button
                     type="button"
@@ -232,7 +234,7 @@ const ExpenseParticipantSelector = ({
                     onClick={(e) => removeParticipant(fieldIndex, e)}
                     disabled={disabled}
                   >
-                    <XCircle className="h-4 w-4" />
+                    <XCircle className="" />
                   </Button>
                 </div>
               )}
@@ -253,7 +255,8 @@ const ExpenseParticipantSelector = ({
           }
         }}
       >
-        <DialogContent>
+       
+        <DialogContent className="">
           <DialogHeader>
             <DialogTitle>
               {editingChargeIndex !== null

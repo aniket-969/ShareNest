@@ -90,7 +90,7 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarContent className="">
         {/* Room Info */}
-        <div className="p-4 border-b space-y-1">
+        <div className="p-4 border-b space-y-1 mt-1 ml-1">
           <h2 className="text-lg font-bold line-clamp-1">
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>

@@ -13,7 +13,7 @@ const passwordSchema = z
 export const registerSchema = z.object({
  
   email: z
-    .string()
+    .string().trim()
     .email({ message: "Invalid email address" })
     .min(5, { message: "Email must be at least 5 characters long" })
     .max(50, { message: "Email must be no more than 50 characters long" }),
@@ -24,7 +24,7 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   identifier: z
-    .string()
+    .string().trim()
     .email({ message: "Invalid email address" })
     .min(5, { message: "Email must be at least 5 characters long" })
     .max(50, { message: "Email must be no more than 50 characters long" }),
