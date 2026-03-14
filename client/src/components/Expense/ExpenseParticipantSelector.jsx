@@ -173,9 +173,9 @@ const ExpenseParticipantSelector = ({
                     </Avatar>
 
                   <div>
-                    <p className="font-semibold">{participant.username}</p>
+                   
                     <p
-                      className={`text-sm ${isSelected ? "text-card-foreground" : "text-gray-500"}`}
+                      className={`text-sm font-semibold ${isSelected ? "text-card-foreground" : "text-gray-500 "}`}
                     >
                       {participant.fullName}
                     </p>

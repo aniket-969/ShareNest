@@ -47,9 +47,9 @@ export const SignIn = () => {
           name="identifier"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username / Email</FormLabel>
+              <FormLabel> Email</FormLabel>
               <FormControl>
-                <Input placeholder="username or email" {...field} />
+                <Input placeholder="email" {...field} />
               </FormControl>
 
               <FormMessage />

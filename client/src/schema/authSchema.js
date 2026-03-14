@@ -11,7 +11,7 @@ const passwordSchema = z
   });
  
 export const registerSchema = z.object({
-  username: stringValidation(1, 20, "username"),
+ 
   email: z
     .string()
     .email({ message: "Invalid email address" })
@@ -23,7 +23,11 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  identifier: stringValidation(1, 20, "identifier"),
+  identifier: z
+    .string()
+    .email({ message: "Invalid email address" })
+    .min(5, { message: "Email must be at least 5 characters long" })
+    .max(50, { message: "Email must be no more than 50 characters long" }),
   password: passwordSchema,
 });
 
@@ -40,7 +44,6 @@ export const changePasswordSchema = z
   });
 
 export const updateUserSchema = z.object({
-  username: optionalStringValidation(1, 20, "username"),
   fullName: optionalStringValidation(1, 20, "fullName"),
   avatar: z
     .string()

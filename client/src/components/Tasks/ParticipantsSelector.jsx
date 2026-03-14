@@ -61,7 +61,7 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
 
   return (
     <ScrollArea>
-      <div className="grid gap-2 h-[11.6rem] py-2 ">
+      <div className="grid gap-2 h-[11.2rem] py-2 ">
         {getSortedParticipants().map((user) => {
           const isSelected = single
             ? selected === user._id
@@ -71,7 +71,7 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
             <div
               key={user._id}
               onClick={() => handleClick(user)}
-              className={`flex items-center space-x-2 cursor-pointer px-3 py-1 rounded-lg hover:bg-neutral-800/20 ${
+              className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-neutral-800/20 ${
                 isSelected ? "bg-card-muted text-card-foreground" : "shadow-xl"
               } `}
             >
@@ -85,9 +85,9 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold">{user?.username}</p>
+               
                 <p
-                  className={`text-sm ${
+                  className={` text-sm font-semibold ${
                     isSelected
                       ? " text-card-foreground"
                       : "text-gray-500"

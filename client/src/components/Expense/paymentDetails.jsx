@@ -36,9 +36,7 @@ const PaymentDetails = ({ participants = [], userId }) => {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {user?.username} 
-                  </p>
+                 
                 </div>
               </div>
             </AccordionTrigger>

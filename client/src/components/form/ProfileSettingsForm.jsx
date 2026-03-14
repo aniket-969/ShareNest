@@ -24,7 +24,6 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
       fullName: initialData?.fullName,
-      username: initialData?.username,
       avatar: initialData?.avatar,
     },
     mode: "onTouched",
@@ -33,10 +32,10 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   const avatarUrl = watch("avatar");
 
   const onSubmit = (values) => {
-    const { fullName, username, avatar } = values;
+    const { fullName,  avatar } = values;
     const payload = {};
     if (fullName !== initialData.fullName) payload.fullName = fullName;
-    if (username !== initialData.username) payload.username = username;
+    
     if (avatar !== initialData.avatar) payload.avatar = avatar;
 
     if (Object.keys(payload).length === 0) {
@@ -82,11 +81,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
           <Input id="fullName" {...register("fullName")} className="bg-[#121418] text-white" />
           {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
         </div>
-        <div className="flex-1">
-          <Label htmlFor="username" className="text-sm text-white">Username</Label>
-          <Input id="username" {...register("username")} className="bg-[#121418] text-white" />
-          {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
-        </div>
+       
       </div>
 
       <div className="flex justify-end gap-2">

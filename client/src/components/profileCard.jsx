@@ -25,7 +25,7 @@ const ProfileCard = () => {
       </div>
       <div className="flex gap-10 sm:gap-20 items-center justify-center font-medium tracking-wide ">
         <p className="max-w-[120px] truncate text-center">{data?.fullName}</p>
-        <p className="max-w-[120px] truncate text-center">@{data?.username}</p>
+       
       </div>
     </div>
   );
