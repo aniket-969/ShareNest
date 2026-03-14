@@ -18,7 +18,6 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   const senderSnapshot = {
     _id: req.user._id,
-    username: req.user.username,
     fullName: req.user.fullName,
     avatar: req.user.avatar,
   };

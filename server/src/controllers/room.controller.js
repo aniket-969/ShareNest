@@ -47,31 +47,31 @@ const getRoomData = asyncHandler(async (req, res) => {
   let roomQuery = Room.findById(roomId);
 
   const populateArr = [
-    { path: "tenants", select: "username fullName avatar _id paymentMethod" },
-    { path: "admin", select: "username fullName avatar _id" },
+    { path: "tenants", select: "fullName avatar _id paymentMethod" },
+    { path: "admin", select: "fullName avatar _id" },
 
     // Tasks
     {
       path: "tasks.createdBy",
-      select: "username fullName avatar _id",
+      select: " fullName avatar _id",
     },
     {
       path: "tasks.participants",
-      select: "username fullName avatar _id",
+      select: " fullName avatar _id",
     },
     {
       path: "tasks.swapRequests.from",
-      select: "username fullName avatar _id",
+      select: " fullName avatar _id",
     },
     {
       path: "tasks.swapRequests.to",
-      select: "username fullName avatar _id",
+      select: " fullName avatar _id",
     },
 
     { path: "awards" },
     { path: "polls" },
 
-    { path: "pendingRequests.userId", select: "username fullName avatar _id" },
+    { path: "pendingRequests.userId", select: "fullName avatar _id" },
   ];
 
   const room = await roomQuery.populate(populateArr);
@@ -84,7 +84,7 @@ const getRoomData = asyncHandler(async (req, res) => {
   const latestPlusOne = await ChatMessage.find({ room: roomId })
     .sort({ createdAt: -1 })
     .limit(LIMIT + 1)
-    .populate("sender", "fullName avatar username _id")
+    .populate("sender", "fullName avatar _id")
     .lean();
 
   const hasMore = latestPlusOne.length > LIMIT;

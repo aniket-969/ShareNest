@@ -124,7 +124,7 @@ const getRoomPolls = asyncHandler(async (req, res) => {
 
   const polls = await Poll.find(filters).populate({
     path: "options.votes.voter",
-    select: "username avatar",
+    select: "fullName avatar",
   });
 
   if (!polls.length) throw new ApiError(404, "No polls found for this room");
@@ -138,7 +138,7 @@ const getRoomPolls = asyncHandler(async (req, res) => {
         optionText: option.optionText,
         voteCount: option.votes.length,
         voters: option.votes.map((vote) => ({
-          username: vote.voter.username,
+          fullName: vote.voter.fullName,
           avatar: vote.voter.avatar,
         })),
         userVote: option.votes.some(
