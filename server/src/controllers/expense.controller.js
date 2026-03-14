@@ -27,7 +27,7 @@ const createExpense = asyncHandler(async (req, res) => {
 
   const users = await User.find(
     { _id: { $in: participantIds } },
-    { fullName: 1, avatar: 1, username: 1}
+    { fullName: 1, avatar: 1}
   ).lean();
 
   const userMap = {};
@@ -57,7 +57,6 @@ const createExpense = asyncHandler(async (req, res) => {
     return {
       id: userId,
       fullName: userSnapshot.fullName,
-      username: userSnapshot.username,
       avatar: userSnapshot.avatar || null,
       baseAmount,
       additionalCharges: charges,
@@ -97,7 +96,6 @@ const createExpense = asyncHandler(async (req, res) => {
     paidBy: {
       id: creator._id,
       fullName: creator.fullName,
-      username: creator.username,
       avatar: creator.avatar || null,
     },
     participants: formattedParticipants,
@@ -172,7 +170,6 @@ const getExpenses = asyncHandler(async (req, res) => {
   const docs = await Expense.find(match, {
     "participants.id": 1,
     "participants.fullName": 1,
-    "participants.username": 1,
     "participants.avatar": 1,
     "participants.totalAmountOwed": 1,
     "participants.hasPaid": 1,
@@ -331,7 +328,6 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
               amount: { $sum: "$participants.totalAmountOwed" },
               lastActivityAt: { $max: "$updatedAt" },
               fullName: { $first: "$participants.fullName" },
-              username: { $first: "$participants.username" },
               avatar: { $first: "$participants.avatar" },
             },
           },
@@ -351,7 +347,6 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
               amount: { $sum: "$participants.totalAmountOwed" },
               lastActivityAt: { $max: "$updatedAt" },
               fullName: { $first: "$paidBy.fullName" },
-              username: { $first: "$paidBy.username" },
               avatar: { $first: "$paidBy.avatar" },
             },
           },
@@ -377,7 +372,6 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
       user: {
         id,
         fullName: row.fullName,
-        username: row.username,
         avatar: row.avatar,
       },
       netAmount: (map.get(id)?.netAmount || 0) + Number(row.amount || 0),
@@ -394,7 +388,6 @@ const getSettleUpDrawer = asyncHandler(async (req, res) => {
       user: {
         id,
         fullName: row.fullName,
-        username: row.username,
         avatar: row.avatar,
       },
       netAmount: (prev?.netAmount || 0) - Number(row.amount || 0),

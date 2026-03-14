@@ -12,7 +12,7 @@ const Login = () => {
       
      <div className="flex gap-4 items-center">
         <p>Don't have an account?</p>
-        <Link to="/register" className="text-muted-foreground text-bold ">
+        <Link to="/register" className="text-muted-foreground text-bold hover:underline underline-offset-2">
           Register
         </Link>
         

@@ -14,7 +14,7 @@ const Register = () => {
 
       <div className="flex gap-4 items-center">
         <p>Already have an account?</p>
-        <Link to="/login" className="text-muted-foreground text-bold ">
+        <Link to="/login" className="text-muted-foreground text-bold hover:underline underline-offset-2">
           Login
         </Link>
       </div>
