@@ -17,7 +17,7 @@ const passwordSchema = z
   });
 
 export const registerSchema = z.object({
-  username: stringValidation(1, 20, "username"),
+ 
   email: z
     .string()
     .email({ message: "Invalid email address" })
@@ -39,7 +39,7 @@ export const changePasswordSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-  username: stringValidation(1, 20, "username").optional(),
+ 
   fullName: stringValidation(1, 20, "fullName").optional(),
   avatar: z
     .string()

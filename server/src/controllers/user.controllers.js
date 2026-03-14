@@ -20,17 +20,16 @@ const generateTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   console.log("this is body", req.body);
-  const { username, email, fullName, avatar, password } = req.body;
+  const { email, fullName, avatar, password } = req.body;
 
   const existedUser = await User.findOne({
-    $or: [{ username }, { email }],
+    email,
   });
   if (existedUser) {
     throw new ApiError(409, "User already exists");
   }
 
   const user = await User.create({
-    username,
     fullName,
     email,
     password,
@@ -53,9 +52,9 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   console.log("Login", req.body);
   const { identifier, password } = req.body;
-// console.log("here is id, pass",identifier,password)
+  // console.log("here is id, pass",identifier,password)
   const existedUser = await User.findOne({
-    $or: [{ username: identifier }, { email: identifier }],
+    email: identifier,
   });
   if (!existedUser) {
     throw new ApiError(409, "User not found");
@@ -67,11 +66,11 @@ const loginUser = asyncHandler(async (req, res) => {
     console.log("Password not valid");
     throw new ApiError(401, "Invalid user credentials");
   }
-console.log("ndf here")
+  console.log("ndf here");
   const { accessToken, refreshToken } = await generateTokens(existedUser._id);
 
   const loggedInUser = await User.findById(existedUser._id).select(
-    "username avatar email fullName"
+    "avatar email fullName"
   );
 
   const options = {
@@ -291,7 +290,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
     .digest("hex");
 
   user.resetPasswordToken = hashedToken;
-  user.resetPasswordExpires = new Date(now + Number(process.env.RESET_PASSWORD_TOKEN_EXPIRY)); 
+  user.resetPasswordExpires = new Date(
+    now + Number(process.env.RESET_PASSWORD_TOKEN_EXPIRY)
+  );
   user.resetPasswordRequestCount += 1;
   user.lastPasswordResetRequestAt = now;
 
@@ -299,8 +300,8 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${rawToken}`;
 
-    console.log("RESET PASSWORD LINK:", resetLink);
-  
+  console.log("RESET PASSWORD LINK:", resetLink);
+
   // try {
   //   await sendResetPasswordEmail(user.email, resetLink);
   // } catch (error) {
@@ -319,10 +320,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 const resetPassword = asyncHandler(async (req, res) => {
   const { token, password } = req.body;
 
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
   const user = await User.findOne({
     resetPasswordToken: hashedToken,
@@ -333,7 +331,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Reset link is invalid or expired");
   }
 
-  user.password = password; 
+  user.password = password;
   user.resetPasswordToken = null;
   user.resetPasswordExpires = null;
   user.resetPasswordRequestCount = 0;
@@ -341,41 +339,23 @@ const resetPassword = asyncHandler(async (req, res) => {
   await user.save();
 
   return res.json(
-    new ApiResponse(
-      200,
-      null,
-      "Password reset successful. Please log in."
-    )
+    new ApiResponse(200, null, "Password reset successful. Please log in.")
   );
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName, username, avatar } = req.body;
+  const { fullName, avatar } = req.body;
   const userId = req.user._id;
 
   const updates = {};
   if (fullName) updates.fullName = fullName;
   if (avatar) updates.avatar = avatar;
 
-  if (username) {
-    // check uniqueness
-    const conflict = await User.findOne({
-      username,
-      _id: { $ne: userId },
-    }).lean();
-
-    if (conflict) {
-      res.status(400);
-      throw new Error("Username already in use");
-    }
-    updates.username = username;
-  }
-
   const user = await User.findByIdAndUpdate(
     userId,
     { $set: updates },
     { new: true, runValidators: true }
-  ).select("username email fullName avatar");
+  ).select("email fullName avatar");
 
   return res
     .status(200)
@@ -455,5 +435,5 @@ export {
   addPaymentMethod,
   deletePaymentMethod,
   forgotPassword,
-  resetPassword
+  resetPassword,
 };
