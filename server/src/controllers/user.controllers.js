@@ -19,24 +19,19 @@ const generateTokens = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  console.log("this is body", req.body);
   const { email, fullName, password } = req.body;
 
-  const existedUser = await User.findOne({
-    email,
-  });
+  const existedUser = await User.findOne({ email });
   if (existedUser) {
     throw new ApiError(409, "User already exists");
   }
 
-  const user = await User.create({
-    fullName,
-    email,
-    password
-  });
+  const user = new User({ fullName, email, password }); 
+  user.setDefaultAvatar();                           
+  await user.save();                                
 
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken "
+    "-password -refreshToken"
   );
 
   if (!createdUser) {
