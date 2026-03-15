@@ -102,6 +102,12 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+userSchema.methods.setDefaultAvatar = function () {
+  if (!this.avatar) {
+    this.avatar = `https://api.dicebear.com/9.x/adventurer/svg?seed=${this._id}`;
+  }
+};
+
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
@@ -123,6 +129,7 @@ userSchema.methods.generateAccessToken = function () {
     }
   );
 };
+
 
 userSchema.methods.generateRefreshToken = function () {
   const refreshToken = jwt.sign(
