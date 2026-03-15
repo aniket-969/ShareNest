@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -6,74 +6,181 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshCw } from "lucide-react";
 
-export const AvatarSelector = ({ onSelect }) => {
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+const STYLES = [
+  "adventurer",
+  "avataaars",
+  "big-smile",
+  "bottts",
+  "croodles",
+  "fun-emoji",
+  "icons",
+  "lorelei",
+  "micah",
+  "miniavs",
+  "notionists",
+  "open-peeps",
+  "personas",
+  "pixel-art",
+  "shapes",
+];
+
+const generateSeeds = () =>
+  Array.from({ length: 15 }, () => Math.random().toString(36).substring(2, 10));
+
+const getDiceBearUrl = (seed, style = "adventurer") =>
+  `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+
+export const AvatarSelector = ({ onSelect, style = "adventurer" }) => {
+  const [selectedUrl, setSelectedUrl] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [seeds, setSeeds] = useState(generateSeeds);
   const [imageLoaded, setImageLoaded] = useState({});
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const avatars = Array.from(
-    { length: 50 },
-    (_, i) => `https://avatar.iran.liara.run/public/${2 * i + 1}`
-  );
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    setImageLoaded({});
+    setSelectedUrl(null);
+    setSeeds(generateSeeds());
+    setTimeout(() => setIsRefreshing(false), 600);
+  }, []);
 
-  const handleConfirm = () => {
-    if (selectedAvatar) {
-      onSelect(selectedAvatar);
-      setIsDialogOpen(false);
-    }
+  const handleSelect = (url) => {
+    setSelectedUrl(url);
+    onSelect(url);
+    setIsDialogOpen(false);
   };
 
   const handleImageLoad = (url) => {
     setImageLoaded((prev) => ({ ...prev, [url]: true }));
   };
 
+  const avatars = seeds.map((seed) => ({
+    seed,
+    url: getDiceBearUrl(seed, style),
+  }));
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" onClick={() => setIsDialogOpen(true)}>
-          Select Avatar
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-2"
+          onClick={() => setIsDialogOpen(true)}
+        >
+          {selectedUrl ? (
+            <>
+              <img
+                src={selectedUrl}
+                alt="Selected avatar"
+                className="w-5 h-5 rounded-full"
+              />
+              Change Avatar
+            </>
+          ) : (
+            "Select Avatar"
+          )}
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogTitle>
           <VisuallyHidden>Choose an avatar</VisuallyHidden>
         </DialogTitle>
 
-        <ScrollArea className="max-h-64 pr-2">
-          <div className="grid grid-cols-5 gap-4 p-2">
-            {avatars.map((url) => (
-              <Card
-                key={url}
-                onClick={() => setSelectedAvatar(url)}
-                className={`relative cursor-pointer p-2 transition-all hover:ring-2 hover:ring-blue-300 ${
-                  selectedAvatar === url ? "ring-2 ring-blue-500" : ""
-                }`}
-              >
-                {!imageLoaded[url] && (
-                  <Skeleton className="w-full h-full aspect-square rounded-full" />
-                )}
-                <img
-                  src={url}
-                  alt={`Avatar ${url.split("/").pop()}`}
-                  onLoad={() => handleImageLoad(url)}
-                  className={`w-full h-full rounded-full object-cover transition-opacity duration-300 ${
-                    imageLoaded[url] ? "opacity-100" : "opacity-0 absolute"
-                  }`}
-                />
-              </Card>
-            ))}
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-base font-semibold text-foreground">
+              Pick your avatar
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Click any avatar to select it
+            </p>
           </div>
-        </ScrollArea>
-
-        <div className="mt-4 flex justify-end">
-          <Button onClick={handleConfirm}>Confirm</Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            onClick={handleRefresh}
+            title="Generate new avatars"
+          >
+            <RefreshCw
+              className={`h-4 w-4 transition-transform duration-500 ${
+                isRefreshing ? "animate-spin" : ""
+              }`}
+            />
+          </Button>
         </div>
+
+        {/* Grid — 5 columns × 3 rows = 15 avatars */}
+        <div className="grid grid-cols-5 gap-3">
+          {avatars.map(({ seed, url }) => (
+            <button
+              key={seed}
+              onClick={() => handleSelect(url)}
+              className={`
+                group relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-150
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                ${
+                  selectedUrl === url
+                    ? "border-primary ring-2 ring-primary/30 scale-105"
+                    : "border-transparent hover:border-primary/50 hover:scale-105"
+                }
+              `}
+            >
+              {/* Skeleton while loading */}
+              {!imageLoaded[url] && (
+                <Skeleton className="absolute inset-0 w-full h-full rounded-xl" />
+              )}
+
+              <img
+                src={url}
+                alt={`Avatar ${seed}`}
+                onLoad={() => handleImageLoad(url)}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  imageLoaded[url] ? "opacity-100" : "opacity-0"
+                }`}
+              />
+
+              {/* Selected checkmark overlay */}
+              {selectedUrl === url && (
+                <span className="absolute inset-0 flex items-center justify-center bg-primary/20 rounded-xl">
+                  <svg
+                    className="w-5 h-5 text-primary drop-shadow"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <p className="text-xs text-muted-foreground text-center mt-2">
+          Powered by{" "}
+          <a
+            href="https://www.dicebear.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            DiceBear
+          </a>
+        </p>
       </DialogContent>
     </Dialog>
   );

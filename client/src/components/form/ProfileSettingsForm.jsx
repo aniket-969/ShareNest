@@ -70,7 +70,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
                   <AvatarFallback>
                     <img src="/altAvatar1.jpg" alt="fallback avatar" />
                   </AvatarFallback>
-                </Avatar>
+                </Avatar> 
         <AvatarSelector onSelect={(url) => setValue("avatar", url, { shouldTouch: true })} />
         {errors.avatar && <p className="text-sm text-destructive">{errors.avatar.message}</p>}
       </div>
