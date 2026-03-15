@@ -14,19 +14,17 @@ const ProfileCard = () => {
     return <>Something went wrong . Please refresh</>;
   }
   return (
-    <div className="flex flex-col items-center gap-4 ">
-      <div className="">
+    <div className="flex flex-col items-center gap-2 ">
+      
         <Avatar className="sm:w-[80px] sm:h-[80px] w-[50px] h-[50px] ">
-          <AvatarImage src={data?.avatar} alt={data?.fullName} />
+          <AvatarImage src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${data?._id}`} alt={data?.fullName} />
           <AvatarFallback>
             <img src="/altAvatar1.jpg" alt="fallback avatar" />
           </AvatarFallback>
         </Avatar>
-      </div>
-      <div className="flex gap-10 sm:gap-20 items-center justify-center font-medium tracking-wide ">
-        <p className="max-w-[120px] truncate text-center">{data?.fullName}</p>
+      
+        <p className="font-medium tracking-wide max-w-[120px] truncate text-center">{data?.fullName}</p>
        
-      </div>
     </div>
   );
 };

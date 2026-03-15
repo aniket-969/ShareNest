@@ -19,7 +19,6 @@ export const registerSchema = z.object({
     .max(50, { message: "Email must be no more than 50 characters long" }),
   fullName: stringValidation(1, 20, "fullName"),
   password: passwordSchema,
-  avatar: stringValidation(5, 300, "avatar"),
 });
 
 export const loginSchema = z.object({

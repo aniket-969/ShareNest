@@ -20,7 +20,7 @@ const generateTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   console.log("this is body", req.body);
-  const { email, fullName, avatar, password } = req.body;
+  const { email, fullName, password } = req.body;
 
   const existedUser = await User.findOne({
     email,
@@ -32,8 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = await User.create({
     fullName,
     email,
-    password,
-    avatar,
+    password
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -70,7 +69,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateTokens(existedUser._id);
 
   const loggedInUser = await User.findById(existedUser._id).select(
-    "avatar email fullName"
+    "email fullName"
   );
 
   const options = {

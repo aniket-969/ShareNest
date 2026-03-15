@@ -10,7 +10,7 @@ const checkMember = asyncHandler(async (req, res, next) => {
   }
 
   const userId = req?.user?._id;
-
+ 
   const room = await Room.findById(roomId).select("tenants currency");
   if (!room) {
     throw new ApiError(404, "Room not found");

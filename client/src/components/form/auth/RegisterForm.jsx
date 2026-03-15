@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AvatarSelector } from "./../../AvatarSelector";
 
 export const SignUp = () => {
   const { registerMutation } = useAuth();
@@ -22,7 +21,6 @@ export const SignUp = () => {
     defaultValues: {
       password: "",
       fullName: "",
-      avatar: "",
       email: "",
     },
   });
@@ -96,19 +94,7 @@ export const SignUp = () => {
           )}
         />
 
-        {/* Avatar */}
-        <FormField
-          control={form.control}
-          name="avatar"
-          render={({ field }) => (
-            <FormItem className="flex items-center gap-4">
-              
-              <AvatarSelector onSelect={(url) => field.onChange(url)} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+      
         {/* Submit */}
         <Button
           type="submit"
