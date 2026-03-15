@@ -8,11 +8,15 @@ export const getUserExpense = async (
   limit = 10,
   q = ""
 ) => {
-  console.log("in get user expense api query");
+  const params = { limit };
+
+  if (beforeId) params.beforeId = beforeId; 
+  if (q) params.q = q;
+
   const response = await axiosClient.get(`/${baseExpense}/${roomId}`, {
-    params: { beforeId, limit, q },
+    params,
   });
-  console.log(response);
+  console.log(response?.data)
   return response?.data?.data;
 };
 
@@ -43,13 +47,13 @@ export const createExpense = async (data, roomId) => {
 };
 
 export const deleteExpense = async (expenseId) => {
-  console.log(expenseId)
+  console.log(expenseId);
   // return
   return axiosClient.delete(`/${baseExpense}/${expenseId}`);
 };
 
 export const updateExpense = async (expenseId, data) => {
-  console.log(expenseId,data)
+  console.log(expenseId, data);
   // return
   return axiosClient.patch(`/${baseExpense}/${expenseId}`, data);
 };

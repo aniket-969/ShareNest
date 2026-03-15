@@ -58,7 +58,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   const someoneElsePaid = expense.participants?.some(
     (p) => p.hasPaid === true && String(p.id) !== String(paidBy.id)
   );
-
+ 
   const canDelete = isCreator && !someoneElsePaid;
 
   const { updateExpenseMutation, deleteExpenseMutation } = useExpense(roomId);

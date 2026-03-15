@@ -19,7 +19,7 @@ const ParticipantsModal = ({ expense, currency = "₹" }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!expense) return null;
-  // if (expense.title == "Soda" ) console.log(expense);
+  // if (expense.title == "ftgf" ) console.log(expense);
   const payerId = expense.paidBy?.id?.toString();
 
   return (
@@ -30,7 +30,7 @@ const ParticipantsModal = ({ expense, currency = "₹" }) => {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-md bg-gray-900 text-gray-100">
+      <DialogContent className="max-w-md bg-gray-900 text-gray-100 ">
         <DialogHeader>
           <DialogTitle>Participants</DialogTitle>
           <DialogDescription>Expense details & payments</DialogDescription>
@@ -54,7 +54,7 @@ const ParticipantsModal = ({ expense, currency = "₹" }) => {
         <ScrollArea className="mt-4 max-h-72 overflow-auto px-4">
           <div className="space-y-4">
             {(expense.participants || []).map((p) => {
-              const uid = p.id?.toString();
+              const uid = p._id?.toString();
               const hasPaid = Boolean(p.hasPaid);
               const paidDate = p.paidAt ? new Date(p.paidAt) : null;
               const status = hasPaid ? "Paid" : "Pending";

@@ -27,7 +27,7 @@ const createExpense = asyncHandler(async (req, res) => {
 
   const users = await User.find(
     { _id: { $in: participantIds } },
-    { fullName: 1, avatar: 1}
+    { fullName: 1, avatar: 1 }
   ).lean();
 
   const userMap = {};
@@ -119,56 +119,102 @@ const getExpenses = asyncHandler(async (req, res) => {
   const beforeId = req.query.beforeId || null;
   const q = (req.query.q || "").trim();
 
-  const match = {
-    roomId: new mongoose.Types.ObjectId(roomId),
+  console.log(beforeId, "before", q, "query");
+
+  const roomObjectId = new mongoose.Types.ObjectId(roomId);
+
+  const baseQuery = {
+    roomId: roomObjectId,
     isDeleted: { $ne: true },
   };
+
+  const andConditions = [];
+
+  let searchCondition = null;
+
+  if (q) {
+    const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(safe, "i");
+
+    searchCondition = {
+      $or: [
+        { title: re },
+        { "paidBy.fullName": re },
+        { "participants.fullName": re },
+      ],
+    };
+
+    console.log("Search condition applied");
+  }
+
+  //  Pagination
+  let beforeCreated = null;
 
   if (beforeId) {
     if (!mongoose.Types.ObjectId.isValid(beforeId)) {
       throw new ApiError(400, "invalid beforeId");
     }
 
-    const beforeDoc = await Expense.findById(beforeId)
+    const beforeDoc = await Expense.findOne({
+      _id: beforeId,
+      roomId: roomObjectId,
+      isDeleted: { $ne: true },
+    })
       .select("createdAt")
       .lean();
 
+    console.log("The doc", beforeDoc);
+
     if (!beforeDoc || !beforeDoc.createdAt) {
+      console.log("Cursor not found in current dataset → returning empty");
+
       return res.json(
         new ApiResponse(
           200,
           {
             expenses: [],
-            meta: { hasMore: false, nextBeforeId: null, limit, returned: 0 },
+            meta: {
+              hasMore: false,
+              nextBeforeId: null,
+              limit,
+              returned: 0,
+            },
           },
           "Expenses fetched"
         )
       );
     }
 
-    const beforeCreated = new Date(beforeDoc.createdAt);
+    beforeCreated = new Date(beforeDoc.createdAt);
+    console.log(beforeCreated, "beforcre");
 
-    match.$or = [
-      { createdAt: { $lt: beforeCreated } },
-      {
-        createdAt: beforeCreated,
-        _id: { $lt: new mongoose.Types.ObjectId(beforeId) },
-      },
-    ];
+    andConditions.push({
+      $or: [
+        { createdAt: { $lt: beforeCreated } },
+        {
+          createdAt: beforeCreated,
+          _id: { $lt: new mongoose.Types.ObjectId(beforeId) },
+        },
+      ],
+    });
   }
 
-  if (q) {
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-    match.$or = match.$or || [];
-    match.$or.push(
-      { title: re },
-      { "paidBy.fullName": re },
-      { "participants.fullName": re }
-    );
+  if (searchCondition) {
+    andConditions.push(searchCondition);
   }
 
-  const docs = await Expense.find(match, {
-    "participants.id": 1,
+  const finalQuery = {
+    ...baseQuery,
+  };
+
+  if (andConditions.length > 0) {
+    finalQuery.$and = andConditions;
+  }
+
+  console.log("Final Query:", JSON.stringify(finalQuery, null, 2));
+
+  const docs = await Expense.find(finalQuery, {
+    "participants._id": 1, 
     "participants.fullName": 1,
     "participants.avatar": 1,
     "participants.totalAmountOwed": 1,
@@ -188,6 +234,9 @@ const getExpenses = asyncHandler(async (req, res) => {
     .limit(limit + 1)
     .lean();
 
+  console.log("Docs length:", docs.length);
+  console.log(docs, "this is docs");
+
   const hasMore = docs.length > limit;
   const page = hasMore ? docs.slice(0, limit) : docs;
 
@@ -205,7 +254,11 @@ const getExpenses = asyncHandler(async (req, res) => {
     const paidCount = participants.filter((p) => p.hasPaid).length;
     const unpaidCount = participants.length - paidCount;
 
-    const userP = participants.find((p) => p.id && String(p.id) === userId);
+    const userP = participants.find((p) => {
+      const pid = p._id || p.id;
+      return pid && String(pid) === userId;
+    });
+
     const isUserParticipant = Boolean(userP);
     const hasUserPaid = userP ? Boolean(userP.hasPaid) : false;
     const requesterTotal = userP ? userP.totalAmountOwed : null;
@@ -223,12 +276,23 @@ const getExpenses = asyncHandler(async (req, res) => {
 
   const nextBeforeId = hasMore ? docs[limit]._id.toString() : null;
 
+  console.log("Meta:", {
+    hasMore,
+    nextBeforeId,
+    returned: expenses.length,
+  });
+
   return res.json(
     new ApiResponse(
       200,
       {
         expenses,
-        meta: { hasMore, nextBeforeId, limit, returned: expenses.length },
+        meta: {
+          hasMore,
+          nextBeforeId,
+          limit,
+          returned: expenses.length,
+        },
       },
       "Expenses fetched successfully"
     )

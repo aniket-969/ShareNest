@@ -6,7 +6,7 @@ const SocketContext = createContext();
 let socketInstance;
 
 export const getSocket = () => {
-  console.log("checking for socket")
+  // console.log("checking for socket")
   if (!socketInstance) {
     
     socketInstance = io(
@@ -17,7 +17,7 @@ export const getSocket = () => {
        
       }
     );
-    console.log(socketInstance,"creating socket bby")
+    // console.log(socketInstance,"creating socket bby")
   }
   
   return socketInstance;
@@ -28,7 +28,7 @@ const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("connected", socket.id);
+      // console.log("connected", socket.id);
     });
 
     socket.on("socketError", (err) => {
@@ -48,7 +48,7 @@ const SocketProvider = ({ children }) => {
       console.log("Socket disconnected and cleaned up");
     };
   }, [socket]);
-console.log("socket.jsx",socketInstance)
+// console.log("socket.jsx",socketInstance)
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );

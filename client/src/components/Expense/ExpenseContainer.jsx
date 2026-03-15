@@ -43,11 +43,12 @@ const expenses = expenseData?.pages
     const scrollTop = viewportRef.current.scrollTop;
 
     if (scrollTop <= 50) {
+      // console.log(scrollTop,"going to fetch")
       if (hasNextPage && !isFetchingNextPage) {
         const oldHeight = viewportRef.current.scrollHeight;
 
         await fetchNextPage();
-
+console.log("fetched bby")
         requestAnimationFrame(() => {
           const newHeight = viewportRef.current.scrollHeight;
           viewportRef.current.scrollTop = newHeight - oldHeight;

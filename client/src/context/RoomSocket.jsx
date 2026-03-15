@@ -15,7 +15,8 @@ export const RoomSocketProvider = ({ children }) => {
     if (!roomId) return;
 
     const handleOnlineUsersUpdate = ({ users, count }) => {
-      console.log("🟢 Online users updated");
+      // console.log("🟢 Online users updated");
+
       setOnlineUsers(users);
     };
 
@@ -24,7 +25,7 @@ export const RoomSocketProvider = ({ children }) => {
 
     const joinRoom = () => {
       socket.emit("joinRoom", roomId);
-      console.log("Joined room", roomId);
+      // console.log("Joined room", roomId);
     };
 
     if (socket.connected) {

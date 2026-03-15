@@ -84,7 +84,7 @@ const AppSidebar = () => {
   ];
   const { onlineUsers } = useRoomSocket();
 
-  console.log("sidebar rendered", onlineUsers);
+  // console.log("sidebar rendered", onlineUsers);
 
   return (
     <Sidebar>

@@ -8,10 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TaskContainerCard from "@/components/Tasks/TaskContainerCard";
-import { useDebouncedCallback } from '@/hooks/use-debounce';
-
-const getFirstName = (fullName = "") =>
-  fullName.trim().split(" ")[0].toLowerCase();
+import { useDebouncedCallback } from "@/hooks/use-debounce";
 
 const SearchOverlay = ({ tasks, userId, onClose }) => {
   const [query, setQuery] = useState("");
@@ -27,7 +24,7 @@ const SearchOverlay = ({ tasks, userId, onClose }) => {
     tasks.forEach((task) => {
       task.participants?.forEach((p) => {
         if (p.fullName) {
-          set.add(getFirstName(p.fullName));
+          set.add(fullName.trim().split(" ")[0].toLowerCase());
         }
       });
     });
@@ -51,7 +48,7 @@ const SearchOverlay = ({ tasks, userId, onClose }) => {
       }
 
       const participantMatch = task.participants?.some(
-        (p) => getFirstName(p.fullName) === q
+        (p) => p.fullName.trim().split(" ")[0].toLowerCase() === q
       );
 
       return titleMatch || participantMatch;
