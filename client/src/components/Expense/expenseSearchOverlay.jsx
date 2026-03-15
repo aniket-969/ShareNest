@@ -33,6 +33,7 @@ const ExpenseSearchOverlay = ({ onClose }) => {
     isLoading,
   } = useExpenseSearchQuery(roomId, debouncedQ);
 
+  const { _id } = JSON.parse(localStorage.getItem("session"));
   const expenses =
     data?.pages?.flatMap((p) => p.expenses) ?? [];
 
@@ -55,7 +56,7 @@ const ExpenseSearchOverlay = ({ onClose }) => {
 
     if (isNearBottom) {
       if (hasNextPage && !isFetchingNextPage) {
-        await fetchNextPage(); // ✅ no scroll adjustment needed
+        await fetchNextPage();
       }
     }
   };
@@ -138,7 +139,7 @@ const ExpenseSearchOverlay = ({ onClose }) => {
                   </div>
 
                   {/* Expense card */}
-                  <ExpenseCard expense={exp} roomId={roomId} />
+                  <ExpenseCard userId={_id} expense={exp} roomId={roomId} />
                 </div>
               ))}
 
