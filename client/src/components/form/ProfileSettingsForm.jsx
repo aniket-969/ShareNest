@@ -67,7 +67,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
         /> */}
         <Avatar className="w-20 h-20 rounded-full object-cover">
           <AvatarImage
-            src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${initialData?._id}&backgroundColor=ffdfbf`}
+            src={avatarUrl || initialData?.avatar}
             alt={initialData?.fullName}
           />
           <AvatarFallback>
@@ -75,7 +75,9 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
           </AvatarFallback>
         </Avatar>
         <AvatarSelector
-          onSelect={(url) => setValue("avatar", url, { shouldTouch: true })}
+          onSelect={(url) =>
+            setValue("avatar", url, { shouldDirty: true, shouldTouch: true })
+          }
         />
         {errors.avatar && (
           <p className="text-sm text-destructive">{errors.avatar.message}</p>

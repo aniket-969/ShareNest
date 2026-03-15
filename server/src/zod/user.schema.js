@@ -43,10 +43,6 @@ export const updateUserSchema = z.object({
   avatar: z
     .string()
     .url("Avatar must be a valid URL")
-    .regex(
-      /^https:\/\/avatar\.iran\.liara\.run\/public\/\d+$/,
-      "Avatar must come from avatar.iran.liara.run"
-    )
     .optional(),
 });
 

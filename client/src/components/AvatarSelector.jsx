@@ -75,11 +75,7 @@ export const AvatarSelector = ({ onSelect, style = "adventurer" }) => {
         >
           {selectedUrl ? (
             <>
-              <img
-                src={selectedUrl}
-                alt="Selected avatar"
-                className="w-5 h-5 rounded-full"
-              />
+              
               Change Avatar
             </>
           ) : (

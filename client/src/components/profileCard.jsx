@@ -18,7 +18,7 @@ const ProfileCard = () => {
   <div className="relative group">
     <Avatar className="sm:w-[80px] sm:h-[80px] w-[50px] h-[50px] bg-transparent">
       <AvatarImage
-        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${data?._id}&backgroundColor=ffdfbf`}
+        src={data?.avatar}
         alt={data?.fullName}
         className=""
       />
