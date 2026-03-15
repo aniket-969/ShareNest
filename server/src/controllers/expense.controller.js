@@ -214,7 +214,8 @@ const getExpenses = asyncHandler(async (req, res) => {
   console.log("Final Query:", JSON.stringify(finalQuery, null, 2));
 
   const docs = await Expense.find(finalQuery, {
-    "participants._id": 1, 
+    "participants._id": 1,
+    "participants.id": 1, 
     "participants.fullName": 1,
     "participants.avatar": 1,
     "participants.totalAmountOwed": 1,
@@ -255,7 +256,7 @@ const getExpenses = asyncHandler(async (req, res) => {
     const unpaidCount = participants.length - paidCount;
 
     const userP = participants.find((p) => {
-      const pid = p._id || p.id;
+      const pid =  p.id;
       return pid && String(pid) === userId;
     });
 
