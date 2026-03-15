@@ -14,7 +14,7 @@ const SearchOverlay = ({ tasks, userId, onClose }) => {
   const [query, setQuery] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const scrollRef = useRef(null);
-
+// console.log(tasks)
   const debouncedInput = useDebouncedCallback((value) => {
     setDebouncedQ(value.trim());
   }, 250);
@@ -24,7 +24,7 @@ const SearchOverlay = ({ tasks, userId, onClose }) => {
     tasks.forEach((task) => {
       task.participants?.forEach((p) => {
         if (p.fullName) {
-          set.add(fullName.trim().split(" ")[0].toLowerCase());
+          set.add(p.fullName.trim().split(" ")[0].toLowerCase());
         }
       });
     });

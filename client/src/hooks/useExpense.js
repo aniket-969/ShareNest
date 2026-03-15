@@ -67,6 +67,25 @@ export const useExpenseQuery = (roomId) => {
   });
 };
 
+export const useExpenseSearchQuery = (roomId, q) => {
+  return useInfiniteQuery({
+    queryKey: ["expense-search", roomId, q], 
+
+    queryFn: ({ pageParam = null }) =>
+      getUserExpense(roomId, pageParam, 10, q),
+
+    getNextPageParam: (lastPage) => {
+      const meta = lastPage?.meta;
+      if (!meta || !meta.hasMore) return undefined;
+      return meta.nextBeforeId;
+    },
+
+    enabled: !!roomId && !!q, 
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
+};
+
 export const useSettleUpQuery = (roomId) => {
   return useQuery({
     queryKey: ["settleUp", roomId],
