@@ -11,7 +11,7 @@ import ExpenseCard from "./userExpense/ExpenseCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useParams } from "react-router-dom";
 import { useExpenseSearchQuery } from "@/hooks/useExpense";
-import { useDebouncedCallback } from "@/hooks/useDebounce";
+import { useDebouncedCallback } from "@/hooks/use-debounce";
 
 const ExpenseSearchOverlay = ({ onClose }) => {
   const { roomId } = useParams();
@@ -43,25 +43,33 @@ const ExpenseSearchOverlay = ({ onClose }) => {
     }
   }, [debouncedQ]);
 
-  //  Infinite scroll handler
+  //  Load more when near bottom
   const handleScroll = async () => {
     if (!viewportRef.current) return;
 
-    const scrollTop = viewportRef.current.scrollTop;
+    const { scrollTop, scrollHeight, clientHeight } =
+      viewportRef.current;
 
-    if (scrollTop <= 20) {
+    const isNearBottom =
+      scrollHeight - (scrollTop + clientHeight) <= 50;
+
+    if (isNearBottom) {
       if (hasNextPage && !isFetchingNextPage) {
-        const oldHeight = viewportRef.current.scrollHeight;
-
-        await fetchNextPage();
-
-        requestAnimationFrame(() => {
-          const newHeight = viewportRef.current.scrollHeight;
-          viewportRef.current.scrollTop = newHeight - oldHeight;
-        });
+        await fetchNextPage(); // ✅ no scroll adjustment needed
       }
     }
   };
+
+  //  Auto-load if content doesn't fill container
+  useEffect(() => {
+    if (!viewportRef.current) return;
+
+    const { scrollHeight, clientHeight } = viewportRef.current;
+
+    if (scrollHeight <= clientHeight && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [data, hasNextPage, fetchNextPage]);
 
   return (
     <Dialog open onOpenChange={onClose}>
@@ -70,7 +78,7 @@ const ExpenseSearchOverlay = ({ onClose }) => {
           <DialogTitle>Search Expenses</DialogTitle>
         </DialogHeader>
 
-        {/* Search Input */}
+        {/*  Search Input */}
         <Input
           placeholder="Search expenses..."
           value={query}
@@ -82,7 +90,7 @@ const ExpenseSearchOverlay = ({ onClose }) => {
           className="mb-3"
         />
 
-        {/*  Results */}
+        {/* Results */}
         <ScrollArea
           ref={viewportRef}
           className="h-[25rem] pr-2"

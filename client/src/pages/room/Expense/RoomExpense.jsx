@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import ExpenseContainer from "@/components/Expense/ExpenseContainer";
 import { Card } from "@/components/ui/card";
-import SearchOverlay from "@/components/Expense/searchOverlay";
+import ExpenseSearchOverlay from "@/components/Expense/expenseSearchOverlay";
 
 const ExpenseForm = lazy(() => import("@/components/form/ExpenseForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -33,7 +33,7 @@ const RoomExpense = () => {
   const scrollToPayments = () => {
     paymentRef.current?.scrollIntoView({ behavior: "smooth" });
   };
- 
+
   const userData = localStorage.getItem("session");
   const userId = JSON.parse(userData)?._id;
 
@@ -42,13 +42,11 @@ const RoomExpense = () => {
   return (
     <div>
       <div className="flex flex-col gap-6 items-center">
-
-{/* heading and icons */}
+        {/* heading and icons */}
         <div className="flex items-center justify-around w-full ">
           <h2 className="font-bold text-2xl hidden sm:block">Expense</h2>
 
           <div className="flex gap-3">
-           
             <Button
               className="md:hidden"
               size="icon"
@@ -80,12 +78,19 @@ const RoomExpense = () => {
       <div ref={paymentRef}>
         <PaymentDetails participants={participants} userId={userId} />
       </div>
-
-        {isFormOpen && (
+      {isSearchOpen && (
+        <ExpenseSearchOverlay onClose={() => setIsSearchOpen(false)} />
+      )}
+      {isFormOpen && (
         <Suspense fallback={<Spinner />}>
-        <FormWrapper onClose={() => setIsFormOpen(false)}>
-        <ExpenseForm onClose={() => {setIsFormOpen(false)}} participants={participants} />
-      </FormWrapper>
+          <FormWrapper onClose={() => setIsFormOpen(false)}>
+            <ExpenseForm
+              onClose={() => {
+                setIsFormOpen(false);
+              }}
+              participants={participants}
+            />
+          </FormWrapper>
         </Suspense>
       )}
     </div>
