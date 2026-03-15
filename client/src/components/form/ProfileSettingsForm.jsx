@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { AvatarSelector } from "../AvatarSelector";
 import { useForm } from "react-hook-form";
 import { updateUserSchema } from "@/schema/authSchema";
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
@@ -32,10 +32,10 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   const avatarUrl = watch("avatar");
 
   const onSubmit = (values) => {
-    const { fullName,  avatar } = values;
+    const { fullName, avatar } = values;
     const payload = {};
     if (fullName !== initialData.fullName) payload.fullName = fullName;
-    
+
     if (avatar !== initialData.avatar) payload.avatar = avatar;
 
     if (Object.keys(payload).length === 0) {
@@ -65,29 +65,54 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
           alt="avatar"
           className="w-20 h-20 rounded-full object-cover"
         /> */}
-        <Avatar  className="w-20 h-20 rounded-full object-cover">
-                  <AvatarImage src={avatarUrl} alt={initialData?.fullName} />
-                  <AvatarFallback>
-                    <img src="/altAvatar1.jpg" alt="fallback avatar" />
-                  </AvatarFallback>
-                </Avatar> 
-        <AvatarSelector onSelect={(url) => setValue("avatar", url, { shouldTouch: true })} />
-        {errors.avatar && <p className="text-sm text-destructive">{errors.avatar.message}</p>}
+        <Avatar className="w-20 h-20 rounded-full object-cover">
+          <AvatarImage
+            src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${initialData?._id}&backgroundColor=ffdfbf`}
+            alt={initialData?.fullName}
+          />
+          <AvatarFallback>
+            <img src="/altAvatar1.jpg" alt="fallback avatar" />
+          </AvatarFallback>
+        </Avatar>
+        <AvatarSelector
+          onSelect={(url) => setValue("avatar", url, { shouldTouch: true })}
+        />
+        {errors.avatar && (
+          <p className="text-sm text-destructive">{errors.avatar.message}</p>
+        )}
       </div>
 
       <div className="flex gap-4">
         <div className="flex-1">
-          <Label htmlFor="fullName" className="text-sm text-white">Full Name</Label>
-          <Input id="fullName" {...register("fullName")} className="bg-[#121418] text-white" />
-          {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+          <Label htmlFor="fullName" className="text-sm text-white">
+            Full Name
+          </Label>
+          <Input
+            id="fullName"
+            {...register("fullName")}
+            className="bg-[#121418] text-white"
+          />
+          {errors.fullName && (
+            <p className="text-sm text-destructive">
+              {errors.fullName.message}
+            </p>
+          )}
         </div>
-       
       </div>
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" disabled={!isDirty || isSubmitting || updateUserMutation.isLoading}>
-          {(isSubmitting || updateUserMutation.isLoading) ? <Spinner size="sm" /> : "Save"}
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={!isDirty || isSubmitting || updateUserMutation.isLoading}
+        >
+          {isSubmitting || updateUserMutation.isLoading ? (
+            <Spinner size="sm" />
+          ) : (
+            "Save"
+          )}
         </Button>
       </div>
     </form>
@@ -95,5 +120,3 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
 };
 
 export default ProfileSettingsForm;
-
-
