@@ -92,7 +92,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   return (
     <Card className="rounded-xl w-[280px] bg-card-muted shadow-lg border-none">
       {/* ───── Card Header ───── */}
-      <CardHeader className="px-6 text-center py-4">
+      <CardHeader className="px-7 text-center py-4 ">
         <CardTitle
           className={`text-base tracking-wide font-semibold text-gray-100 flex ${showActions ? "justify-between" : "justify-center"}`}
         >
