@@ -26,7 +26,7 @@ const NotificationBell = () => {
   };
 
   return (
-    <div className="notification rounded-3xl flex justify-center items-center hover:bg-muted/30 transition-colors bg-card borde">
+    <div className="notification rounded-3xl flex justify-center items-center hover:bg-muted/30 transition-colors bg-card ">
       <div className="relative ">
         <button onClick={toggle} className="p-2 ">
           <Bell className=" text-primary p-[0.15rem]" />
@@ -40,10 +40,10 @@ const NotificationBell = () => {
         {open && (
           <div
             ref={panelRef}
-            className="absolute right-0 mt-2 w-80  bg-background border border-primary rounded-lg shadow-lg z-50"
+            className="absolute right-0 mt-2 w-80  bg-background border border-primary rounded-lg shadow-lg z-50 "
           >
             <ScrollArea className="h-40 m-2">
-              <div className="p-2">
+              <div className="px-3 py-1">
                 {notifications.length === 0 ? (
                   <p className="text-md text-muted-foreground text-center py-2">
                     No notifications
@@ -52,11 +52,11 @@ const NotificationBell = () => {
                   notifications.map((note) => (
                     <div
                       key={note.id}
-                      className="mb-2 last:mb-0 p-1.5 rounded bg-muted/80 transition "
+                      className="mb-2 last:mb-0 pl-2 py-1 rounded bg-card-muted text-gray-300 transition "
                     >
                       <div className="flex items-center gap-2 ">
                         {/* Avatar */}
-                        <Avatar className=" w-7 h-7">
+                        <Avatar className=" w-6 h-6">
                           <AvatarImage
                             src={note?.actor?.avatar}
                             alt={note?.actor?.fullName[0]}
