@@ -62,7 +62,7 @@ const createRoomTask = asyncHandler(async (req, res) => {
       }
     }
   }
-
+  console.log("just above task");
   const task = {
     title,
     description,
@@ -74,13 +74,16 @@ const createRoomTask = asyncHandler(async (req, res) => {
   };
 
   room.tasks.push(task);
-  await room.save();
+  await room.save({ validateModifiedOnly: true });
 
   const savedTask = room.tasks[room.tasks.length - 1];
 
   const taskForSocket = savedTask.toObject();
-  taskForSocket.actor = req.user.fullName;
-
+  taskForSocket.actor = {
+    avatar: req.user.avatar,
+    fullName: req.user.fullName,
+  };
+  console.log(taskForSocket, "Socket task");
   emitSocketEvent(req, roomId, TaskEventEnum.TASK_CREATE_EVENT, taskForSocket);
 
   return res.json(new ApiResponse(200, savedTask, "Task created successfully"));
