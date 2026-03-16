@@ -18,27 +18,6 @@ const NotificationBell = () => {
     window.addEventListener("mousedown", onClick);
     return () => window.removeEventListener("mousedown", onClick);
   }, [open]);
-  //   const fakeNotifications = [
-  //     { id: 1,  message: 'Alice created a new task "Write unit tests"',        seen: false },
-  //     { id: 2,  message: 'Bob created a poll "Best lunch spot?"',             seen: false },
-  //     { id: 4,  message: 'Dan requested maintenance "Air conditioner fix"',   seen: false },
-  //     { id: 5,  message: 'Eve created a custom award "Top Debugger"',         seen: false },
-  //     { id: 6,  message: 'Frank created a new task "Deploy to staging"',      seen: false },
-  //     { id: 7,  message: 'Grace created a poll "Remote vs Office?"',          seen: false },
-  //     { id: 8,  message: 'Heidi added a new expense "Conference ticket ($300)"', seen: false },
-  //     { id: 9,  message: 'Ivan requested maintenance "Printer repair"',       seen: false },
-  //     { id: 10, message: 'Judy created a custom award "UX Champion"',         seen: false },
-  //     { id: 11, message: 'Mallory created a new task "Update dependencies"',  seen: false },
-  //     { id: 12, message: 'Niaj created a poll "UI theme choice"',             seen: false },
-  //     { id: 13, message: 'Olivia added a new expense "Client dinner ($85)"',  seen: false },
-  //     { id: 14, message: 'Peggy requested maintenance "Network reboot"',      seen: false },
-  //     { id: 15, message: 'Sybil created a custom award "Bug Basher"',         seen: false },
-  //     { id: 16, message: 'Trent created a new task "Refactor login flow"',    seen: false },
-  //     { id: 17, message: 'Victor created a poll "Sprint retrospective date"', seen: false },
-  //     { id: 18, message: 'Wendy added a new expense "Office snacks ($45)"',    seen: false },
-  //     { id: 19, message: 'Xavier requested maintenance "Window lock fix"',    seen: false },
-  //     { id: 20, message: 'Yvonne created a custom award "Documentation Hero"',seen: false },
-  //   ];
 
   const toggle = () => {
     if (!open) markAllSeen();
@@ -50,9 +29,9 @@ const NotificationBell = () => {
       <div className="relative ">
         <button onClick={toggle} className="p-2 ">
           <Bell className=" text-primary p-[0.15rem]" />
-          {unreadCount >0 && (
+          {unreadCount > 0 && (
             <span className="absolute -top-1 p-[0.1rem] right-1 bg-black text-white text-xs ">
-             {unreadCount}
+              {unreadCount}
             </span>
           )}
         </button>
@@ -74,7 +53,30 @@ const NotificationBell = () => {
                       key={note.id}
                       className="mb-2 last:mb-0 p-2 rounded hover:bg-muted/80 transition"
                     >
-                      <p className="text-sm">{note.message}</p>
+                      <div className="flex items-start gap-2">
+                        {/* Avatar */}
+                        <div className="w-7 h-7 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                          {note.actor?.avatar ? (
+                            <img
+                              src={note.actor.avatar}
+                              alt={note.actor.fullName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs">
+                              {note.actor?.fullName?.[0]}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Message */}
+                        <p className="text-sm leading-tight">
+                          <span className="font-medium">
+                            {note.actor?.fullName || "Someone"}
+                          </span>{" "}
+                          {note.message}
+                        </p>
+                      </div>
                     </div>
                   ))
                 )}
