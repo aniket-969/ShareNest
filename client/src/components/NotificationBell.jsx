@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from "@/context/NotificationContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const NotificationBell = () => {
   const { unreadCount, notifications, markAllSeen } = useNotifications();
@@ -51,25 +52,22 @@ const NotificationBell = () => {
                   notifications.map((note) => (
                     <div
                       key={note.id}
-                      className="mb-2 last:mb-0 p-2 rounded hover:bg-muted/80 transition"
+                      className="mb-2 last:mb-0 p-1.5 rounded bg-muted/80 transition "
                     >
-                      <div className="flex items-start gap-2">
+                      <div className="flex items-center gap-2 ">
                         {/* Avatar */}
-                        <div className="w-7 h-7 rounded-full overflow-hidden bg-muted flex-shrink-0">
-                          {note.actor?.avatar ? (
-                            <img
-                              src={note.actor.avatar}
-                              alt={note.actor.fullName}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xs">
-                              {note.actor?.fullName?.[0]}
-                            </div>
-                          )}
-                        </div>
+                        <Avatar className=" w-7 h-7">
+                          <AvatarImage
+                            src={note?.actor?.avatar}
+                            alt={note?.actor?.fullName[0]}
+                            className=""
+                          />
+                          <AvatarFallback className="bg-transparent">
+                            <img src="/altAvatar1.jpg" alt="fallback avatar" />
+                          </AvatarFallback>
+                        </Avatar>
 
-                        {/* Message */}
+                        {/* Message with actor name*/}
                         <p className="text-sm leading-tight">
                           <span className="font-medium">
                             {note.actor?.fullName || "Someone"}
