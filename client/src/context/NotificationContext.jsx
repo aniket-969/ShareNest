@@ -15,30 +15,45 @@ export const NotificationProvider = ({ children }) => {
 
   // In-app socket notifications
   useEffect(() => {
+    
     const handleAny = (event, payload) => {
       let message = null;
+      const actor = payload.actor || {};
 
       switch (event) {
         case "createdTask":
-          message = `${payload.actor || "Someone"} created a new task "${payload.title}"`;
+          message = `created a new task "${payload.title}"`;
           break;
+
         case "createdAward":
-          message = `${payload.assignedTo || "Someone"} received a new award "${payload.title}"`;
+          message = `received a new award "${payload.title}"`;
           break;
+
         case "createdExpense":
-          message = `${payload.paidBy || "Someone"} added a new expense "${payload.title}"`;
+          message = `added a new expense "${payload.title}"`;
           break;
+
         case "createdPoll":
-          message = `${payload.actor || "Someone"} created a poll "${payload.title}"`;
+          message = `created a poll "${payload.title}"`;
           break;
+
         default:
           return;
       }
 
       setNotifications((prev) => [
-        { id: Date.now(), message, seen: false },
+        {
+          id: crypto.randomUUID(),
+          message,
+          actor: {
+            fullName: actor.fullName || "Someone",
+            avatar: actor.avatar || null,
+          },
+          seen: false,
+        },
         ...prev,
       ]);
+
       setUnreadCount((c) => c + 1);
     };
 
