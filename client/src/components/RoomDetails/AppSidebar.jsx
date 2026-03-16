@@ -95,8 +95,7 @@ const AppSidebar = () => {
             {roomData?.name?.toUpperCase() || "Loading..."}
           </h2>
           <p className="text-sm text-muted-foreground line-clamp-2 max-w-full">
-            {roomData?.description || ""} just a band which knows how to play
-            music ain't nothing else than that so get that in your mind
+            {roomData?.description || ""}
           </p>
 
           <div className="flex items-center justify-between rounded-md pt-4 ">

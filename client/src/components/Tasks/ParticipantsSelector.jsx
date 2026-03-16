@@ -60,8 +60,8 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
   };
 
   return (
-    <ScrollArea>
-      <div className="grid gap-2 h-[11.2rem] py-2 ">
+    <ScrollArea className="max-h-[11.2rem]">
+      <div className="grid gap-2 py-2 ">
         {getSortedParticipants().map((user) => {
           const isSelected = single
             ? selected === user._id
@@ -71,31 +71,25 @@ const ParticipantSelector = ({ participants, onChange, single = false }) => {
             <div
               key={user._id}
               onClick={() => handleClick(user)}
-              className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-neutral-800/20 ${
+              className={`flex items-center space-x-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-neutral-800/20   ${
                 isSelected ? "bg-card-muted text-card-foreground" : "shadow-xl"
               } `}
             >
-              <Avatar className="w-8 h-8 rounded-[2.4rem]">
-                <AvatarImage
-                  src={user?.avatar}
-                  alt={user?.fullName}
-                />
+              {/* avatar */}
+              <Avatar className="w-8 h-8 rounded-[2.4rem] ">
+                <AvatarImage src={user?.avatar} alt={user?.fullName} />
                 <AvatarFallback>
                   <img src="/altAvatar1.jpg" alt="fallback avatar" />
                 </AvatarFallback>
               </Avatar>
-              <div>
-               
-                <p
-                  className={` text-sm font-semibold ${
-                    isSelected
-                      ? " text-card-foreground"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {user?.fullName}
-                </p>
-              </div>
+              {/* full name */}
+              <p
+                className={` text-sm font-semibold ${
+                  isSelected ? " text-card-foreground" : "text-gray-500"
+                }`}
+              >
+                {user?.fullName}
+              </p>
             </div>
           );
         })}
