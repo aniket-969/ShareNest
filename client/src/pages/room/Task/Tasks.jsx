@@ -37,8 +37,9 @@ const Tasks = () => {
   useEffect(() => {
     const handleCreateTask = (newTask) => {
       queryClient.setQueryData(["room", roomId], (oldData) => {
+       console.log("new",newTask)
         if (!oldData) return oldData;
-
+ console.log('ther is oldie task')
         return {
           ...oldData,
           tasks: [...(oldData.tasks ?? []), newTask],

@@ -4,7 +4,6 @@ const chatMessageSchema = new Schema(
   {
     sender: {
       _id: { type: Schema.Types.ObjectId, required: true },
-      username: { type: String, required: true },
       fullName: { type: String, required: true },
       avatar: { type: String },
     },
