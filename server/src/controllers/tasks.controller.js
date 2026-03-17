@@ -79,6 +79,18 @@ const createRoomTask = asyncHandler(async (req, res) => {
   const savedTask = room.tasks[room.tasks.length - 1];
 
   const taskForSocket = savedTask.toObject();
+
+  // Fix shape for frontend consistency
+  taskForSocket.createdBy = {
+    _id: req.user._id,
+    fullName: req.user.fullName,
+    avatar: req.user.avatar,
+  };
+
+  taskForSocket.participants = taskForSocket.participants.map((id) => ({
+    _id: id,
+  }));
+
   taskForSocket.actor = {
     avatar: req.user.avatar,
     fullName: req.user.fullName,
