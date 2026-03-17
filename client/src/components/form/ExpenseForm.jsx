@@ -20,10 +20,10 @@ import DatePicker from "@/components/ui/datePicker";
 import ExpenseParticipantSelector from "../Expense/ExpenseParticipantSelector";
 
  
-const ExpenseForm = ({ participants,onClose,currency }) => {
+const ExpenseForm = ({ participants,onClose,currency,scrollRef }) => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
-
+// console.log(scrollRef.current.scrollHeight)
   const onSubmit = async (values) => {
     console.log(values, roomId);
     // return;
@@ -33,6 +33,8 @@ const ExpenseForm = ({ participants,onClose,currency }) => {
       toast("Splitted Expense ");
       form.reset()
       onClose()
+      // console.log(scrollRef.current)
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 
     } catch (error) {
       console.error("Error during registration:", error);

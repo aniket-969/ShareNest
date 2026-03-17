@@ -145,7 +145,7 @@ const ExpenseContainer = ({ participants }) => {
 
       {/* Expense form */}
       <Card className="w-full max-w-[25rem] p-10 rounded-xl bg-card border-none md:block hidden">
-        <ExpenseForm onClose={() => {}} participants={participants} />
+        <ExpenseForm scrollRef={viewportRef}  onClose={() => {}} participants={participants} />
       </Card>
     </div>
   );
