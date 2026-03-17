@@ -96,14 +96,43 @@ const createExpense = asyncHandler(async (req, res) => {
     paidBy: {
       id: creator._id,
       fullName: creator.fullName,
-      avatar: creator.avatar || null,
+      avatar: creator.avatar 
     },
     participants: formattedParticipants,
     paymentHistory: initialPaymentHistory,
     currency: expenseCurrency,
   });
+  const expenseObj = expense.toObject();
 
-  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, expense);
+const unpaidCount = creatorPart?expenseObj.participants.length-1:expenseObj.participants.length
+const paidCount = expenseObj.participants.length - unpaidCount
+
+const participantAvatars = expenseObj.participants.map(p => ({
+  _id: p._id,
+  fullName: p.fullName,
+  avatar: p.avatar,
+}));
+
+const requesterPart = expenseObj.participants.find(
+  (p) => String(p.id) === String(creator._id)
+);
+
+const requesterTotal = requesterPart?.totalAmountOwed || 0;
+const hasUserPaid = requesterPart?.hasPaid || false;
+
+const socketPayload = {
+  ...expenseObj,
+  paidCount,
+  unpaidCount,
+  participantAvatars,
+  requesterTotal,
+  hasUserPaid,
+  actor: {
+    fullName: creator.fullName,
+    avatar: creator.avatar,
+  },
+};
+  emitSocketEvent(req, roomId, ExpenseEventEnum.EXPENSE_CREATED_EVENT, socketPayload);
 
   return res
     .status(201)

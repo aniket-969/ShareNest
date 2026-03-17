@@ -63,7 +63,7 @@ const RoomMembers = ({
               {tenants.map((member) => (
                 <div
                   key={member?._id}
-                  className="flex items-center p-2 bg-secondary/20 rounded-lg"
+                  className="flex items-center p-2 bg-card-muted  rounded-lg"
                 >
                   {/* avatar and name */}
                   <div className="flex items-center flex-1">
