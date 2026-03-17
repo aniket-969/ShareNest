@@ -34,11 +34,14 @@ const ExpenseForm = ({ participants,onClose,currency,scrollRef }) => {
       form.reset()
       onClose()
       // console.log(scrollRef.current)
-      setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
-    }, 0);
+     setTimeout(() => {
+  if (scrollRef.current) {
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }
+}, 0);
 
     } catch (error) {
       console.error("Error during registration:", error);
