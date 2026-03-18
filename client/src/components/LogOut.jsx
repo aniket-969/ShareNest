@@ -18,7 +18,7 @@ const LogOut = ({variant=""}) => {
       onClick={() => onClick()}
       
       variant={variant}
-      size="sm"
+      size="sm" className="text-"
     >
       Logout
     </Button>

@@ -19,14 +19,14 @@ export const RoomHeader = () => {
     }
   };
   return (
-    <div className="flex items-center justify-around p-3 shadow-md bg-white ">
+    <div className="flex items-center justify-around p-4 shadow-md">
       {/* Leftmost Title: Dashboard */}
-      <h3 className="text- font-semibold text-lg text-primary"> Dashboard</h3>
+      <h3 className="text- font-semibold text-lg "> Dashboard</h3>
 
       {/* Navigation Links */}
       <div className="flex space-x-4">
         <Link to="/room/create" className=" ">
-          <Button variant="link" size="sm" className="text-primary ">
+          <Button variant="link" size="sm" className="text- ">
             {" "}
             Create/Join Room
           </Button>
