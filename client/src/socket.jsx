@@ -6,49 +6,40 @@ const SocketContext = createContext();
 let socketInstance;
 
 export const getSocket = () => {
-  // console.log("checking for socket")
+  console.log("checking for socket");
   if (!socketInstance) {
-    
     socketInstance = io(
       import.meta.env.REACT_APP_SOCKET_SERVER || "http://localhost:3000",
       {
         withCredentials: true,
         transports: ["polling", "websocket"],
-       
       }
     );
-    // console.log(socketInstance,"creating socket bby")
+    console.log(socketInstance, "creating socket bby");
   }
-  
+
   return socketInstance;
 };
 
 const SocketProvider = ({ children }) => {
-  const socket = useMemo(() => getSocket(), []);
+  const socket = getSocket();
 
   useEffect(() => {
-    socket.on("connect", () => {
-      // console.log("connected", socket.id);
-    });
+    const onConnect = () => console.log("connected", socket.id);
+    const onError = (err) => console.error("Socket error:", err);
+    const onAny = (event, data) => console.log(`Event: ${event}`, data);
 
-    socket.on("socketError", (err) => {
-      console.error("Socket connection error:", err);
-    });
-
-    socket.onAny((event, data) => {
-      console.log(`Received event: ${event}`, data);
-    });
+    socket.on("connect", onConnect);
+    socket.on("socketError", onError);
+    socket.onAny(onAny);
 
     return () => {
-      socket.off("connect");
-      socket.off("socketError");
-      socket.offAny();
-      socket.disconnect()
-      socketInstance = null
-      console.log("Socket disconnected and cleaned up");
+      socket.off("connect", onConnect);
+      socket.off("socketError", onError);
+      socket.offAny(onAny);
     };
   }, [socket]);
-// console.log("socket.jsx",socketInstance)
+  // console.log("socket.jsx",socketInstance)
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );

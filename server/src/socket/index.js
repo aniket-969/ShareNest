@@ -12,7 +12,7 @@ const emitPresenceUpdate = (io, roomId, roomMap) => {
     users: Array.from(roomMap.keys()),
     count: roomMap.size,
   });
-  console.log("Presence updated",roomPresence)
+  console.log("Presence updated", roomPresence);
 };
 
 /**
@@ -35,6 +35,7 @@ const cleanupPresence = (socket, roomId) => {
   if (roomMap.size === 0) {
     roomPresence.delete(roomId);
   }
+  console.log(roomMap, "in cleanup presense");
 };
 
 /**
@@ -44,6 +45,7 @@ const mountJoinRoomEvent = (socket) => {
   const io = socket.server;
 
   socket.on(RoomEventEnum.JOIN_ROOM_EVENT, (roomId) => {
+    console.log("about to start joining room",roomId)
     socket.join(roomId);
     socket.data.roomId = roomId;
 
@@ -59,7 +61,7 @@ const mountJoinRoomEvent = (socket) => {
     }
 
     roomMap.get(userId).add(socket.id);
-
+    console.log("room join event triggered");
     emitPresenceUpdate(io, roomId, roomMap);
   });
 
@@ -78,6 +80,7 @@ const mountJoinRoomEvent = (socket) => {
  * Socket initialization
  */
 const initializeSocketIO = (io) => {
+  console.log("initializing socket conn")
   return io.on("connection", async (socket) => {
     try {
       const token =
@@ -125,7 +128,7 @@ const initializeSocketIO = (io) => {
       socket.user = user;
       socket.data.userId = user._id.toString();
 
-      // Personal room 
+      // Personal room
       socket.join(socket.data.userId);
 
       mountJoinRoomEvent(socket);

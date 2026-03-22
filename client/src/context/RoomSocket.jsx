@@ -11,26 +11,28 @@ export const RoomSocketProvider = ({ children }) => {
   const socket = getSocket();
   const [onlineUsers, setOnlineUsers] = useState([]);
 
+  const handleOnlineUsersUpdate = ({ users, count }) => {
+    console.log("online member even triggered");
+
+    setOnlineUsers(users);
+  };
+
+  const joinRoom = () => {
+    socket.emit("joinRoom", roomId);
+    console.log("Emitting join room event", roomId);
+  };
+  
   useEffect(() => {
     if (!roomId) return;
-
-    const handleOnlineUsersUpdate = ({ users, count }) => {
-      // console.log("🟢 Online users updated");
-
-      setOnlineUsers(users);
-    };
 
     //  listener added before joining to avoid race condition
     socket.on("onlineUsersUpdated", handleOnlineUsersUpdate);
 
-    const joinRoom = () => {
-      socket.emit("joinRoom", roomId);
-      // console.log("Joined room", roomId);
-    };
-
     if (socket.connected) {
+      console.log("socket is connected so joining");
       joinRoom();
     } else {
+      console.log("Socket not connected so once triggered");
       socket.once("connect", joinRoom);
     }
 
