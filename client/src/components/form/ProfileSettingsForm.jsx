@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { updateUserSchema } from "@/schema/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ChangePasswordModal from "../Settings/profile/ChangePasswordModal";
 
 const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   const { updateUserMutation } = useAuth();
@@ -57,7 +58,7 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-xl mx-auto flex flex-col gap-6 p-4 rounded-2xl  shadow-md"
+      className="max-w-xl mx-auto flex flex-col gap-6 py-4 rounded-2xl shadow-md "
     >
       <div className="flex flex-col items-center gap-2">
         {/* <img
@@ -84,8 +85,8 @@ const ProfileSettingsForm = ({ initialData, onCancel, onSave }) => {
         )}
       </div>
 
-      <div className="flex gap-4">
-        <div className="flex-1">
+      <div className="flex gap-4 ">
+        <div className="flex-1 ">
           <Label htmlFor="fullName" className="text-sm text-white">
             Full Name
           </Label>

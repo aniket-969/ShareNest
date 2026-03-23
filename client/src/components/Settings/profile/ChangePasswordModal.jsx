@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import FormWrapper from "@/components/ui/formWrapper";
 import { changePasswordSchema } from "@/schema/authSchema";
 
-const ChangePasswordModal = () => {
+const ChangePasswordModal = ({variant=""}) => {
   const [isOpen, setIsOpen] = useState(false);
   const { changePasswordMutation } = useAuth();
 
@@ -59,7 +59,7 @@ const ChangePasswordModal = () => {
 
   return (
     <>
-      <Button className="" onClick={openModal}>Change Password</Button>
+      <Button className="" variant={variant} onClick={openModal}>Change Password</Button>
 
       {isOpen && (
         <FormWrapper onClose={closeModal}>
