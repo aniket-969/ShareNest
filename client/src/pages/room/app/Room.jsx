@@ -31,22 +31,22 @@ const {
 console.log(rooms)
 const [isEditing, setIsEditing] = useState(false);
 
-if( isLoading){
+if( roomLoading){
   return <RoomLoader/>
 }
 
-if(isError){
+if(roomError){
   return <>Something went wrong, Please refresh</>
 }
   
   // console.log("in room");
- if (!user) return <Navigate to="/login" replace />;
+//  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="">
       <RoomHeader user={user}/>
       <div className="flex flex-col md:gap-10 gap-6 items-center pt-16">
-        <div className="sm:block hidden">
+        <div className="md:block hidden">
            <ProfileSettingsView onEdit={() => setIsEditing(true)} />
         <EditProfileModal
           open={isEditing}

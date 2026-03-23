@@ -31,8 +31,8 @@ export const RoomHeader = ({ user }) => {
   return (
     <div className="flex items-center justify-between sm:px-8 px-4 py-3 shadow-md ">
       {/* Leftmost Title: Dashboard */}
-      <h3 className="font-semibold text-lg hidden sm:block"> Dashboard</h3>
-      <div className="block sm:hidden">
+      <h3 className="font-semibold text-lg hidden md:block"> Dashboard</h3>
+      <div className="block md:hidden">
          <TopbarProfileAvatar data={user} onEdit={() => setIsEditOpen(true)} />
 
       <EditProfileModal
