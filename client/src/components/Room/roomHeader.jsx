@@ -19,9 +19,9 @@ export const RoomHeader = () => {
     }
   };
   return (
-    <div className="flex items-center justify-around p-4 shadow-md">
+    <div className="flex items-center justify-between px-8 py-3 shadow-md">
       {/* Leftmost Title: Dashboard */}
-      <h3 className="text- font-semibold text-lg "> Dashboard</h3>
+      <h3 className="font-semibold text-lg "> Dashboard</h3>
 
       {/* Navigation Links */}
       <div className="flex space-x-4">
@@ -31,7 +31,7 @@ export const RoomHeader = () => {
             Create/Join Room
           </Button>
         </Link>
-
+       
           <LogOut variant="link"/>
         
       </div>

@@ -16,7 +16,7 @@ const ProfileCard = () => {
   return (
     <div className="flex flex-col items-center gap-2">
   <div className="relative group">
-    <Avatar className="sm:w-[80px] sm:h-[80px] w-[50px] h-[50px] bg-transparent">
+    <Avatar className="sm:w-[60px] sm:h-[60px] w-[50px] h-[50px] bg-transparent">
       <AvatarImage
         src={data?.avatar}
         alt={data?.fullName}
