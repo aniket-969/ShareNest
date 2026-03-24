@@ -14,7 +14,7 @@ const ProfileCard = () => {
     return <>Something went wrong . Please refresh</>;
   }
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 ">
   <div className="relative group">
     <Avatar className="sm:w-[60px] sm:h-[60px] w-[50px] h-[50px] bg-transparent">
       <AvatarImage

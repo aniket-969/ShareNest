@@ -45,8 +45,8 @@ if(roomError){
   return (
     <div className="">
       <RoomHeader user={user}/>
-      <div className="flex flex-col md:gap-10 gap-6 items-center pt-16">
-        <div className="md:block hidden">
+      <div className="flex flex-col md:gap-10 gap-6 items-center pt-16 ">
+        <div className="md:block hidden ">
            <ProfileSettingsView onEdit={() => setIsEditing(true)} />
         <EditProfileModal
           open={isEditing}
