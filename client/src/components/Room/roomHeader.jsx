@@ -8,10 +8,10 @@ import LogOut from "../LogOut";
 import ProfileSettingsView from "../Settings/profile/ProfileSettingsView";
 import ProfileCard from "../profileCard";
 import TopbarProfileAvatar from "../ui/topbarAvatar";
-import EditProfileModal from "../Settings/profile/EditProfileModal";
+import EditProfileModal from "@/components/Settings/profile/EditProfileModal";
 import { useState } from "react";
 
-export const RoomHeader = ({ user }) => {
+export const RoomHeader = ({ user, refetch }) => {
   const navigate = useNavigate();
   const { logoutMutation, sessionQuery } = useAuth();
 
@@ -30,7 +30,7 @@ export const RoomHeader = ({ user }) => {
   return (
     <div
       className="flex items-center justify-between sm:px-8 px-4 py-3 
-bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800"
+bg-zinc-900/80 border-b border-zinc-800 "
     >
       {/* Leftmost Title: Dashboard */}
       <h3 className="font-semibold text-lg hidden md:block"> Dashboard</h3>
@@ -41,6 +41,7 @@ bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800"
           open={isEditOpen}
           onClose={() => setIsEditOpen(false)}
           user={user}
+          onSave={() => refetch()}
         />
       </div>
 

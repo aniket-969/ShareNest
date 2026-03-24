@@ -7,7 +7,7 @@ const TopbarProfileAvatar = ({ onEdit,data }) => {
  
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <Avatar className="w-8 h-8">
         <AvatarImage src={data?.avatar} />
         <AvatarFallback>

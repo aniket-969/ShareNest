@@ -44,7 +44,7 @@ if(roomError){
 
   return (
     <div className="">
-      <RoomHeader user={user}/>
+      <RoomHeader user={user} refetch={refetch}/>
       <div className="flex flex-col md:gap-10 gap-6 items-center pt-16 ">
         {/* Profile with edit btn */}
         <div className="md:block hidden ">

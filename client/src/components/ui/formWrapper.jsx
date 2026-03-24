@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const FormWrapper = ({ children, className, onClose }) => {
   return (
     <div
-      className="fixed inset-0 bg-[#121212]/60 flex z-10 justify-center items-start pt-12 px-2"
+      className="fixed inset-0 bg-[#121212]/60 flex z-50 justify-center items-start pt-12 px-2"
       onClick={onClose}
     >
       <div

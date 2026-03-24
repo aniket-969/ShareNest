@@ -6,7 +6,7 @@ const EditProfileModal = ({ open, onClose, user, onSave }) => {
   if (!open) return null;
 
   return (
-    <FormWrapper onClose={onClose}>
+    <FormWrapper onClose={onClose} className="">
       <ProfileSettingsForm
         initialData={user}
         onCancel={onClose}
