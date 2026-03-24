@@ -154,7 +154,7 @@ const ChatLayout = ({ Imessages = [], initialMeta = null, currentUser }) => {
   }
 
   return (
-    <div className="flex flex-col sm:max-w-[25rem] h-full ">
+    <div className="flex flex-col sm:max-w-[25rem] w-full h-full ">
       <ScrollArea
         ref={viewportRef}
         className="flex flex-col px-4 py- h-[450px] overflow-y-auto "
