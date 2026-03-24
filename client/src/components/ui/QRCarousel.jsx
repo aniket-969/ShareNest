@@ -56,8 +56,8 @@ export const QRCarousel = ({
               {/* add payment method */}
               {item.isAdd ? (
                 <div className=" h-[270px] flex items-center justify-center bg-card  ">
-                   <Button variant=""
-                  className="text-xs sm:text-sm" 
+                   <Button variant="ghost" 
+                  className="text-xs sm:text-sm border hover:bg-primary hover:text-foreground" 
                   onClick={() => setShowForm(true)}
                 >
                   Add Payment Method

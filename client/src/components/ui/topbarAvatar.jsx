@@ -15,13 +15,12 @@ const TopbarProfileAvatar = ({ onEdit,data }) => {
         </AvatarFallback>
       </Avatar>
  <Button
-        size="icon"
-        variant="ghost"
-        className="w-4 h-4 absolute -bottom-1 -right-1 text-muted"
-        onClick={onEdit}
-      >
-        <Pencil />
-      </Button>
+  variant="ghost"
+  className="w-6 h-6 p-1 absolute -bottom-1 -right-2 text-muted hover:bg-muted hover:text-white"
+  onClick={onEdit}
+>
+  <Pencil className="w-3 h-3" />
+</Button>
       
     </div>
   );

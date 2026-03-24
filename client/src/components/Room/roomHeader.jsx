@@ -12,7 +12,6 @@ import EditProfileModal from "../Settings/profile/EditProfileModal";
 import { useState } from "react";
 
 export const RoomHeader = ({ user }) => {
-
   const navigate = useNavigate();
   const { logoutMutation, sessionQuery } = useAuth();
 
@@ -29,19 +28,22 @@ export const RoomHeader = ({ user }) => {
   };
 
   return (
-    <div className="flex items-center justify-between sm:px-8 px-4 py-3 shadow-md ">
+    <div
+      className="flex items-center justify-between sm:px-8 px-4 py-3 
+bg-zinc-900/80 backdrop-blur-md border-b border-zinc-800"
+    >
       {/* Leftmost Title: Dashboard */}
       <h3 className="font-semibold text-lg hidden md:block"> Dashboard</h3>
       <div className="block md:hidden">
-         <TopbarProfileAvatar data={user} onEdit={() => setIsEditOpen(true)} />
+        <TopbarProfileAvatar data={user} onEdit={() => setIsEditOpen(true)} />
 
-      <EditProfileModal
-        open={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
-        user={user}
-      />
+        <EditProfileModal
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          user={user}
+        />
       </div>
-     
+
       {/* Navigation Links */}
       <div className="flex sm:space-x-4">
         <Link to="/room/create" className=" ">
