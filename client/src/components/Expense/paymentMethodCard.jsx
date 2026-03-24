@@ -24,9 +24,9 @@ const PaymentMethodCard = ({
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button
-              className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+              className="absolute top-3 right-3 z-10 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive "
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5 sm:w-4  sm:h-4" />
             </button>
           </AlertDialogTrigger>
 

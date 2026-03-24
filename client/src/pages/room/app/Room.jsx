@@ -46,6 +46,7 @@ if(roomError){
     <div className="">
       <RoomHeader user={user}/>
       <div className="flex flex-col md:gap-10 gap-6 items-center pt-16 ">
+        {/* Profile with edit btn */}
         <div className="md:block hidden ">
            <ProfileSettingsView onEdit={() => setIsEditing(true)} />
         <EditProfileModal
@@ -55,8 +56,8 @@ if(roomError){
           onSave={() => refetch()}
         />
         </div>
-     
-        <div className="flex flex-col-reverse justify-center items-center w-full gap-16 md:gap-32 lg:gap-80 md:flex-row md:mt-7 ">
+     {/* bottom qr code and room list */}
+        <div className="flex flex-col-reverse justify-evenly items-center w-full gap-16 md:gap-32 md:flex-row md:mt-7 ">
           <QRCode />
           <RoomList />
         </div>
