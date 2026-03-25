@@ -23,12 +23,12 @@ const ProfileSettings = ({user,refetch}) => {
       {/* Other feature buttons */}
       <div className="flex items-center  gap-5 mt-5 py-2">
         {/* Change Password */}
-        <ChangePasswordModal
+        <ChangePasswordModal variant="outline"
           open={isPwModalOpen}
           onClose={() => setIsPwModalOpen(false)}
         />
         {/* Logout */}
-        <LogOut />
+        <LogOut variant="outline"/>
       </div>
     </div>
   );

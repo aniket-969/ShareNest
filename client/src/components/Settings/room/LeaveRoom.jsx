@@ -12,7 +12,7 @@ const LeaveRoom = ({ roomId }) => {
 
   return (
     <Button
-      onClick={handleLeave}
+      onClick={handleLeave} variant="outline"
       disabled={leaveRoomMutation.isLoading}
       className="flex items-center gap-2"
     >

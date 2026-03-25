@@ -36,7 +36,7 @@ const KickUserModal = ({ roomId, participants }) => {
 
   return (
     <>
-      <Button onClick={openModal}>Kick User</Button>
+      <Button variant="outline" onClick={openModal}>Kick User</Button>
 
       {isOpen && (
         <FormWrapper onClose={closeModal}>
