@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import RoomListSkeleton from "../skeleton/Room/roomList";
+import { Card } from "../ui/card";
 
 const RoomList = () => {
   const { sessionQuery } = useAuth();
@@ -24,15 +25,17 @@ const RoomList = () => {
         <>
           <h1 className="text-xl font-semibold">Rooms</h1>
           <ScrollArea>
-            <div className="flex flex-col gap-2 h-[6.3rem] pt-2 sm:pr-2 ">
+            <div className="flex flex-col gap-2 h-[7.5rem] pt-2 sm:pr-2 ">
               {data?.rooms?.map((room) => (
                 <Link key={room?._id} to={`/room/${room?.roomId}`}>
-                  <Button
-                    className="text-white text-lg w-[95%] rounded-none "
-                    variant="outline"
+                  <Card>
+                    <Button
+                    className=" text-lg w-[100%] bg-card py-6"
                   >
                     {room?.name}
                   </Button>
+                  </Card>
+                  
                 </Link>
               ))}
             </div>
