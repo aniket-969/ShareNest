@@ -25,12 +25,12 @@ const RoomList = () => {
         <>
           <h1 className="text-xl font-semibold">Rooms</h1>
           <ScrollArea>
-            <div className="flex flex-col gap-2 h-[7.5rem] pt-2 sm:pr-2 ">
+            <div className="flex flex-col gap-2 h-[7.2rem] pt- mr-2">
               {data?.rooms?.map((room) => (
                 <Link key={room?._id} to={`/room/${room?.roomId}`}>
-                  <Card>
+                  <Card >
                     <Button
-                    className=" text-lg w-[100%] bg-card py-6"
+                    className=" text-lg bg-card w-[100%] hover:bg-card-muted/20 py-6"
                   >
                     {room?.name}
                   </Button>
