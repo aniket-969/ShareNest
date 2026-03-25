@@ -42,7 +42,7 @@ const Room = () => {
       <div className="flex items-center justify-between pt-16 ">
         <div className="flex items-center justify-evenly w-full">
           <div className="space-y-20">
-            <div className="md:block hidden ">
+            <div className="md:block hidden ml-10">
               <ProfileSettingsView onEdit={() => setIsEditing(true)} />
               <EditProfileModal
                 open={isEditing}
