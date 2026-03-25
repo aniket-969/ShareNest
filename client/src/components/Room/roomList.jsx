@@ -18,21 +18,24 @@ const RoomList = () => {
   if (isError) {
     return <>Something went wrong . Please refresh</>;
   }
-
+// console.log(data.rooms)
+const rl = [
+  {roomId:"34", name:'U2',_id:"sdfd"}
+]
   return (
     <div className="flex flex-col gap-3 sm:gap-5 items-center ">
       {data?.rooms?.length > 0 ? (
         <>
-          <h1 className="text-xl font-semibold">Rooms</h1>
+          <h1 className="text-lg font-semibold">Rooms</h1>
           <ScrollArea>
-            <div className="flex flex-col gap-2 h-[7.2rem] pt- mr-2">
+            <div className="flex flex-col gap-1 h-[6.7rem] pt- mr-2">
               {data?.rooms?.map((room) => (
                 <Link key={room?._id} to={`/room/${room?.roomId}`}>
                   <Card >
                     <Button
-                    className=" text-lg bg-card w-[100%] hover:bg-card-muted/20 py-6"
+                    className=" text-lg bg-card max-w-[100%] hover:bg-card-muted/30 py-6 w-[188px] truncate"
                   >
-                    {room?.name}
+                    <span className="truncate">{room?.name}</span>
                   </Button>
                   </Card>
                   
