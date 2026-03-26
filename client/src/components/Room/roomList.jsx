@@ -23,17 +23,17 @@ const rl = [
   {roomId:"34", name:'U2',_id:"sdfd"}
 ]
   return (
-    <div className="flex flex-col gap-3 sm:gap-5 items-center ">
+    <Card className="flex flex-col gap-3 sm:gap-5 items-center bg-card p-7">
       {data?.rooms?.length > 0 ? (
         <>
           <h1 className="text-lg font-semibold">Rooms</h1>
           <ScrollArea>
-            <div className="flex flex-col gap-1 h-[6.7rem] pt- mr-2">
+            <div className="flex flex-col gap-2 h-[7rem] pt- mr-3">
               {data?.rooms?.map((room) => (
                 <Link key={room?._id} to={`/room/${room?.roomId}`}>
-                  <Card >
+                  <Card className="border-none">
                     <Button
-                    className=" text-lg bg-card max-w-[100%] hover:bg-card-muted/30 py-6 w-[188px] truncate"
+                    className=" text-lg bg-card-muted max-w-[100%] hover:bg-card-muted/80 py-6 w-[188px] truncate"
                   >
                     <span className="truncate">{room?.name}</span>
                   </Button>
@@ -52,7 +52,7 @@ const rl = [
           </Link>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
