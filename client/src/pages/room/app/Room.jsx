@@ -34,7 +34,6 @@ const Room = () => {
   }
 
   // console.log("in room");
-  //  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="">

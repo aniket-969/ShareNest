@@ -16,6 +16,7 @@ import AuthLayout from "@/layouts/AuthLayout.jsx";
 import { SocketProvider } from "@/socket.jsx";
 import { RoomSocketProvider } from "@/context/RoomSocket.jsx";
 import { NotificationProvider } from "@/context/NotificationContext.jsx";
+import AuthGuard from "@/layouts/authGuard.jsx";
 
 // Pages
 import LandingPage from "../LandingPage.jsx";
@@ -69,16 +70,23 @@ export const AppRouter = () => {
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
 
-            <Route path="room">
+            <Route
+              path="room"
+              element={
+                <AuthGuard>
+                  <Outlet />
+                </AuthGuard>
+              }
+            >
+              {/* /room */}
+              <Route index element={<Room />} />
+
+              {/* non-socket routes */}
               <Route path="create" element={<CreateRoom />} />
               <Route path=":roomId/payment" element={<RoomPayment />} />
               <Route path=":roomId/activating" element={<ActivateRoom />} />
-            </Route>
 
-            {/* Room Routes with socket */}
-            <Route path="room">
-              <Route index element={<Room />} />
-
+              {/* socket + room specific */}
               <Route path=":roomId" element={<RoomShell />}>
                 <Route element={<RoomLayout />}>
                   <Route index element={<RoomDetails />} />

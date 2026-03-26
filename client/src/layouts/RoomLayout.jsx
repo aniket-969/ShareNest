@@ -9,16 +9,11 @@ import SidebarSkeleton from "@/components/skeleton/Room/sidebar";
 
 export const RoomLayout = () => {
   const { roomId } = useParams();
- 
-  const session = localStorage.getItem("session");
 
   if (!roomId) {
     return <Navigate to="/room" />;
   }
-  if (!session) {
-    localStorage.clear();
-    return <Navigate to="/login" />;
-  }
+ 
 
   return (
     <SidebarProvider>
