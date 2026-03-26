@@ -19,7 +19,7 @@ const PaymentMethodCard = ({
   onDelete,
 }) => {
   return (
-    <Card className="relative group bg-card w-full border-none">
+    <Card className="relative group bg-card w-full shadow-lg rounded-lg ">
       {editable && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
