@@ -12,6 +12,7 @@ import FormWrapper from "@/components/ui/formWrapper";
 import PaymentMethodForm from "../form/PaymentMethodForm";
 import { useAuth } from "@/hooks/useAuth";
 import { generateQRCode } from "@/utils/helper";
+import { Card } from "./card";
 
 export const QRCarousel = ({
   paymentMethod = [],
@@ -55,14 +56,14 @@ export const QRCarousel = ({
             <CarouselItem key={item._id} className="">
               {/* add payment method */}
               {item.isAdd ? (
-                <div className=" h-[270px] flex items-center justify-center bg-card  ">
+                <Card className=" h-[270px] flex items-center justify-center bg-card rounded-lg">
                    <Button variant="ghost" 
                   className="text-xs sm:text-sm border hover:bg-primary hover:text-foreground" 
                   onClick={() => setShowForm(true)}
                 >
                   Add Payment Method
                 </Button>
-                </div>
+                </Card>
                
               ) : (
                 <PaymentMethodCard
