@@ -5,6 +5,7 @@ import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import crypto from "crypto";
+import { sendEmail, sendResetPasswordEmail } from './../utils/email.js';
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -296,11 +297,11 @@ console.log(email,"got mail")
 
   console.log("RESET PASSWORD LINK:", resetLink);
 
-  // try {
-  //   await sendResetPasswordEmail(user.email, resetLink);
-  // } catch (error) {
-  //   console.error("Reset email failed:", error);
-  // }
+  try {
+    await sendResetPasswordEmail(user.email, resetLink);
+  } catch (error) {
+    console.error("Reset email failed:", error);
+  }
 
   return res.json(
     new ApiResponse(
