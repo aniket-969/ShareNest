@@ -49,7 +49,6 @@ const ResetPassword = () => {
         password: values.password,
       });
 
-      toast("Password reset successful. Please log in.");
       navigate("/login");
     } catch (error) {
       console.error("Reset password error:", error);

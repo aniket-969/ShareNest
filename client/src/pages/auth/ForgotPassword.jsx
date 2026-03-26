@@ -29,12 +29,10 @@ const ForgotPassword = () => {
 
   const onSubmit = async (values) => {
     console.log(values)
-    return
+    // return
     try {
       await forgotPasswordMutation.mutateAsync(values);
-      toast(
-        "If an account exists, you will receive a reset link."
-      );
+    
     } catch (error) {
       console.error("Forgot password error:", error);
     }

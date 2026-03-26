@@ -244,7 +244,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
   if (!email) {
     throw new ApiError(400, "Email is required");
   }
-
+console.log(email,"got mail")
   const user = await User.findOne({ email });
 
   if (!user) {
