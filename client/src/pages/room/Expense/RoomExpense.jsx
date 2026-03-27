@@ -14,6 +14,7 @@ import {
 import ExpenseContainer from "@/components/Expense/ExpenseContainer";
 import { Card } from "@/components/ui/card";
 import ExpenseSearchOverlay from "@/components/Expense/expenseSearchOverlay";
+import ExpensePageSkeleton from "@/components/skeleton/Expense/expensePageSkeleton";
 
 const ExpenseForm = lazy(() => import("@/components/form/ExpenseForm"));
 const FormWrapper = lazy(() => import("@/components/ui/formWrapper"));
@@ -24,7 +25,7 @@ const PaymentDetails = lazy(
 const RoomExpense = () => {
   const { roomId } = useParams();
   const { createExpenseMutation } = useExpense(roomId);
-  const { roomQuery } = useRoom(roomId);
+  const { roomQuery, isLoading, isError } = useRoom(roomId);
   const { data } = roomQuery;
   const paymentRef = useRef(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -39,9 +40,11 @@ const RoomExpense = () => {
 
   const participants = [...(data?.tenants || [])];
 
+  if (isLoading) return <ExpensePageSkeleton />;
+
   return (
     <div>
-      <div className="flex flex-col gap-6 items-center">
+      <div className="flex flex-col md:gap-6 items-center ">
         {/* heading and icons */}
         <div className="flex items-center justify-around w-full ">
           <h2 className="font-bold text-2xl hidden sm:block">Expense</h2>

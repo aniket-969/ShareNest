@@ -6,7 +6,7 @@ const AuthGuard = ({ children }) => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
 
-  if (isLoading) return <RoomLoader/>;
+  if (isLoading) return null;
 
   if (isError || !data) {
     return <Navigate to="/login" />;
