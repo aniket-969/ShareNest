@@ -8,6 +8,8 @@ import { useExpenseQuery } from "@/hooks/useExpense";
 import { useParams } from "react-router-dom";
 import { getSocket } from "@/socket";
 import { useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "../ui/skeleton";
+import ExpensePageSkeleton from "../skeleton/Expense/expensePageSkeleton";
 
 const ExpenseContainer = ({ participants }) => {
   const { _id } = JSON.parse(localStorage.getItem("session"));
@@ -16,6 +18,7 @@ const ExpenseContainer = ({ participants }) => {
   const {
     data: expenseData,
     fetchNextPage,
+    isLoading,
     hasNextPage,
     isFetchingNextPage,
   } = useExpenseQuery(roomId);
@@ -88,6 +91,7 @@ const ExpenseContainer = ({ participants }) => {
     setInitialScrolled(true);
   }, [expenses, initialScrolled]);
 
+if (isLoading) return <ExpensePageSkeleton navbar={false}/>
   return (
     <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
       {/* Scrollable expense history */}
