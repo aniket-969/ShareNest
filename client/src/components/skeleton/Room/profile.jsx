@@ -7,8 +7,7 @@ const ProfileSkeleton = () => {
         <Skeleton className="rounded-[2.4rem] w-[80px] h-[80px]" />
       </div>
       <div className="flex gap-5">
-        <Skeleton className="h-4 w-[145px]" />
-        <Skeleton className="h-4 w-[65px]" />
+        <Skeleton className="h-4 w-[130px]" />
       </div>
     </div>
   );

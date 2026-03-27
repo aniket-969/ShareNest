@@ -58,10 +58,6 @@ const Room = () => {
           <QRCode />
         </div>
 
-        {/* Profile with edit btn */}
-
-        {/* bottom qr code and room list */}
-
         <PendingRoomList rooms={pendingRooms} />
       </div>
     </div>

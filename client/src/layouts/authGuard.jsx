@@ -1,4 +1,4 @@
-import { Spinner } from "@/components/ui/spinner";
+import RoomLoader from "@/components/skeleton/Room";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from 'react-router-dom';
 
@@ -6,7 +6,7 @@ const AuthGuard = ({ children }) => {
   const { sessionQuery } = useAuth();
   const { data, isLoading, isError } = sessionQuery;
 
-  if (isLoading) return <Spinner/>;
+  if (isLoading) return <RoomLoader/>;
 
   if (isError || !data) {
     return <Navigate to="/login" />;
