@@ -25,6 +25,11 @@ import ViewTurnsModal from "@/components/Tasks/viewTurnModal";
 import { useParams } from "react-router-dom";
 import { useTask } from "@/hooks/useTask";
 
+const formatDueDate = (date) =>
+  new Date(date).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+  });
 const TaskContainerCard = ({ task, userId, time }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openSwapModal, setOpenSwapModal] = useState(false);
@@ -33,23 +38,18 @@ const TaskContainerCard = ({ task, userId, time }) => {
   const { roomId } = useParams();
 
   const isCreator = userId === task?.createdBy?._id;
-  const isParticipant = task?.participants?.some(
-    (p) => p._id === userId
-  );
+  const isParticipant = task?.participants?.some((p) => p._id === userId);
   const isRecurringTask = task?.recurrence?.enabled === true;
- 
-  const showActions = isCreator || isRecurringTask;
 
-  const {
-    deleteTaskMutation,
-    createSwitchRequestMutation,
-  } = useTask(roomId);
+  const showActions = isCreator || isRecurringTask;
+  const isSingleTask = task?.assignmentMode === "single";
+  const dueDate = task?.recurrence?.startDate;
+  const { deleteTaskMutation, createSwitchRequestMutation } = useTask(roomId);
 
   const handleDelete = () => {
     deleteTaskMutation.mutate(task._id);
   };
 
- 
   return (
     <>
       <Card className="rounded-xl bg-card-muted shadow-lg border-non w-[300px] max-w-full mt-3 ">
@@ -57,7 +57,10 @@ const TaskContainerCard = ({ task, userId, time }) => {
         <CardHeader className="px-6 text-center">
           <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex justify-between">
             <p>{task?.title}</p>
-
+            {/* due date */}
+            {isSingleTask && dueDate && (
+              <p className="text-xs pt-0.5">Due: {formatDueDate(dueDate)}</p>
+            )}
             {showActions && (
               <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger>
@@ -133,12 +136,15 @@ const TaskContainerCard = ({ task, userId, time }) => {
 
         {/* ───── Card Footer ───── */}
         <CardFooter className="flex justify-between items-center ">
-          <p className="text-xs">
+          <div className="text-xs">
             Created by:
-            <Badge className="mx-2 font-normal border-white max-w-[100px] truncate " variant="outlined">
+            <Badge
+              className="mx-2 font-normal border-white max-w-[100px] truncate "
+              variant="outlined"
+            >
               {task?.createdBy?.fullName}
             </Badge>
-          </p>
+          </div>
 
           <p className="text-xs opacity-70">{time}</p>
         </CardFooter>
