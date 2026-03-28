@@ -28,7 +28,6 @@ export const AvailableChatEvents = Object.values(ChatEventEnum);
 export const PollEventEnum = Object.freeze({
   CREATE_POLL_EVENT: "createdPoll",
   CASTVOTE_POLL_EVENT: "castVote",
-  DELETE_POLL_EVENT: "deletePoll",
 });
 
 export const AvailablePollEvents = Object.values(PollEventEnum);

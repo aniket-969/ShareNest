@@ -6,7 +6,7 @@ const SocketContext = createContext();
 let socketInstance;
 
 export const getSocket = () => {
-  console.log("checking for socket");
+  // console.log("checking for socket");
   if (!socketInstance) {
     socketInstance = io(
       import.meta.env.REACT_APP_SOCKET_SERVER || "http://localhost:3000",
@@ -15,7 +15,7 @@ export const getSocket = () => {
         transports: ["polling", "websocket"],
       }
     );
-    console.log(socketInstance, "creating socket bby");
+    // console.log(socketInstance, "creating socket bby");
   }
 
   return socketInstance;

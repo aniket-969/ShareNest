@@ -41,7 +41,7 @@ const createPoll = asyncHandler(async (req, res) => {
     { $push: { polls: poll._id } },
     { new: true }
   );
-console.log("This is befrore upated",poll)
+
   if (!room) {
     await Poll.findByIdAndDelete(poll._id);
     return res.status(404).json(new ApiResponse(404, null, "Room not found"));
@@ -63,10 +63,10 @@ const castVote = asyncHandler(async (req, res) => {
   const poll = await Poll.findById(pollId);
   if (!poll) throw new ApiError(404, "Poll not found");
 
-  if (new Date() > new Date(poll.voteEndTime)) {
+  if (new Date() > new Date(poll?.voteEndTime)) {
     throw new ApiError(400, "Voting has ended for this poll");
   }
-  const roomId = poll.room;
+  const roomId = poll?.room;
 
   if (!isRoomMember(roomId, userId)) {
     throw new ApiError(401, "User not authorized to vote this poll");
@@ -92,8 +92,9 @@ const castVote = asyncHandler(async (req, res) => {
     voters: poll.voters,
   };
 
-  emitSocketEvent(req, roomId, "castVote", pollData);
-
+  emitSocketEvent(req, roomId?.toString(), PollEventEnum.CASTVOTE_POLL_EVENT, pollData);
+ 
+  console.log("voted", PollEventEnum.CASTVOTE_POLL_EVENT, roomId);
   return res.json(new ApiResponse(200, poll, "Vote cast successfully"));
 });
 

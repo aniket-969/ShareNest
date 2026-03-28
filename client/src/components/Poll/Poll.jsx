@@ -15,9 +15,11 @@ const Poll = ({ initialPolls }) => {
 
   useEffect(() => {
     const handleCreatePoll = (newPoll) => {
+      console.log(newPoll)
       setPolls((prevPoll) => [...prevPoll, newPoll]);
     };
     const handleCastVote = (updatedPoll) => {
+      console.log(updatedPoll)
       setPolls((prevPolls) =>
         prevPolls.map((poll) =>
           poll._id === updatedPoll.pollId
