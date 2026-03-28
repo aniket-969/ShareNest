@@ -90,9 +90,9 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   // console.log(paidBy, userId);
   // console.log(expense)
   return (
-    <Card className="rounded-xl w-[280px] bg-card-muted shadow-lg border-none">
+    <Card className="rounded-xl w-[320px] bg-card-muted shadow-lg border-non">
       {/* ───── Card Header ───── */}
-      <CardHeader className="px-7 text-center py-4 ">
+      <CardHeader className="px-7 text-center py-3 ">
         <CardTitle
           className={`text-base tracking-wide font-semibold text-gray-100 flex ${showActions ? "justify-between" : "justify-center"}`}
         >
@@ -143,7 +143,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
       </CardHeader>
 
       {/* ───── Card Content ───── */}
-      <CardContent className="space-y-2 pb-5">
+      <CardContent className="space-y-2 pb-4">
         {/* amount owed */}
         <span className="text-2xl font-medium text-gray-100 ">
           {symbol}

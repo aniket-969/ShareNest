@@ -44,7 +44,7 @@ const RoomExpense = () => {
 
   return (
     <div className="">
-      <div className="flex flex-col md:gap-6 items-center ">
+      <div className="flex flex-col sm:gap-8 items-center gap-3 ">
         {/* heading and icons */}
         <div className="flex items-center justify-around w-full ">
           <h2 className="font-bold text-2xl hidden sm:block">Expense</h2>
@@ -81,7 +81,7 @@ const RoomExpense = () => {
       <div ref={paymentRef}>
         <PaymentDetails participants={participants} userId={userId} />
       </div>
-      {isSearchOpen && (
+      {isSearchOpen && ( 
         <ExpenseSearchOverlay onClose={() => setIsSearchOpen(false)} />
       )}
       {isFormOpen && (
