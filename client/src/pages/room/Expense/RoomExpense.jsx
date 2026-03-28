@@ -43,7 +43,7 @@ const RoomExpense = () => {
   if (isLoading) return <ExpensePageSkeleton />;
 
   return (
-    <div>
+    <div className="">
       <div className="flex flex-col md:gap-6 items-center ">
         {/* heading and icons */}
         <div className="flex items-center justify-around w-full ">

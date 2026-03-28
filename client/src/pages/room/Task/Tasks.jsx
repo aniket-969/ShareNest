@@ -15,6 +15,7 @@ import TaskForm from "@/components/form/tasks/TaskForm";
 import { Card } from "@/components/ui/card";
 import FormWrapper from "@/components/ui/formWrapper";
 import SwapRequestsDialog from "@/components/Tasks/swapRequestsDialog";
+import ExpensePageSkeleton from "@/components/skeleton/Expense/expensePageSkeleton";
 const RecurringTaskForm = lazy(
   () => import("@/components/form/tasks/RecurringTaskForm")
 );
@@ -82,12 +83,12 @@ const Tasks = () => {
   }, 0);
 
   // console.log(swapRequestCount);
-  if (roomQuery.isLoading) return <Spinner />;
+  if (roomQuery.isLoading) return <ExpensePageSkeleton />;
   if (roomQuery.isError) return <>Something went wrong. Please refresh.</>;
 
   return (
-    <div className="flex flex-col gap-6 w-full items-center ">
-      <div className="flex items-center justify-around w-full ">
+    <div className="flex flex-col sm:gap-6 w-full items-center gap-2">
+      <div className="flex items-center justify-around w-full">
         <h2 className="font-bold text-2xl">Tasks</h2>
         {/* icons */}
         <div className="flex gap-3">

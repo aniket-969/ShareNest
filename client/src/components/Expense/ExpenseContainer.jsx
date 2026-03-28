@@ -93,7 +93,7 @@ const ExpenseContainer = ({ participants }) => {
 
 if (isLoading) return <ExpensePageSkeleton navbar={false}/>
   return (
-    <div className="flex w-full items-center justify-center lg:gap-16 h-[38rem] gap-4 px-3 ">
+    <div className="flex w-full items-center justify-center lg:gap-16  gap-4 px-3 ">
       {/* Scrollable expense history */}
       <Card className="w-full max-w-[25rem] border-none py-6 ">
         <ScrollArea
