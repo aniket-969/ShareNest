@@ -13,13 +13,13 @@ const hasUserVoted = (poll, userId) => {
     option.votes.some((vote) => vote.voter.toString() === userId.toString())
   );
 };
- 
+
 const createPoll = asyncHandler(async (req, res) => {
   const { roomId } = req.params;
   const { title, voteEndTime, options } = req.body;
   const createdBy = req.user?._id;
 
-  const voteEndDate = new Date(voteEndTime); 
+  const voteEndDate = new Date(voteEndTime);
   const expireAt = new Date(voteEndDate.getTime() + 24 * 60 * 60 * 1000); // 1 day after voting ends
 
   const formattedOptions = options.map((text) => ({
@@ -41,12 +41,15 @@ const createPoll = asyncHandler(async (req, res) => {
     { $push: { polls: poll._id } },
     { new: true }
   );
-
+console.log("This is befrore upated",poll)
   if (!room) {
     await Poll.findByIdAndDelete(poll._id);
     return res.status(404).json(new ApiResponse(404, null, "Room not found"));
   }
-  const pollWithActor = { ...poll, actor: req.user?.fullName };
+  const pollWithActor = {
+    ...poll.toObject(),
+    actor: { fullName: req.user?.fullName, avatar: req.user?.avatar },
+  };
   emitSocketEvent(req, roomId, PollEventEnum.CREATE_POLL_EVENT, pollWithActor);
 
   return res.json(new ApiResponse(201, poll, "Poll created successfully"));

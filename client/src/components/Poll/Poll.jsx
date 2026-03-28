@@ -58,7 +58,6 @@ const Poll = ({ initialPolls }) => {
       resultCards.push(poll);
     } else {
       voteForms.push(poll);
-      resultCards.push(poll)
     }
   }
   // console.log(voteForms,resultCards)

@@ -19,7 +19,7 @@ export const NotificationProvider = ({ children }) => {
     const handleAny = (event, payload) => {
       let message = null;
       const actor = payload.actor || {};
-
+console.log("Socketnoti",payload)
       switch (event) {
         case "createdTask":
           message = `created a new task "${payload.title}"`;
