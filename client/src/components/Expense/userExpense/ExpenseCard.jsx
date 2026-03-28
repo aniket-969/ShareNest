@@ -58,7 +58,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   const someoneElsePaid = expense.participants?.some(
     (p) => p.hasPaid === true && String(p.id) !== String(paidBy.id)
   );
- 
+
   const canDelete = isCreator && !someoneElsePaid;
 
   const { updateExpenseMutation, deleteExpenseMutation } = useExpense(roomId);
@@ -71,7 +71,7 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
     setMenuOpen(false);
     setEditOpen(true);
   };
-  
+
   const handleSaveTitle = (newTitle) => {
     updateExpenseMutation.mutate(
       {
@@ -93,51 +93,52 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
     <Card className="rounded-xl w-[320px] bg-card-muted shadow-lg border-non">
       {/* ───── Card Header ───── */}
       <CardHeader className="px-7 text-center py-3 ">
-        <CardTitle
-          className={`text-base tracking-wide font-semibold text-gray-100 flex ${showActions ? "justify-between" : "justify-center"}`}
-        >
-          <p>{title}</p>
+        <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex items-start gap-3">
+          {/* LEFT: Title */}
+          <p className="flex-1 text-left break-words">{title}</p>
 
+          {/* RIGHT: Menu */}
           {showActions && (
-            <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-              <DropdownMenuTrigger>
-                <Ellipsis />
-              </DropdownMenuTrigger>
+            <div className="shrink-0">
+              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                <DropdownMenuTrigger>
+                  <Ellipsis />
+                </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="border-none">
-                {canDelete ? (
+                <DropdownMenuContent className="border-none">
+                  {canDelete ? (
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setMenuOpen(false);
+                        handleDelete();
+                      }}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="block cursor-not-allowed">
+                          <DropdownMenuItem disabled>Delete</DropdownMenuItem>
+                        </span>
+                      </TooltipTrigger>
+
+                      <TooltipContent>
+                        Can’t delete after someone has paid
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+
                   <DropdownMenuItem
                     onSelect={() => {
-                      setMenuOpen(false);
-                      handleDelete();
+                      handleEdit();
                     }}
                   >
-                    Delete
+                    Edit
                   </DropdownMenuItem>
-                ) : (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                     
-                      <span className="block cursor-not-allowed">
-                        <DropdownMenuItem disabled>Delete</DropdownMenuItem>
-                      </span>
-                    </TooltipTrigger>
-
-                    <TooltipContent>
-                      Can’t delete after someone has paid
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleEdit();
-                  }}
-                >
-                  Edit
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </CardTitle>
       </CardHeader>
