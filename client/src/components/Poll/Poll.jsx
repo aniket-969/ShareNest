@@ -58,6 +58,7 @@ const Poll = ({ initialPolls }) => {
       resultCards.push(poll);
     } else {
       voteForms.push(poll);
+      resultCards.push(poll)
     }
   }
   // console.log(voteForms,resultCards)
@@ -75,7 +76,7 @@ const Poll = ({ initialPolls }) => {
 
       {/*  voted results */}
       {resultCards.length > 0 && (
-        <div className="">
+        <div className="flex flex-col gap-3">
           {resultCards.map((poll) => (
             <PollResults poll={poll} key={poll._id} />
           ))}

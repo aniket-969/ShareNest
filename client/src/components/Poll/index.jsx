@@ -34,7 +34,7 @@ const PollCard = ({ initialPolls }) => {
         </FormWrapper>
       )}
 
-      <ScrollArea className="flex-1 pr-1">
+      <ScrollArea className="flex-1 py-2 px-4">
         <Poll initialPolls={initialPolls} />
       </ScrollArea>
     </div>

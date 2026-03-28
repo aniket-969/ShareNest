@@ -30,7 +30,7 @@ const PollVoteForm = ({ poll }) => {
   };
 
   return (
-    <div className="rounded-lg px-2 py-1 shadow">
+    <div className="rounded-lg py-1 shadow ">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 ">
           <FormField
@@ -39,7 +39,7 @@ const PollVoteForm = ({ poll }) => {
             render={({ field }) => (
               <FormItem className="">
                 {/* title */}
-                <FormLabel className="text-lg font-semibold text-foreground ">
+                <FormLabel className="text-md font-semibold text-foreground ">
                   {poll.title}
                 </FormLabel>
                 <FormControl className="">
