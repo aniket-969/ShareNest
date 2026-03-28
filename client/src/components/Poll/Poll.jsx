@@ -15,11 +15,11 @@ const Poll = ({ initialPolls }) => {
 
   useEffect(() => {
     const handleCreatePoll = (newPoll) => {
-      console.log(newPoll)
+      console.log(newPoll);
       setPolls((prevPoll) => [...prevPoll, newPoll]);
     };
     const handleCastVote = (updatedPoll) => {
-      console.log(updatedPoll)
+      console.log(updatedPoll);
       setPolls((prevPolls) =>
         prevPolls.map((poll) =>
           poll._id === updatedPoll.pollId
@@ -50,7 +50,7 @@ const Poll = ({ initialPolls }) => {
 
   const voteForms = [];
   const resultCards = [];
-
+  console.log(polls);
   for (const poll of polls) {
     const voteEnd = new Date(poll.voteEndTime);
     const hasVoted = poll.voters.includes(user._id);
@@ -62,10 +62,13 @@ const Poll = ({ initialPolls }) => {
       voteForms.push(poll);
     }
   }
+  voteForms.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   // console.log(voteForms,resultCards)
   if (voteForms.length == 0 && resultCards.length == 0) {
     return (
-      <p className="text-muted-foreground text-sm mt-8 text-center">Room has no polls.</p>
+      <p className="text-muted-foreground text-sm mt-8 text-center">
+        Room has no polls.
+      </p>
     );
   }
   return (
