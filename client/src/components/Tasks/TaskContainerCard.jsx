@@ -55,53 +55,56 @@ const TaskContainerCard = ({ task, userId, time }) => {
       <Card className="rounded-xl bg-card-muted shadow-lg border-non w-[300px] max-w-full mt-3 ">
         {/* ───── Card Header ───── */}
         <CardHeader className="px-6 text-center">
-          <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex justify-between">
-            <p>{task?.title}</p>
-            {/* due date */}
-            {isSingleTask && dueDate && (
-              <p className="text-xs pt-0.5">Due: {formatDueDate(dueDate)}</p>
-            )}
-            {showActions && (
-              <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                <DropdownMenuTrigger>
-                  <Ellipsis />
-                </DropdownMenuTrigger>
+          <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex justify-between items-start gap-3">
+            {/* LEFT: Title */}
+            <p className="flex-1 text-left break-words">{task?.title}</p>
 
-                <DropdownMenuContent className="border-none">
-                  {isCreator && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        handleDelete();
-                      }}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  )}
+            {/* RIGHT: Due + Menu */}
+            <div className="flex items-center gap-3 shrink-0">
+              {isSingleTask && dueDate && (
+                <span className="text-xs whitespace-nowrap">
+                  Due: {formatDueDate(dueDate)}
+                </span>
+              )}
 
-                  {isRecurringTask && isParticipant && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setMenuOpen(false);
-                        setOpenSwapModal(true);
-                      }}
-                    >
-                      Swap your Turn
-                    </DropdownMenuItem>
-                  )}
+              {showActions && (
+                <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                  <DropdownMenuTrigger>
+                    <Ellipsis />
+                  </DropdownMenuTrigger>
 
-                  {isRecurringTask && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setMenuOpen(false);
-                        setOpenTurnsModal(true);
-                      }}
-                    >
-                      View turns
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+                  <DropdownMenuContent className="border-none">
+                    {isCreator && (
+                      <DropdownMenuItem onSelect={handleDelete}>
+                        Delete
+                      </DropdownMenuItem>
+                    )}
+
+                    {isRecurringTask && isParticipant && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setMenuOpen(false);
+                          setOpenSwapModal(true);
+                        }}
+                      >
+                        Swap your Turn
+                      </DropdownMenuItem>
+                    )}
+
+                    {isRecurringTask && (
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setMenuOpen(false);
+                          setOpenTurnsModal(true);
+                        }}
+                      >
+                        View turns
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
 
