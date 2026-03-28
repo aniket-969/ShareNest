@@ -33,7 +33,7 @@ const Poll = ({ initialPolls }) => {
       );
     };
 
-    socket.on("createPoll", handleCreatePoll);
+    socket.on("createdPoll", handleCreatePoll);
     socket.on("castVote", handleCastVote);
 
     return () => {
