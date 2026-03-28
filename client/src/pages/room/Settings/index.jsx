@@ -18,15 +18,15 @@ const Settings = () => {
   if (isError || userError) return <div>Something went wrong</div>;
 console.log(user._id,roomData?.admin._id)
   return (
-    <div className="max-w-6xl mx-auto space-y-8 px-4 py-6">
-      <Card className="bg-[#121418] text-white shadow-md rounded-2xl border-none">
-        <CardContent className="py-6">
+    <div className="max-w-6xl mx-auto space-y-8 px-4 mb-4">
+      {/* <Card className="bg-[#121418] text-white shadow-md rounded-2xl border-none">
+        <CardContent className="py-6 ">
           <h2 className="text-xl font-semibold mb-4 text-white">Profile Settings</h2>
           <ProfileSettings refetch={userRefetch} user={user} />
         </CardContent>
       </Card>
 
-      <Separator className="my-4 bg-muted/40" />
+      <Separator className="my-4 bg-muted/40" /> */}
 
       <Card className="bg-[#121418] text-white shadow-md rounded-2xl border-none">
         <CardContent className="py-6">
