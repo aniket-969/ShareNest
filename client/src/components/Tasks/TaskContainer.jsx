@@ -33,7 +33,7 @@ const TaskContainer = ({ participants, tasks }) => {
   const [taskType, setTaskType] = useState("one-time");
 
   const scrollRef = useRef(null);
-console.log(tasks)
+  console.log(tasks);
   // Scroll to bottom on load / task change
   useEffect(() => {
     if (scrollRef.current) {
@@ -43,7 +43,7 @@ console.log(tasks)
 
   // Render oldest → newest
   const orderedTasks = [...tasks].reverse();
-
+console.log(orderedTasks)
   let lastRenderedDate = null;
 
   return (
@@ -52,33 +52,34 @@ console.log(tasks)
       <Card className="w-full max-w-[25rem] border-none p-5 ">
         <ScrollArea className="h-[32rem]">
           <Card className="flex flex-col items-center max-h-[90%] border-none rounded-none gap- ">
-            {orderedTasks.length>0?(
- orderedTasks.map((task) => {
-              const taskDate = formatDate(task.createdAt);
-              const showDate = taskDate !== lastRenderedDate;
-              lastRenderedDate = taskDate;
+            {orderedTasks.length > 0 ? (
+              orderedTasks.map((task) => {
+                const taskDate = formatDate(task.createdAt);
+                const showDate = taskDate !== lastRenderedDate;
+                lastRenderedDate = taskDate;
 
-              return (
-                <div key={task._id} className="flex flex-col items-center  ">
-                  {showDate && (
-                    <p className="text-center text-xs opacity-70 mt-2">
-                      {taskDate}
-                    </p>
-                  )}
+                return (
+                  <div key={task._id} className="flex flex-col items-center  ">
+                    {showDate && (
+                      <p className="text-center text-xs opacity-70 mt-2">
+                        {taskDate}
+                      </p>
+                    )}
 
-                  <TaskContainerCard
-                    userId={_id}
-                    task={task}
-                    time={formatTime(task.createdAt)}
-                  />
-                </div>
-              );
-            })
+                    <TaskContainerCard
+                      userId={_id}
+                      task={task}
+                      time={formatTime(task.createdAt)}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <p className="mt-8">No tasks to show</p>
+            )}
 
-            ):(<p className="mt-8">No tasks to show</p>)}
-           
             {/* Scroll anchor */}
-            <div ref={scrollRef} className=""/>
+            <div ref={scrollRef} className="" />
           </Card>
         </ScrollArea>
       </Card>

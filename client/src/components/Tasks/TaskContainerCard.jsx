@@ -38,7 +38,7 @@ const TaskContainerCard = ({ task, userId, time }) => {
   );
   const isRecurringTask = task?.recurrence?.enabled === true;
  
-  const showActions = isCreator || isParticipant;
+  const showActions = isCreator || isRecurringTask;
 
   const {
     deleteTaskMutation,
@@ -103,7 +103,8 @@ const TaskContainerCard = ({ task, userId, time }) => {
         </CardHeader>
 
         {/* ───── Card Content ───── */}
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-2 ">
+          {/* Group Avatar */}
           <div className="flex -space-x-2">
             {task.participants.map((participant) => (
               <Tooltip key={participant._id}>
@@ -131,7 +132,7 @@ const TaskContainerCard = ({ task, userId, time }) => {
         </CardContent>
 
         {/* ───── Card Footer ───── */}
-        <CardFooter className="flex justify-between items-center">
+        <CardFooter className="flex justify-between items-center ">
           <p className="text-xs">
             Created by:
             <Badge className="mx-2 font-normal border-white max-w-[100px] truncate " variant="outlined">
