@@ -15,7 +15,7 @@ export const ROOM_PLANS = {
       pro_monthly: {
         planId: "pro_monthly",
         label: "Monthly",
-        price: 49,
+        price: 99,
         paid: true,
         billingCycle: "monthly",
         maxMembers: 6,
@@ -24,7 +24,7 @@ export const ROOM_PLANS = {
       pro_yearly: {
         planId: "pro_yearly",
         label: "Yearly",
-        price: 499,
+        price: 999,
         paid: true,
         billingCycle: "yearly",
         maxMembers: 6,
@@ -49,7 +49,7 @@ export const ROOM_PLANS = {
       pro_monthly: {
         planId: "pro_monthly",
         label: "Monthly",
-        price: 4.99,
+        price: 2.49,
         paid: true,
         billingCycle: "monthly",
         maxMembers: 6,
@@ -58,7 +58,7 @@ export const ROOM_PLANS = {
       pro_yearly: {
         planId: "pro_yearly",
         label: "Yearly",
-        price: 49.99,
+        price: 24.99,
         paid: true,
         billingCycle: "yearly",
         maxMembers: 6,

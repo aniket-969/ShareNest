@@ -7,7 +7,7 @@ export function HeroSection() {
   const words = "" // Placeholder for animation
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
+    <section className="relative min-h-screen flex justify-center overflow-hidden items-center sm:pb-16 pb-8">
       {/* Animated gradient background */}
       <AnimatedGradientBg />
 
@@ -15,7 +15,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40" />
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-8 ">
           <TextGenerateEffect
             words={words}
             className="text-4xl md-6xl lg-7xl font-bold text-white leading-tight"
