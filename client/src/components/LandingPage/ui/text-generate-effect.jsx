@@ -39,7 +39,7 @@ export const TextGenerateEffect = ({
   return (
     <div className={cn("font-bold", className)}>
       <div className="text-white text-center">
-        <div className="block ">Shared living,</div>
+        <div className="block text-5xl">Shared living,</div>
         <div className="block mt-2">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">
             {displayText}

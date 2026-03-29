@@ -26,7 +26,7 @@ export function HeroSection() {
            Track chores, split bills, polls, chat instantly—all in one private space.
         </p>
 
-        <div className="flex flex-col sm-row gap-4 justify-center items-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button
             size="lg"
             className="bg-gradient-to-r from-pink-500 to-red-500 hover-pink-600 hover-red-600 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 transform hover-105 shadow-lg shadow-pink-500/25"
