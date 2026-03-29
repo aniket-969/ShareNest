@@ -31,7 +31,7 @@ export const TextGenerateEffect = ({
           setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length)
         }
       }
-    }, isDeleting )
+    }, isDeleting ? 50 : 100 )
 
     return () => clearTimeout(timeout)
   }, [displayText, isDeleting, currentWordIndex, rotatingWords])
@@ -39,7 +39,7 @@ export const TextGenerateEffect = ({
   return (
     <div className={cn("font-bold", className)}>
       <div className="text-white text-center">
-        <div className="block">Shared living,</div>
+        <div className="block ">Shared living,</div>
         <div className="block mt-2">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">
             {displayText}
