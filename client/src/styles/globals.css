@@ -28,65 +28,64 @@ select:-webkit-autofill:focus {
 
 @layer base {
   :root {
-  --radius: 0.5rem;
+    --radius: 0.5rem;
 
-  /* BASE */
-  --background: 0 0% 100%;
-  --foreground: 240 10% 4%;
+    /* BASE */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
 
-  /* CARD */
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 4%;
-  --card-muted: 0 0% 96%;
-  --card-border: 240 6% 90%;
+    /* CARD */
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --card-muted: 0 0% 96%;
+    --card-border: 240 6% 90%;
 
-  /* POPOVER */
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 4%;
+    /* POPOVER */
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
 
-  /* PRIMARY (pink identity) */
-  --primary: 345 95% 55%;
-  --primary-foreground: 0 0% 100%;
+    /* PRIMARY (pink identity) */
+    --primary: 345 95% 55%;
+    --primary-foreground: 0 0% 100%;
 
-  /* SECONDARY (cyan identity) */
-  --secondary: 178 70% 45%;
-  --secondary-foreground: 0 0% 100%;
+    /* SECONDARY (cyan identity) */
+    --secondary: 178 70% 45%;
+    --secondary-foreground: 0 0% 100%;
 
-  /* MUTED */
-  --muted: 240 6% 94%;
-  --muted-foreground: 240 5% 35%;
+    /* MUTED */
+    --muted: 240 6% 94%;
+    --muted-foreground: 240 5% 35%;
 
-  /* ACCENT */
-  --accent: 178 60% 90%;
-  --accent-foreground: 178 40% 20%;
+    /* ACCENT */
+    --accent: 178 60% 90%;
+    --accent-foreground: 178 40% 20%;
 
-  /* DESTRUCTIVE */
-  --destructive: 0 75% 55%;
-  --destructive-foreground: 0 0% 100%;
+    /* DESTRUCTIVE */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-  /* INPUTS / BORDERS */
-  --border: 240 6% 90%;
-  --input: 240 6% 94%;
-  --ring: 345 95% 55%;
+    /* INPUTS / BORDERS */
+    --border: 240 6% 90%;
+    --input: 240 6% 94%;
+    --ring: 345 95% 55%;
 
-  /* CHART */
-  --chart-1: 345 95% 55%;
-  --chart-2: 178 70% 45%;
-  --chart-3: 200 40% 45%;
-  --chart-4: 300 60% 60%;
-  --chart-5: 240 6% 20%;
+    /* CHART */
+    --chart-1: 345 95% 55%;
+    --chart-2: 178 70% 45%;
+    --chart-3: 200 40% 45%;
+    --chart-4: 300 60% 60%;
+    --chart-5: 240 6% 20%;
 
-  /* ---- SHADCN SIDEBAR (UNCHANGED LIGHT) ---- */
-  --sidebar-background: 0 0% 98%;
-  --sidebar-foreground: 240 5.3% 26.1%;
-  --sidebar-primary: 240 5.9% 10%;
-  --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 240 4.8% 95.9%;
-  --sidebar-accent-foreground: 240 5.9% 10%;
-  --sidebar-border: 220 13% 91%;
-  --sidebar-ring: 217.2 91.2% 59.8%;
-}
-
+    /* ---- SHADCN SIDEBAR (UNCHANGED LIGHT) ---- */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
 
   * {
     @apply border-border;
@@ -135,8 +134,8 @@ select:-webkit-autofill:focus {
     --chart-4: 345 99% 57%;
     --chart-5: 0 0% 2%;
 
-     /* --sidebar-background: 240 5.9% 10%; */
-     --sidebar-background: 0 0% 7%;
+    /* --sidebar-background: 240 5.9% 10%; */
+    --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -204,7 +203,17 @@ select:-webkit-autofill:focus {
     transform: rotate(360deg);
   }
 }
-
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(40px, -30px) scale(1.05);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
 .radial-swirl {
   position: absolute;
   inset: 0;
