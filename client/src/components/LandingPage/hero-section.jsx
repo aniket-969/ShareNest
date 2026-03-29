@@ -1,10 +1,10 @@
-
-import { Button } from "@/components/ui/button"
-import { TextGenerateEffect } from "./ui/text-generate-effect"
-import { AnimatedGradientBg } from "./ui/animated-gradient-bg"
+import { Button } from "@/components/ui/button";
+import { TextGenerateEffect } from "./ui/text-generate-effect";
+import { AnimatedGradientBg } from "./ui/animated-gradient-bg";
+import { Link } from "react-router-dom";
 
 export function HeroSection() {
-  const words = "" // Placeholder for animation
+  const words = ""; // Placeholder for animation
 
   return (
     <section className="relative min-h-screen flex justify-center overflow-hidden items-center sm:pb-16 pb-8">
@@ -23,25 +23,30 @@ export function HeroSection() {
         </div>
 
         <p className="text-lg md-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-           Track chores, split bills, real-time polls, chat instantly — all in one private space.
+          Track chores, split bills, real-time polls, chat instantly — all in
+          one private space.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-pink-500 to-red-500 hover-pink-600 hover-red-600 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 transform hover-105 shadow-lg shadow-pink-500/25"
-          >
-            Get Started for Free
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="border-2 border-blue-500 text-blue-400 hover-blue-500 hover-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 backdrop-blur-sm bg-transparent"
-          >
-            Video Demo
-          </Button>
+          <Link to="/register">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-pink-500 to-red-500 hover-pink-600 hover-red-600 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 transform hover-105 shadow-lg shadow-pink-500/25"
+            >
+              Get Started for Free
+            </Button>
+          </Link>
+          <Link to="/login">
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-2 border-blue-500 text-blue-400 hover-blue-500 hover-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 backdrop-blur-sm bg-transparent"
+            >
+              Video Demo
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
-  )
+  );
 }
