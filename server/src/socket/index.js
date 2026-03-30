@@ -45,7 +45,7 @@ const mountJoinRoomEvent = (socket) => {
   const io = socket.server;
 
   socket.on(RoomEventEnum.JOIN_ROOM_EVENT, (roomId) => {
-    console.log("about to start joining room",roomId)
+    console.log("about to start joining room", roomId);
     socket.join(roomId);
     socket.data.roomId = roomId;
 
@@ -74,13 +74,22 @@ const mountJoinRoomEvent = (socket) => {
       emitPresenceUpdate(io, roomId, roomMap);
     }
   });
+
+  socket.on("getOnlineUsers", (roomId) => {
+    const roomMap = roomPresence.get(roomId);
+
+    socket.emit(RoomEventEnum.ONLINE_USERS_UPDATED, {
+      users: roomMap ? Array.from(roomMap.keys()) : [],
+      count: roomMap ? roomMap.size : 0,
+    });
+  });
 };
 
 /**
  * Socket initialization
  */
 const initializeSocketIO = (io) => {
-  console.log("initializing socket conn")
+  console.log("initializing socket conn");
   return io.on("connection", async (socket) => {
     try {
       const token =
