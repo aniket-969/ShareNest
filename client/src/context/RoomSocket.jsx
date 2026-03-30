@@ -12,16 +12,17 @@ export const RoomSocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   const handleOnlineUsersUpdate = ({ users, count }) => {
-    // console.log("online member even triggered");
+    console.log("online member even triggered");
 
     setOnlineUsers(users);
   };
 
   const joinRoom = () => {
     socket.emit("joinRoom", roomId);
+    socket.emit("getOnlineUsers", roomId);
     // console.log("Emitting join room event", roomId);
   };
-  
+
   useEffect(() => {
     if (!roomId) return;
 
@@ -31,10 +32,8 @@ export const RoomSocketProvider = ({ children }) => {
     if (socket.connected) {
       // console.log("socket is connected so joining");
       joinRoom();
-    } else {
-      // console.log("Socket not connected so once triggered");
-      socket.once("connect", joinRoom);
     }
+    socket.emit("getOnlineUsers", roomId);
 
     return () => {
       socket.off("onlineUsersUpdated", handleOnlineUsersUpdate);
