@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import FormWrapper from "@/components/ui/formWrapper";
 import { updateRoomSchema } from "@/schema/roomSchema";
+import { Textarea } from "@/components/ui/textarea";
 
 const EditRoomDetailsModal = ({
   open,
@@ -37,9 +38,9 @@ const EditRoomDetailsModal = ({
     <FormWrapper onClose={onClose}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4 max-w-md mx-auto"
+        className="space-y-4 max-w-md mx-auto "
       >
-        <div>
+        <div className="space-y-1">
           <Label>Room Name</Label>
           <Input
             {...form.register("name")}
@@ -52,9 +53,9 @@ const EditRoomDetailsModal = ({
           )}
         </div>
 
-        <div>
+        <div className="space-y-1">
           <Label>Description</Label>
-          <Input
+          <Textarea
             {...form.register("description")}
             className="bg-[#121418] text-white"
           />
