@@ -28,7 +28,7 @@ export const RoomSocketProvider = ({ children }) => {
 
     //  listener added before joining to avoid race condition
     socket.on("onlineUsersUpdated", handleOnlineUsersUpdate);
-
+    socket.on("connect", joinRoom);
     if (socket.connected) {
       // console.log("socket is connected so joining");
       joinRoom();

@@ -64,14 +64,14 @@ const TaskForm = ({ participants }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2 pt-3 ">
         {/* Title */}
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              {/* <FormLabel>Title</FormLabel> */}
               <FormControl>
                 <Input placeholder="Task title" {...field} />
               </FormControl>
@@ -86,7 +86,7 @@ const TaskForm = ({ participants }) => {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              {/* <FormLabel>Description</FormLabel> */}
               <FormControl>
                 <Textarea
                   placeholder="Task description"

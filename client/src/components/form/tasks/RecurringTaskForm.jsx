@@ -83,14 +83,14 @@ const RecurringTaskForm = ({ participants }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-2 pt-3">
         {/* Title */}
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              {/* <FormLabel>Title</FormLabel> */}
               <FormControl>
                 <Input {...field} placeholder="Task title" />
               </FormControl>
@@ -105,7 +105,7 @@ const RecurringTaskForm = ({ participants }) => {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              {/* <FormLabel>Description</FormLabel> */}
               <FormControl>
                 <Textarea {...field} placeholder="Task description" />
               </FormControl>
