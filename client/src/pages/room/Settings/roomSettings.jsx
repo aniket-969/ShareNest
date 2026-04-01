@@ -15,7 +15,7 @@ const RoomSettings = ({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="flex flex-col items-start gap-12 ">
+    <div className="flex flex-col items-start sm:gap-12 gap-8">
       <RoomDetailsView
         room={room}
         isAdmin={isAdmin}
@@ -29,7 +29,7 @@ const RoomSettings = ({
         onClose={() => setIsEditing(false)}
         onSuccess={onRoomUpdate}
       />
-<div className="space-x-5 flex ">
+<div className="gap-3 flex sm:flex-row flex-col">
    <LeaveRoom roomId={roomId} />
 
       {isAdmin && <AdminTransfer roomId={roomId} participants={room.tenants} />}
