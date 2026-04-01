@@ -90,9 +90,9 @@ const ExpenseCard = ({ expense, userId, roomId }) => {
   // console.log(paidBy, userId);
   // console.log(expense)
   return (
-    <Card className="rounded-xl w-[320px] bg-card-muted shadow-lg border-non">
+    <Card className="rounded-xl w-[300px] bg-card-muted shadow-lg border-non ">
       {/* ───── Card Header ───── */}
-      <CardHeader className="px-7 text-center py-3 ">
+      <CardHeader className="px-7 text-center pb-2 pt-3">
         <CardTitle className="text-base tracking-wide font-semibold text-gray-100 flex items-start gap-3">
           {/* LEFT: Title */}
           <p className="flex-1 text-left break-words">{title}</p>
