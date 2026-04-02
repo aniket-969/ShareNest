@@ -87,7 +87,7 @@ const AppSidebar = () => {
   // console.log("sidebar rendered", onlineUsers);
 
   return (
-    <Sidebar>
+    <Sidebar className="">
       <SidebarContent className="">
         {/* Room Info */}
         <div className="p-4 border-b space-y-1 mt-1 ml-1">

@@ -16,16 +16,16 @@ export const RoomLayout = () => {
  
 
   return (
-    <SidebarProvider>
-      <div className="flex w-full overflow-y-hidden">
+    <SidebarProvider className="">
+      <div className="flex w-full overflow-y-hidden ">
         {/* DESKTOP SIDEBAR SLOT (≥1280px only) */}
 
         <Suspense fallback={<SidebarSkeleton />}>
           <AppSidebar />
         </Suspense>
 
-        <main className="flex-1 min-w-0 w-full">
-          <div className="xl:hidden p-2">
+        <main className="flex-1 min-w-0 w-full ">
+          <div className="xl:hidden sm:p-2 ">
             <SidebarTrigger />
           </div>
 

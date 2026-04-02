@@ -255,15 +255,15 @@ const SidebarTrigger = React.forwardRef(
         data-sidebar="trigger"
         variant="ghost"
         size="icon"
-        className={cn("h-7 w-7", className)}
+        className={cn("sm:h-7 sm:w-7", className)}
         onClick={(event) => {
           onClick?.(event);
           toggleSidebar();
         }}
         {...props}
       >
-        <PanelLeft />
-        <span className="sr-only">Toggle Sidebar</span>
+        <PanelLeft className=""/>
+        <span className="sr-only ">Toggle Sidebar</span>
       </Button>
     );
   }
@@ -317,7 +317,7 @@ const SidebarInput = React.forwardRef(({ className, ...props }, ref) => {
       ref={ref}
       data-sidebar="input"
       className={cn(
-        "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+        "h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring ",
         className
       )}
       {...props}
@@ -368,7 +368,7 @@ const SidebarContent = React.forwardRef(({ className, ...props }, ref) => {
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden ",
         className
       )}
       {...props}
@@ -382,7 +382,7 @@ const SidebarGroup = React.forwardRef(({ className, ...props }, ref) => {
     <div
       ref={ref}
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn("relative flex w-full min-w-0 flex-col p-2 ", className)}
       {...props}
     />
   );
