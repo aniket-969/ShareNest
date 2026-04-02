@@ -10,49 +10,82 @@ let isRefreshing = false;
 let refreshSubscribers = [];
 
 const onTokenRefreshed = (newToken) => {
-  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers.forEach(({ resolve }) => resolve(newToken));
   refreshSubscribers = [];
 };
 
-const addRefreshSubscriber = (cb) => {
-  refreshSubscribers.push(cb);
+const onRefreshFailed = (error) => {
+  refreshSubscribers.forEach(({ reject }) => reject(error));
+  refreshSubscribers = [];
+};
+
+const addRefreshSubscriber = (subscriber) => {
+  refreshSubscribers.push(subscriber);
 };
 
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const { response, config } = error;
-    const expired =
-      response?.status === 401 &&
-      response.data?.message?.toLowerCase().includes("expired");
-    const currentPath = window.location.pathname;
 
+    const message = response?.data?.message?.toLowerCase() || "";
+    const status = response?.status;
+
+    const currentPath = window.location.pathname;
     const isPublicPage = ["/login", "/register"].includes(currentPath);
-    if (!expired) {
-      localStorage.clear()
+
+    const isRefreshRequest = config?.url?.includes("/users/refreshTokens");
+
+    const isAccessExpired =
+      status === 401 && message.includes("expired");
+
+    // refresh token request fails 
+    if (isRefreshRequest) {
+      localStorage.clear();
       return Promise.reject(error);
     }
 
-    //  return a promise that will retry this request
-    const retryRequest = new Promise((resolve) => {
-      addRefreshSubscriber((token) => {
-        config.headers["Authorization"] = `Bearer ${token}`;
-        resolve(axiosClient(config));
+    // normal error
+    if (!isAccessExpired) {
+      localStorage.clear();
+      return Promise.reject(error);
+    }
+
+    // Prevent infinite retry loop
+    if (config._retry) {
+      return Promise.reject(error);
+    }
+    config._retry = true;
+
+    const retryRequest = new Promise((resolve, reject) => {
+      addRefreshSubscriber({
+        resolve: (token) => {
+          config.headers["Authorization"] = `Bearer ${token}`;
+          resolve(axiosClient(config));
+        },
+        reject,
       });
     });
 
-    
+    // Trigger refresh ONLY once
     if (!isRefreshing) {
       isRefreshing = true;
+
       axiosClient
         .post("/users/refreshTokens")
         .then(({ data }) => {
           const newToken = data.data.accessToken;
           onTokenRefreshed(newToken);
         })
-        .catch(() => {
+        .catch((err) => {
+         
+          onRefreshFailed(err);
+
           localStorage.clear();
-          if (!isPublicPage) window.location.href = "/login";
+
+          if (!isPublicPage) {
+            window.location.href = "/login";
+          }
         })
         .finally(() => {
           isRefreshing = false;
