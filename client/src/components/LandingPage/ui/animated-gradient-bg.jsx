@@ -10,7 +10,7 @@ export const AnimatedGradientBg = ({ className }) => {
         {/* Top-left glow */}
         <div
           className="absolute top-1/4 left-1/4 w-96 h-96 
-bg-gradient-to-r from-pink-500/30 to-purple-500/30 
+bg-gradient-to-r from-pink-500/40 to-purple-500/30 
 rounded-full blur-3xl 
 animate-[glow_8s_ease-in-out_infinite]"
         />
@@ -23,7 +23,7 @@ animate-[glow_8s_ease-in-out_infinite]"
           className="absolute top-1/2 left-[60%] 
   -translate-x-1/2 -translate-y-1/2 
   w-[500px] h-[300px] 
-  bg-gradient-to-r from-red-500/30 to-pink-500/30 
+  bg-gradient-to-r from-red-500/30 to-pink-500/40 
   rounded-full blur-3xl 
   animate-[glow_10s_ease-in-out_infinite]"
         />
