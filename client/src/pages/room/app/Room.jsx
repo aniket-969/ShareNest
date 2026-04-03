@@ -38,12 +38,12 @@ const Room = () => {
   return (
     <div className="">
       <RoomHeader user={user} refetch={refetch} />
-      <div className="flex items-center pt-12 md:pt-16 ">
-        <div className="flex flex-col md:flex-row items-center justify-evenly w-full md:gap-0 gap-12 ">
+      <div className="flex items-center pt-12 bs:pt-16 ">
+        <div className="flex flex-col bs:flex-row items-center justify-evenly w-full bs:gap-0 gap-12">
           {/* room list and profile container */}
-          <div className="md:space-y-20">
+          <div className="bs:space-y-20">
             {/* profile and edit btn */}
-            <div className="md:block hidden ml-10 ">
+            <div className="bs:block hidden ml-10 ">
               <ProfileSettingsView onEdit={() => setIsEditing(true)} />
               <EditProfileModal
                 open={isEditing}
@@ -55,6 +55,7 @@ const Room = () => {
             {/* room list */}
             <RoomList />
           </div>
+          {/* QR */}
           <QRCode />
         </div>
 

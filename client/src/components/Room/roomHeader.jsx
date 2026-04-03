@@ -33,8 +33,8 @@ export const RoomHeader = ({ user, refetch }) => {
 bg-zinc-900/80 border-b border-zinc-800 "
     >
       {/* Leftmost Title: Dashboard */}
-      <h3 className="font-semibold text-lg hidden md:block"> Dashboard</h3>
-      <div className="block md:hidden">
+      <h3 className="font-semibold text-lg hidden bs:block"> Dashboard</h3>
+      <div className="block bs:hidden">
         <TopbarProfileAvatar data={user} onEdit={() => setIsEditOpen(true)} />
 
         <EditProfileModal
