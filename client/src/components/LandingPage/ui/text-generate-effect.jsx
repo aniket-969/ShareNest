@@ -39,9 +39,9 @@ export const TextGenerateEffect = ({
   return (
     <div className={cn("font-bold", className)}>
       <div className="text-white text-center">
-        <div className=" text-5xl lg:text-6xl">Shared living,</div>
+        <div className="text-4xl sm:text-5xl bs:text-6xl">Shared living,</div>
         <div className=" mt-2 ">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500 text-3xl sm:text-4xl bs:text-5xl">
             {displayText}
           </span>
           <span className="animate-pulse text-pink-500">|</span>

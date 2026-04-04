@@ -22,7 +22,7 @@ export function HeroSection() {
           />
         </div>
 
-        <p className="text-lg md-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed sm:px-0 px-5">
           Track chores, split bills, real-time polls, chat instantly — all in
           one private space.
         </p>
@@ -31,7 +31,7 @@ export function HeroSection() {
           <Link to="/register">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-pink-500 to-red-500 hover-pink-600 hover-red-600 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 transform hover-105 shadow-lg shadow-pink-500/25"
+              className="bg-gradient-to-r from-pink-500 to-red-500 hover-pink-600 hover-red-600 text-white px-8 py-3 text-md sm:text-lg font-semibold rounded-lg transition-all duration-300 transform hover-105 shadow-lg shadow-pink-500/25"
             >
               Get Started for Free
             </Button>
@@ -40,7 +40,7 @@ export function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="border-2 border-blue-500 text-blue-400 hover-blue-500 hover-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 backdrop-blur-sm bg-transparent"
+              className="border-2 border-blue-500 text-blue-400 hover-blue-500 hover-white px-8 py-3 text-md sm:text-lg font-semibold rounded-lg transition-all duration-300 backdrop-blur-sm bg-transparent"
             >
               Video Demo
             </Button>
