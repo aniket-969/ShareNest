@@ -164,7 +164,8 @@ select:-webkit-autofill:focus {
   z-index: 20;
 } */
 
-.notification {
+/* Original */
+/* .notification {
   position: absolute;
   width: 38px;
   height: 30px;
@@ -172,6 +173,50 @@ select:-webkit-autofill:focus {
   right: 0.8rem;
   top: 0.8rem;
   z-index: 20;
+} */
+ .notification {
+  position: absolute;
+  width: 38px;
+  height: 30px;
+  transform: translate(10%, -35%);
+  right: 0.8rem;
+  top: 0.8rem;
+  z-index: 20;
+}
+
+@media (max-width: 440px) {
+  .notification {
+   right:0.6rem
+  }
+}
+@media (max-width: 420px) {
+  .notification {
+   right:0.5rem
+  }
+}
+
+@media (max-width: 400px) {
+  .notification {
+    width: 32px;
+    height: 32px;
+    right: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .notification {
+    width: 32px;
+    height: 32px;
+    right: 0.4rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .notification {
+    width: 32px;
+    height: 32px;
+    right: 0.3rem;
+  }
 }
 
 .bb {
