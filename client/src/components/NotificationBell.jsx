@@ -24,7 +24,7 @@ const NotificationBell = () => {
     if (!open) markAllSeen();
     setOpen((o) => !o);
   };
-
+ 
   return (
     <div className="notification rounded-3xl flex justify-center items-center hover:bg-muted/30 transition-colors bg-card ">
       <div className="relative ">
